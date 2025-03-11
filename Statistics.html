@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG SWIFT SYSTEM-Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            direction: rtl;
+            text-align: center;
+            background: url('background2.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        h2 {
+            color: black;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-range {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .date-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .date-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            color: black;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin-top: 15px;
+            background: #27ae60;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            margin: 0 5px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        select, input[type="date"] {
+            padding: 12px;
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #357abd;
+            font-size: 16px;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-message {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            font-size: 22px;
+            color: #333;
+            text-align: center;
+            width: 70%;
+            max-width: 400px;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            border: 3px solid #4a90e2;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3); }
+            100% { transform: scale(1); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); }
+        }
+
+        #chartContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #statisticsChart {
+            max-width: 100%;
+            height: 400px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableTransactions, #printableTransactions * { visibility: visible; }
+            #printableStatistics, #printableStatistics * { visibility: hidden; }
+            #chartContainer.printing, #chartContainer.printing * { visibility: visible; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-message">
+            <p>يرجى الانتظار لحين جلب التفاصيل...</p>
+        </div>
+    </div>
+
+    <div class="container" id="content" style="visibility: hidden;">
+        <img src="KG_SWIFT.png" alt="KG SWIFT" class="logo" style="max-width: 120px; height: auto; margin-bottom: 20px;">
+        <h2>KG SWIFT SYSTEM</h2>
+        <p style="margin-bottom: 25px; font-size: 24px; color: black;">نظام تحويل المعاملات</p>
+
+        <div class="date-range">
+            <div class="date-group">
+                <label for="startDate">من تاريخ:</label>
+                <input type="date" id="startDate" onchange="filterTransactions()">
+            </div>
+            <div class="date-group">
+                <label for="endDate">إلى تاريخ:</label>
+                <input type="date" id="endDate" onchange="filterTransactions()">
+            </div>
+        </div>
+
+        <select id="engineer" onchange="filterTransactions()">
+            <option value="">جميع المهندسين</option>     
+            <option value="سالم عيسى العامري">المهندس سالم عيسى العامري</option>
+            <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+            <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+            <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+            <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+            <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+            <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+            <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+            <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+            <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+            <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+            <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+            <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+            <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+            <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+            <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+            <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+            <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+            <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+            <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+            <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+            <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+            <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+            <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+            <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+        </select>
+
+        <div class="button-container">
+            <button onclick="exportTransactionsToExcel()">تصدير المعاملات إلى Excel</button>
+            <button onclick="printTransactionsTable()">طباعة جدول المعاملات</button>
+            <button onclick="goToHomePage()">الانتقال إلى الصفحة الرئيسية</button>
+            <button onclick="toggleStatistics()">عرض الإحصائيات</button>
+            <button onclick="toggleChartView()" id="chartViewButton">عرض الإحصاء البياني</button>
+            <button onclick="exportChartToExcel()" id="exportChartButton" style="display: none;">تصدير الإحصاء إلى Excel</button>
+            <button onclick="printStatistics()" id="printChartButton" style="display: none;">طباعة الإحصاء البياني</button>
+        </div>
+
+        <div id="printableTransactions">
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>رقم المعاملة</th>
+                        <th>اسم المهندس</th>
+                        <th>نوع المعاملة</th>
+                        <th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="statisticsSection" style="display: none;">
+            <h2>إحصائيات إضافية</h2>
+            <div id="printableStatistics">
+                <table id="statisticsTable">
+                    <thead>
+                        <tr>
+                            <th>اسم المهندس</th>
+                            <th>عدد المعاملات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="chartContainer">
+            <h2>الإحصاء البياني للمعاملات</h2>
+            <canvas id="statisticsChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let myChart = null;
+        let showingChart = false;
+
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('content').style.visibility = 'visible';
+                initializeDatabase();
+            }, 3000);
+        };
+
+        let db;
+
+        function initializeDatabase() {
+            const request = indexedDB.open("TransactionsDB", 2);
+
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains("transactions")) {
+                    db.createObjectStore("transactions", { keyPath: "id" });
+                }
+                if (!db.objectStoreNames.contains("users")) {
+                    db.createObjectStore("users", { keyPath: "username" });
+                }
+            };
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                loadData();
+            };
+
+            request.onerror = function(event) {
+                console.error("خطأ في فتح قاعدة البيانات:", event.target.error);
+                alert("حدث خطأ في فتح قاعدة البيانات!");
+            };
+        }
+
+        function loadData() {
+            displayTransactions();
+            displayStatistics();
+        }
+
+        function filterTransactions() {
+            const selectedEngineer = document.getElementById('engineer').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية!");
+                return;
+            }
+
+            displayTransactions(selectedEngineer, startDate, endDate);
+            displayStatistics(selectedEngineer, startDate, endDate);
+
+            if (showingChart) {
+                updateChart(selectedEngineer, startDate, endDate);
+            }
+        }
+
+        function displayTransactions(engineer = '', startDate = '', endDate = '') {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                const filteredTransactions = transactions.filter(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    return (
+                        (!engineer || transaction.engineer === engineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    );
+                });
+
+                if (filteredTransactions.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                    return;
+                }
+
+                filteredTransactions.forEach(transaction => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${transaction.id}</td>
+                        <td>${transaction.engineer}</td>
+                        <td>${transaction.type}</td>
+                        <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+                    `;
+                });
+            };
+        }
+
+        function displayStatistics(engineer = '', startDate = '', endDate = '') {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const statistics = {};
+
+                transactions.forEach(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    if (
+                        (!engineer || transaction.engineer === engineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    ) {
+                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+                    }
+                });
+
+                const statsTableBody = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
+                statsTableBody.innerHTML = '';
+
+                for (const engineer in statistics) {
+                    const row = statsTableBody.insertRow();
+                    row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
+                }
+            };
+        }
+
+        function updateChart(engineer = '', startDate = '', endDate = '') {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const statistics = {};
+
+                transactions.forEach(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    if (
+                        (!engineer || transaction.engineer === engineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    ) {
+                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+                    }
+                });
+
+                const engineers = Object.keys(statistics);
+                const transactionCounts = engineers.map(name => statistics[name]);
+                const colors = engineers.map((_, index) => `hsl(${index * 15}, 70%, 50%)`);
+
+                if (engineers.length === 0) {
+                    console.log("لا توجد بيانات لعرضها في الرسم البياني.");
+                    const chartContainer = document.getElementById('chartContainer');
+                    chartContainer.innerHTML = '<h2>الإحصاء البياني للمعاملات</h2><p>لا توجد بيانات كافية لعرض الرسم البياني.</p>';
+                    return;
+                }
+
+                if (myChart !== null) {
+                    myChart.destroy();
+                }
+
+                const ctx = document.getElementById('statisticsChart').getContext('2d');
+                if (!ctx) {
+                    console.error("لم يتم العثور على عنصر canvas!");
+                    return;
+                }
+
+                myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: engineers,
+                        datasets: [{
+                            label: "عدد المعاملات",
+                            data: transactionCounts,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'عدد المعاملات',
+                                    color: '#333',
+                                    font: { weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#333',
+                                    font: { weight: 'bold' }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'إحصائيات المعاملات حسب المهندس',
+                                font: { size: 18, weight: 'bold' }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            };
+
+            request.onerror = function(event) {
+                console.error("خطأ في جلب البيانات:", event.target.error);
+            };
+        }
+
+        function toggleStatistics() {
+            const statsSection = document.getElementById('statisticsSection');
+            if (statsSection.style.display === 'none' || statsSection.style.display === '') {
+                statsSection.style.display = 'block';
+            } else {
+                statsSection.style.display = 'none';
+            }
+        }
+
+        function toggleChartView() {
+            const chartContainer = document.getElementById('chartContainer');
+            const printChartButton = document.getElementById('printChartButton');
+            const exportChartButton = document.getElementById('exportChartButton');
+
+            if (chartContainer.style.display === 'none' || chartContainer.style.display === '') {
+                chartContainer.style.display = 'block';
+                printChartButton.style.display = 'inline-block';
+                exportChartButton.style.display = 'inline-block';
+                showingChart = true;
+
+                const selectedEngineer = document.getElementById('engineer').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                updateChart(selectedEngineer, startDate, endDate);
+            } else {
+                chartContainer.style.display = 'none';
+                printChartButton.style.display = 'none';
+                exportChartButton.style.display = 'none';
+                showingChart = false;
+                if (myChart !== null) {
+                    myChart.destroy();
+                    myChart = null;
+                }
+            }
+        }
+
+        function exportToCSV(data, filename) {
+            const csvRows = [];
+            data.forEach(row => {
+                const values = Object.values(row).map(value => `"${value}"`); // وضع القيم بين علامات اقتباس للتعامل مع الفواصل
+                csvRows.push(values.join(','));
+            });
+            const csvString = csvRows.join('\n');
+            const bom = '\uFEFF'; // إضافة BOM لدعم اللغة العربية في Excel
+            const blob = new Blob([bom + csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        function exportTransactionsToExcel() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const selectedEngineer = document.getElementById('engineer').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const filteredTransactions = transactions.filter(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    return (
+                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    );
+                });
+
+                if (filteredTransactions.length === 0) {
+                    alert("لا توجد بيانات لتصديرها!");
+                    return;
+                }
+
+                const csvData = [
+                    ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'], // رأس الجدول
+                    ...filteredTransactions.map(t => [
+                        t.id,
+                        t.engineer,
+                        t.type,
+                        new Date(t.date).toLocaleDateString('ar-EG')
+                    ])
+                ];
+
+                exportToCSV(csvData, 'Transactions_Export.csv');
+            };
+        }
+
+        function exportChartToExcel() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const selectedEngineer = document.getElementById('engineer').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const statistics = {};
+                transactions.forEach(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    if (
+                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    ) {
+                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+                    }
+                });
+
+                const engineers = Object.keys(statistics);
+                if (engineers.length === 0) {
+                    alert("لا توجد بيانات لتصديرها!");
+                    return;
+                }
+
+                const csvData = [
+                    ['اسم المهندس', 'عدد المعاملات'], // رأس الجدول
+                    ...engineers.map(engineer => [engineer, statistics[engineer]])
+                ];
+
+                exportToCSV(csvData, 'Statistics_Export.csv');
+            };
+        }
+
+        function printTransactionsTable() {
+            window.print();
+        }
+
+        function printStatistics() {
+            const chartContainer = document.getElementById('chartContainer');
+            chartContainer.classList.add('printing');
+
+            const originalVisibility = {};
+            const transactionsTable = document.getElementById('printableTransactions');
+            originalVisibility.transactions = transactionsTable.style.display;
+            transactionsTable.style.display = 'none';
+
+            const statsTable = document.getElementById('statisticsSection');
+            originalVisibility.stats = statsTable.style.display;
+            statsTable.style.display = 'none';
+
+            window.print();
+
+            transactionsTable.style.display = originalVisibility.transactions;
+            statsTable.style.display = originalVisibility.stats;
+            chartContainer.classList.remove('printing');
+        }
+
+        function goToHomePage() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
