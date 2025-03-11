@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG SWIFT SYSTEM-Transactions</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            direction: rtl;
+            text-align: center;
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        #welcome {
+            background-color: rgba(255, 255, 255, 0.6);
+            color: black;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            color: #2c3e50;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h2, h3, h4 {
+            color: black;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .total-transactions {
+            font-size: 24px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        select, button, input {
+            padding: 10px;
+            margin: 15px auto;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            background: white;
+            color: black;
+            width: 70%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px 15px;
+            width: 70%;
+        }
+
+        button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 10px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 2px solid #4a90e2;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+        }
+
+        #statistics-container {
+            margin-top: 20px;
+        }
+
+        .date-range-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .date-input-group label {
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .password-container {
+            position: relative;
+            width: 70%;
+            margin: 15px auto;
+        }
+
+        #password {
+            width: 100%; /* جعل حقل كلمة المرور يملأ كامل عرض الحاوية */
+            box-sizing: border-box; /* التأكد من أن الحشوة والحدود لا تزيد العرض */
+        }
+
+        .password-toggle {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto;
+            padding: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableContent * {
+                visibility: visible;
+            }
+            #printableContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+
+        .transactions-list table {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .transactions-list th {
+            padding: 12px;
+            background: #4a90e2;
+            color: white;
+        }
+
+        .transactions-list td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="login-container">
+        <img src="KG_SWIFT.png" alt="الشعار" class="logo">
+        <h2>تسجيل الدخول</h2>
+        <div class="login-form">
+            <input type="text" id="username" placeholder="اسم المستخدم" required onkeypress="handleKeyPress(event)">
+            <div class="password-container">
+                <input type="password" id="password" placeholder="كلمة المرور" required onkeypress="handleKeyPress(event)">
+                <button type="button" class="password-toggle" onclick="togglePassword()"></button>
+            </div>
+            <button class="login-btn" onclick="checkCredentials()">دخول</button>
+            <button class="login-btn" onclick="goToHomePage()">العودة الى الصفحة الرئيسية</button>
+        </div>
+    </div>
+
+    <div class="hidden" id="welcome">
+        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
+        <h2>KG SWIFT SYSTEM</h2>
+        <h2>نظام إدارة المعاملات</h2>
+    </div>
+
+    <div class="container hidden" id="main-container">
+        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
+        <h2>KG SWIFT SYSTEM</h2>
+        <p style="margin-bottom: 25px; font-size: 24px;">نظام تحويل المعاملات</p>
+
+        <input type="text" id="transactionId" placeholder="رقم المعاملة" required>
+        <select id="engineer">
+            <option value="">اختيار المهندس</option>
+            <option value="سالم عيسى العامري">المهندس سالم عيسى العامري</option>
+            <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+            <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+            <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+            <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+            <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+            <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+            <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+            <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+            <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+            <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+            <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+            <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+            <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+            <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+            <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+            <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+            <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+            <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+            <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+            <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+            <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+            <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+            <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+            <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+        </select>
+        <select id="transactionType">
+            <option value="">نوع الطلب</option>
+            <option value="حديقة عامة">حديقة عامة</option>
+            <option value="أبراج اتصالات">أبراج اتصالات</option>
+            <option value="ملعب">ملعب</option>
+            <option value="سياحي سكني">سياحي سكني</option>
+            <option value="تجاري سكني">تجاري سكني</option>
+            <option value="موافقة فنية سكنية">موافقة فنية سكنية</option>
+            <option value="موافقة فنية تجارية">موافقة فنية تجارية</option>
+            <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
+            <option value="صناعي">صناعي</option>
+            <option value="مسجد">مسجد</option>
+            <option value="سكني تجاري">سكني تجاري</option>
+            <option value="كنيسة">كنيسة</option>
+        </select>
+
+        <input type="text" id="search" placeholder="بحث عن المعاملات" oninput="searchTransactions()">
+        
+        <div class="button-container">
+            <button onclick="addTransaction()">إضافة المعاملة</button>
+            <button onclick="clearFields()">تفريغ الحقول</button>
+            <button onclick="deleteTransaction()">حذف الطلب</button>
+            <button onclick="editTransaction()">تحديث الطلب</button>
+            <button onclick="toggleStatistics()">عرض الإحصائيات</button>
+            <button onclick="logout()">تسجيل الخروج</button>
+        </div>
+
+        <div class="transactions-list" id="transactionsList"></div>
+    </div>
+
+    <div class="container hidden" id="statistics-container">
+        <img src="images/KG_SWIFT.png" alt="شعار الشركة" class="logo">
+        <h2>إحصائيات المعاملات</h2>
+        
+        <div class="total-transactions" id="totalTransactions">إجمالي عدد المعاملات: 0</div>
+
+        <div class="date-range-container">
+            <div class="date-input-group">
+                <label for="startDate">من تاريخ:</label>
+                <input type="date" id="startDate" onchange="filterTransactions()">
+            </div>
+            <div class="date-input-group">
+                <label for="endDate">إلى تاريخ:</label>
+                <input type="date" id="endDate" onchange="filterTransactions()">
+            </div>
+        </div>
+
+        <select id="engineerFilter" onchange="filterTransactions()">
+            <option value="">جميع المهندسين</option>
+        </select>
+
+        <div class="button-container">
+            <button onclick="printReport()">طباعة التقرير</button>
+            <button onclick="toggleStatistics()">العودة للصفحة الرئيسية</button>
+        </div>
+
+        <div id="printableContent">
+            <div id="transactionsStats">
+                <h3>جدول المعاملات</h3>
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>رقم المعاملة</th>
+                            <th>اسم المهندس</th>
+                            <th>نوع المعاملة</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="engineerStats">
+                <h3>إحصائيات المهندسين</h3>
+                <table id="statisticsTable">
+                    <thead>
+                        <tr>
+                            <th>اسم المهندس</th>
+                            <th>عدد المعاملات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transactions = [];
+        let db;
+
+        const request = indexedDB.open("TransactionsDB", 2);
+
+        request.onupgradeneeded = event => {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains("transactions")) {
+                db.createObjectStore("transactions", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("users")) {
+                const userStore = db.createObjectStore("users", { keyPath: "username" });
+                const defaultUsers = [
+                    { username: "admin", password: "ghazaloman123", isAdmin: true },
+                    { username: "11221", password: "B@11221", isAdmin: false },
+                    { username: "11731", password: "M@11731", isAdmin: false },
+                    { username: "11220", password: "A@11220", isAdmin: false },
+                    { username: "9684", password: "A@9684", isAdmin: false }
+                ];
+                defaultUsers.forEach(user => userStore.add(user));
+            }
+        };
+
+        request.onsuccess = event => {
+            db = event.target.result;
+            loadTransactionsFromDB();
+        };
+
+        function logout() {
+            const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
+            if (confirmation) {
+                transactions = [];
+                document.getElementById("main-container").classList.add("hidden");
+                document.getElementById("login-container").classList.remove("hidden");
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        }
+
+        function checkCredentials() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            const request = store.get(username);
+
+            request.onsuccess = function(e) {
+                const user = e.target.result;
+                if (user && user.password === password) {
+                    document.getElementById("login-container").classList.add("hidden");
+                    document.getElementById("welcome").classList.remove("hidden");
+
+                    setTimeout(() => {
+                        document.getElementById("welcome").classList.add("hidden");
+                        document.getElementById("main-container").classList.remove("hidden");
+                    }, 5000);
+                } else {
+                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+                }
+            };
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                checkCredentials();
+            }
+        }
+
+        function goToHomePage() {
+            window.location.href = "index.html";
+        }
+
+        function toggleStatistics() {
+            const mainContainer = document.getElementById("main-container");
+            const statsContainer = document.getElementById("statistics-container");
+
+            if (mainContainer.classList.contains("hidden")) {
+                statsContainer.classList.add("hidden");
+                mainContainer.classList.remove("hidden");
+            } else {
+                mainContainer.classList.add("hidden");
+                statsContainer.classList.remove("hidden");
+                displayStatisticsTransactions(transactions);
+                displayStatistics(transactions);
+            }
+        }
+
+        function addTransaction() {
+            const engineer = document.getElementById('engineer').value;
+            const transactionId = document.getElementById('transactionId').value;
+            const transactionType = document.getElementById('transactionType').value;
+
+            if (!engineer || !transactionId || !transactionType) {
+                alert("⚠️ الرجاء ملء جميع الحقول.");
+                return;
+            }
+
+            const transaction = {
+                id: transactionId,
+                engineer,
+                type: transactionType,
+                date: new Date().toISOString(),
+                createdAt: new Date().getTime() // إضافة تاريخ الإنشاء
+            };
+
+            saveTransactionToDB(transaction);
+            transactions.push(transaction);
+            updateTransactionList();
+            updateTotalTransactions();
+            alert("✅ تمت إضافة المعاملة بنجاح!");
+            clearFields();
+        }
+
+        function saveTransactionToDB(transaction) {
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+            store.put(transaction);
+        }
+
+        function loadTransactionsFromDB() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = event => {
+                transactions = event.target.result;
+                updateTransactionList();
+                updateTotalTransactions();
+                populateEngineerSelect();
+            };
+        }
+
+        function filterRecentTransactions(transactionsToFilter) {
+            const now = new Date().getTime();
+            const twelveHoursInMs = 12 * 60 * 60 * 1000; // 12 ساعة بدلاً من 24 ساعة
+            return transactionsToFilter.filter(transaction => {
+                const age = now - transaction.createdAt;
+                return age <= twelveHoursInMs; // عرض المعاملات التي لم تتجاوز 12 ساعة فقط
+            });
+        }
+
+        function updateTransactionList() {
+            const recentTransactions = filterRecentTransactions(transactions);
+            displayTransactions(recentTransactions);
+        }
+
+        function updateTotalTransactions() {
+            const recentTransactions = filterRecentTransactions(transactions);
+            const totalTransactionsElement = document.getElementById('totalTransactions');
+            totalTransactionsElement.innerText = `إجمالي عدد المعاملات: ${recentTransactions.length}`;
+        }
+
+        function displayTransactions(transactionsToDisplay) {
+            const recentTransactions = filterRecentTransactions(transactionsToDisplay);
+            const transactionsList = document.getElementById("transactionsList");
+            transactionsList.innerHTML = '';
+
+            if (recentTransactions.length === 0) {
+                transactionsList.innerHTML = '<p>لا توجد معاملات لعرضها.</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            const headerRow = document.createElement('tr');
+            ['رقم المعاملة', 'اسم المهندس', 'نوع الطلب', 'تاريخ الإضافة'].forEach(text => {
+                const th = document.createElement('th');
+                th.textContent = text;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            recentTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                [transaction.id, transaction.engineer, transaction.type, new Date(transaction.date).toLocaleString('ar-EG')].forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+            transactionsList.appendChild(table);
+        }
+
+        function displayStatisticsTransactions(transactionsToDisplay) {
+            const recentTransactions = filterRecentTransactions(transactionsToDisplay);
+            const statsTable = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            statsTable.innerHTML = '';
+
+            recentTransactions.forEach(transaction => {
+                const row = statsTable.insertRow();
+                row.insertCell(0).innerText = transaction.id;
+                row.insertCell(1).innerText = transaction.engineer;
+                row.insertCell(2).innerText = transaction.type;
+                row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
+            });
+        }
+
+        function filterTransactions() {
+            const selectedEngineer = document.getElementById('engineerFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            const filteredTransactions = transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const matchesEngineer = selectedEngineer ? transaction.engineer === selectedEngineer : true;
+                
+                let matchesDate = true;
+                if (startDate && endDate) {
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59);
+                    matchesDate = transactionDate >= start && transactionDate <= end;
+                }
+
+                return matchesEngineer && matchesDate;
+            });
+
+            const recentTransactions = filterRecentTransactions(filteredTransactions);
+            displayStatisticsTransactions(recentTransactions);
+            displayStatistics(recentTransactions);
+            updateTotalTransactions();
+        }
+
+        function displayStatistics(filteredTransactions = transactions) {
+            const recentTransactions = filterRecentTransactions(filteredTransactions);
+            const statistics = {};
+            recentTransactions.forEach(transaction => {
+                statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+            });
+
+            const statsTable = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
+            statsTable.innerHTML = '';
+
+            Object.entries(statistics).forEach(([engineer, count]) => {
+                const row = statsTable.insertRow();
+                row.insertCell(0).innerText = engineer;
+                row.insertCell(1).innerText = count;
+            });
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function searchTransactions() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const filteredTransactions = transactions.filter(tx => 
+                tx.id.toLowerCase().includes(searchValue) || 
+                tx.engineer.toLowerCase().includes(searchValue) ||
+                tx.type.toLowerCase().includes(searchValue)
+            );
+            displayTransactions(filteredTransactions);
+        }
+
+        function clearFields() {
+            document.getElementById('engineer').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('transactionType').value = '';
+        }
+
+        function deleteTransaction() {
+            const transactionId = document.getElementById('transactionId').value;
+            if (!transactionId) {
+                alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
+                return;
+            }
+
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+            const request = store.delete(transactionId);
+
+            request.onsuccess = () => {
+                transactions = transactions.filter(t => t.id !== transactionId);
+                updateTransactionList();
+                updateTotalTransactions();
+                alert("✅ تم حذف المعاملة بنجاح.");
+                clearFields();
+            };
+
+            request.onerror = () => {
+                alert("❌ حدث خطأ أثناء حذف المعاملة.");
+            };
+        }
+
+        function editTransaction() {
+            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
+            if (!transactionIdToEdit) return;
+
+            const transaction = transactions.find(t => t.id === transactionIdToEdit);
+            if (!transaction) {
+                alert("⚠️ لا توجد معاملة بهذا الرقم!");
+                return;
+            }
+
+            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
+            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
+            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transaction.type);
+
+            if (!newTransactionId || !newEngineer || !newTransactionType) {
+                alert("⚠️ تم إلغاء التحديث.");
+                return;
+            }
+
+            const updatedTransaction = {
+                id: newTransactionId,
+                engineer: newEngineer,
+                type: newTransactionType,
+                date: new Date().toISOString(),
+                createdAt: transaction.createdAt // الاحتفاظ بتاريخ الإنشاء الأصلي
+            };
+
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+
+            if (transactionIdToEdit !== newTransactionId) {
+                store.delete(transactionIdToEdit);
+            }
+            
+            store.put(updatedTransaction);
+
+            tx.oncomplete = () => {
+                transactions = transactions.map(t => 
+                    t.id === transactionIdToEdit ? updatedTransaction : t
+                );
+                updateTransactionList();
+                updateTotalTransactions();
+                alert("✅ تم تحديث المعاملة بنجاح!");
+            };
+
+            tx.onerror = () => {
+                alert("❌ حدث خطأ أثناء تحديث المعاملة.");
+            };
+        }
+
+        function populateEngineerSelect() {
+            const recentTransactions = filterRecentTransactions(transactions);
+            const engineerSelect = document.getElementById('engineerFilter');
+            const uniqueEngineers = [...new Set(recentTransactions.map(t => t.engineer))];
+            
+            engineerSelect.innerHTML = '<option value="">جميع المهندسين</option>';
+            uniqueEngineers.forEach(engineer => {
+                if (engineer) {
+                    const option = document.createElement('option');
+                    option.value = engineer;
+                    option.textContent = engineer;
+                    engineerSelect.appendChild(option);
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            populateEngineerSelect();
+            
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            const today = new Date().toISOString().split('T')[0];
+            
+            startDate.value = today;
+            endDate.value = today;
+            
+            loadTransactionsFromDB();
+        });
+
+        request.onerror = event => {
+            console.error('Database error:', event.target.error);
+            alert('حدث خطأ في قاعدة البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+        };
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91ca8d846e8ebd1c',t:'MTc0MTM1NTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
