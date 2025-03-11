@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG SWIFT SYSTEM - Administrator</title>
+    <link rel="icon" href="KG_SWIFT2.ico"> <!-- الأيقونة كما هي -->
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            direction: rtl;
+            text-align: center;
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .management-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+        }
+
+        input, button {
+            padding: 12px 20px;
+            margin: 10px auto;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            width: 80%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .admin-btn {
+            background: #e74c3c !important;
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            background: #2ecc71;
+            border: 2px solid #27ae60;
+        }
+
+        .back-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- قسم تسجيل الدخول -->
+    <div class="login-container" id="loginContainer">
+        <img src="KG_SWIFT.png" alt="الشعار" style="max-width: 120px; margin-bottom: 20px;">
+        <h2 style="color: black;">Administrator</h2>
+        <div class="login-form">
+            <input type="text" id="username" placeholder="اسم المستخدم" required>
+            <input type="password" id="password" placeholder="كلمة المرور" required>
+            <button onclick="checkCredentials()">دخول</button>
+            <button class="back-btn" onclick="goToHome()">العودة للصفحة الرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم النظام الرئيسي -->
+    <div class="management-container hidden" id="mainSystem">
+        <h2>نظام إدارة المعاملات</h2>
+        <button onclick="showAdminPanel()">الوصول لوحة الإدارة</button>
+    </div>
+
+    <!-- قسم إدارة قاعدة البيانات -->
+    <div class="management-container hidden" id="adminPanel">
+        <h2>لوحة إدارة المعاملات</h2>
+        <!-- إدارة المعاملات -->
+        <button onclick="getAllTransactions()">عرض جميع المعاملات</button>
+        <input type="text" id="deleteId" placeholder="رقم المعاملة للحذف">
+        <button onclick="deleteTransaction()" class="admin-btn">حذف معاملة</button>
+        <button onclick="clearAllTransactions()" class="admin-btn">مسح الكل</button>
+        
+        <!-- إدارة المستخدمين -->
+        <h3>إدارة المستخدمين</h3>
+        <input type="text" id="newUsername" placeholder="اسم المستخدم الجديد">
+        <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
+        <button onclick="addUser()">إضافة مستخدم</button>
+        <input type="text" id="editUsername" placeholder="اسم المستخدم للتعديل">
+        <input type="password" id="editPassword" placeholder="كلمة المرور الجديدة">
+        <button onclick="editUser()">تعديل مستخدم</button>
+        <button onclick="getAllUsers()">عرض جميع المستخدمين</button>
+
+        <button onclick="logout()" style="background: #2ecc71;">العودة للنظام</button>
+    </div>
+
+    <script>
+        let db;
+
+        const defaultUsers = [
+            { username: "admin", password: "ghazaloman123", isAdmin: true },
+            { username: "user1", password: "pass1", isAdmin: false }
+        ];
+
+        // إعداد قاعدة البيانات
+        const dbRequest = indexedDB.open("TransactionsDB", 2);
+        
+        dbRequest.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("transactions")) {
+                db.createObjectStore("transactions", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("users")) {
+                const userStore = db.createObjectStore("users", { keyPath: "username" });
+                defaultUsers.forEach(user => userStore.add(user));
+            }
+        };
+
+        dbRequest.onsuccess = function(e) {
+            db = e.target.result;
+        };
+
+        // التحقق من بيانات الدخول
+        function checkCredentials() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert("يرجى ملء جميع الحقول!");
+                return;
+            }
+
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            const request = store.get(username);
+
+            request.onsuccess = function(e) {
+                const user = e.target.result;
+                if (user && user.password === password) {
+                    document.getElementById('loginContainer').classList.add('hidden');
+                    user.isAdmin ? 
+                        document.getElementById('adminPanel').classList.remove('hidden') :
+                        document.getElementById('mainSystem').classList.remove('hidden');
+                    // إفراغ الحقلين بعد تسجيل الدخول الناجح
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
+                }
+            };
+        }
+
+        // وظيفة العودة للصفحة الرئيسية
+        function goToHome() {
+            window.location.href = "index.html";
+        }
+
+        // تفعيل زر Enter فقط عندما يكون الحقلان مملوءين
+        document.getElementById('username').addEventListener('keydown', function(e) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (e.key === 'Enter' && username.trim() && password.trim()) {
+                checkCredentials();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keydown', function(e) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (e.key === 'Enter' && username.trim() && password.trim()) {
+                checkCredentials();
+            }
+        });
+
+        // وظائف إدارة المعاملات
+        function getAllTransactions() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            store.getAll().onsuccess = function(e) {
+                alert(JSON.stringify(e.target.result, null, 2));
+            };
+        }
+
+        function deleteTransaction() {
+            const id = document.getElementById('deleteId').value;
+            const tx = db.transaction("transactions", "readwrite");
+            tx.objectStore("transactions").delete(id);
+            alert("تم الحذف بنجاح!");
+        }
+
+        function clearAllTransactions() {
+            const tx = db.transaction("transactions", "readwrite");
+            tx.objectStore("transactions").clear();
+            alert("تم مسح جميع البيانات!");
+        }
+
+        // وظائف إدارة المستخدمين
+        function addUser() {
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            if (!username || !password) {
+                alert("يرجى إدخال اسم المستخدم وكلمة المرور!");
+                return;
+            }
+
+            const newUser = { username, password, isAdmin: false };
+            const tx = db.transaction("users", "readwrite");
+            const store = tx.objectStore("users");
+            const request = store.add(newUser);
+
+            request.onsuccess = function() {
+                alert("تم إضافة المستخدم بنجاح!");
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+            };
+            request.onerror = function() {
+                alert("اسم المستخدم موجود مسبقًا!");
+            };
+        }
+
+        function editUser() {
+            const username = document.getElementById('editUsername').value;
+            const newPassword = document.getElementById('editPassword').value;
+            if (!username || !newPassword) {
+                alert("يرجى إدخال اسم المستخدم وكلمة المرور الجديدة!");
+                return;
+            }
+
+            const tx = db.transaction("users", "readwrite");
+            const store = tx.objectStore("users");
+            const request = store.get(username);
+
+            request.onsuccess = function(e) {
+                const user = e.target.result;
+                if (user) {
+                    user.password = newPassword;
+                    store.put(user);
+                    alert("تم تعديل كلمة المرور بنجاح!");
+                    document.getElementById('editUsername').value = '';
+                    document.getElementById('editPassword').value = '';
+                } else {
+                    alert("اسم المستخدم غير موجود!");
+                }
+            };
+        }
+
+        function getAllUsers() {
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            store.getAll().onsuccess = function(e) {
+                alert(JSON.stringify(e.target.result, null, 2));
+            };
+        }
+
+        function logout() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginContainer').classList.remove('hidden');
+        }
+
+        function showAdminPanel() {
+            document.getElementById('mainSystem').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
