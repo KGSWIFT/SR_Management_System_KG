@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Home Page</title>
-    <link rel="icon"  href="KG_SWIFT2.ico"> <!-- إضافة الأيقونة هنا -->
+    <link rel="icon" href="KG_SWIFT2.ico"> <!-- الأيقونة كما هي -->
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -158,6 +158,18 @@
             background: #e55a5a;
         }
 
+        /* تنسيق نص حقوق الطبع والنشر */
+        .footer {
+            position: absolute;
+            bottom: 70px; 
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -198,7 +210,7 @@
 
     <div id="welcome">
         <h2>WELCOME TO KG SWIFT SYSTEM</h2>
-        <img src="KG_SWIFT.PNG" alt="شعار الشركة" style="width: 220px; height: auto; border-radius: 10px;">
+        <img src="KG_SWIFT.png" alt="شعار الشركة" style="width: 220px; height: auto; border-radius: 10px;">
     </div>
 
     <div id="main-content" class="hidden content-box">
@@ -207,6 +219,9 @@
         <button class="button" onclick="window.location.href='Statistics.html'">إحصائيات المعاملات</button>
         <button class="button admin-button" onclick="window.location.href='ManageDB.html'">مسؤول النظام</button>
     </div>
+
+    <!-- نص حقوق الطبع والنشر -->
+    <div class="footer">جــــميـع الــــحقــــوق مـــــــحفوظـــــة 2025 KG™</div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
@@ -226,5 +241,6 @@
 
     <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91b0f3a11b70bfb1',t:'MTc0MTA4Njg4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
     <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91d18f213f1553d3',t:'MTc0MTQyODc5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91e968ca1e9bb0e7',t:'MTc0MTY3ODg4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
