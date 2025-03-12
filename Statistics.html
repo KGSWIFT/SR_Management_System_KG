@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Statistics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     <link rel="icon" href="KG_SWIFT2.ico">
+    <link rel="icon" href="KG_SWIFT2.ico">
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -144,6 +144,15 @@
             height: 400px;
         }
 
+        .total-transactions {
+            font-size: 24px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            color: #333;
+        }
+
         @media print {
             body * { visibility: hidden; }
             #printableTransactions, #printableTransactions * { visibility: visible; }
@@ -163,6 +172,7 @@
         <img src="KG_SWIFT.PNG" alt="KG SWIFT" class="logo" style="max-width: 120px; height: auto; margin-bottom: 20px;">
         <h2>KG SWIFT SYSTEM</h2>
         <p style="margin-bottom: 25px; font-size: 24px; color: black;">نظام تحويل المعاملات</p>
+        <div class="total-transactions" id="totalTransactions">إجمالي عدد المعاملات: 0</div>
 
         <div class="date-range">
             <div class="date-group">
@@ -287,9 +297,22 @@
             };
         }
 
+        function updateTotalTransactions(transactions) {
+            const totalTransactionsElement = document.getElementById('totalTransactions');
+            totalTransactionsElement.innerText = `إجمالي عدد المعاملات: ${transactions.length}`;
+        }
+
         function loadData() {
             displayTransactions();
             displayStatistics();
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                updateTotalTransactions(transactions);
+            };
         }
 
         function filterTransactions() {
@@ -302,12 +325,33 @@
                 return;
             }
 
-            displayTransactions(selectedEngineer, startDate, endDate);
-            displayStatistics(selectedEngineer, startDate, endDate);
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
 
-            if (showingChart) {
-                updateChart(selectedEngineer, startDate, endDate);
-            }
+            request.onsuccess = function(event) {
+                const transactions = event.target.result;
+                const filteredTransactions = transactions.filter(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    const start = startDate ? new Date(startDate) : null;
+                    const end = endDate ? new Date(endDate) : null;
+                    if (end) end.setHours(23, 59, 59);
+
+                    return (
+                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                        (!start || transactionDate >= start) &&
+                        (!end || transactionDate <= end)
+                    );
+                });
+
+                displayTransactions(selectedEngineer, startDate, endDate);
+                displayStatistics(selectedEngineer, startDate, endDate);
+                updateTotalTransactions(filteredTransactions);
+
+                if (showingChart) {
+                    updateChart(selectedEngineer, startDate, endDate);
+                }
+            };
         }
 
         function displayTransactions(engineer = '', startDate = '', endDate = '') {
@@ -519,11 +563,11 @@
         function exportToCSV(data, filename) {
             const csvRows = [];
             data.forEach(row => {
-                const values = Object.values(row).map(value => `"${value}"`); // وضع القيم بين علامات اقتباس للتعامل مع الفواصل
+                const values = Object.values(row).map(value => `"${value}"`);
                 csvRows.push(values.join(','));
             });
             const csvString = csvRows.join('\n');
-            const bom = '\uFEFF'; // إضافة BOM لدعم اللغة العربية في Excel
+            const bom = '\uFEFF';
             const blob = new Blob([bom + csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -561,7 +605,7 @@
                 }
 
                 const csvData = [
-                    ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'], // رأس الجدول
+                    ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
                     ...filteredTransactions.map(t => [
                         t.id,
                         t.engineer,
@@ -608,7 +652,7 @@
                 }
 
                 const csvData = [
-                    ['اسم المهندس', 'عدد المعاملات'], // رأس الجدول
+                    ['اسم المهندس', 'عدد المعاملات'],
                     ...engineers.map(engineer => [engineer, statistics[engineer]])
                 ];
 
