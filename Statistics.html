@@ -260,6 +260,8 @@
     </div>
 
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxCHPfPzDepysh-XvawhMXaJXyUQ87N7P2Ad697-JWmxzcosE_AG0kM6NoxIG69RiG3zA/exec"; // استبدل هذا برابط Web App الخاص بك
+        let transactions = [];
         let myChart = null;
         let showingChart = false;
 
@@ -267,52 +269,28 @@
             setTimeout(() => {
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('content').style.visibility = 'visible';
-                initializeDatabase();
+                loadData();
             }, 3000);
         };
 
-        let db;
-
-        function initializeDatabase() {
-            const request = indexedDB.open("TransactionsDB", 2);
-
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                if (!db.objectStoreNames.contains("transactions")) {
-                    db.createObjectStore("transactions", { keyPath: "id" });
-                }
-                if (!db.objectStoreNames.contains("users")) {
-                    db.createObjectStore("users", { keyPath: "username" });
-                }
-            };
-
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                loadData();
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في فتح قاعدة البيانات:", event.target.error);
-                alert("حدث خطأ في فتح قاعدة البيانات!");
-            };
+        function loadData() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    transactions = data;
+                    displayTransactions();
+                    displayStatistics();
+                    updateTotalTransactions(transactions);
+                })
+                .catch(error => {
+                    console.error("❌ فشل في تحميل البيانات:", error);
+                    alert("❌ حدث خطأ أثناء جلب البيانات!");
+                });
         }
 
         function updateTotalTransactions(transactions) {
             const totalTransactionsElement = document.getElementById('totalTransactions');
             totalTransactionsElement.innerText = `إجمالي عدد المعاملات: ${transactions.length}`;
-        }
-
-        function loadData() {
-            displayTransactions();
-            displayStatistics();
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                updateTotalTransactions(transactions);
-            };
         }
 
         function filterTransactions() {
@@ -325,202 +303,170 @@
                 return;
             }
 
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const filteredTransactions = transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
+                return (
+                    (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                );
+            });
 
-                    return (
-                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
+            displayTransactions(selectedEngineer, startDate, endDate);
+            displayStatistics(selectedEngineer, startDate, endDate);
+            updateTotalTransactions(filteredTransactions);
 
-                displayTransactions(selectedEngineer, startDate, endDate);
-                displayStatistics(selectedEngineer, startDate, endDate);
-                updateTotalTransactions(filteredTransactions);
-
-                if (showingChart) {
-                    updateChart(selectedEngineer, startDate, endDate);
-                }
-            };
+            if (showingChart) {
+                updateChart(selectedEngineer, startDate, endDate);
+            }
         }
 
         function displayTransactions(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = '';
+            const filteredTransactions = transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
+                return (
+                    (!engineer || transaction.engineer === engineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                );
+            });
 
-                    return (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
+            if (filteredTransactions.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                return;
+            }
 
-                if (filteredTransactions.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
-                    return;
-                }
-
-                filteredTransactions.forEach(transaction => {
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${transaction.id}</td>
-                        <td>${transaction.engineer}</td>
-                        <td>${transaction.type}</td>
-                        <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
-                    `;
-                });
-            };
+            filteredTransactions.forEach(transaction => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${transaction.transaction_id}</td>
+                    <td>${transaction.engineer}</td>
+                    <td>${transaction.type}</td>
+                    <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+                `;
+            });
         }
 
         function displayStatistics(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const statistics = {};
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const statistics = {};
+            transactions.forEach(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-                transactions.forEach(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    if (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    ) {
-                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                    }
-                });
-
-                const statsTableBody = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
-                statsTableBody.innerHTML = '';
-
-                for (const engineer in statistics) {
-                    const row = statsTableBody.insertRow();
-                    row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
+                if (
+                    (!engineer || transaction.engineer === engineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                ) {
+                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
                 }
-            };
+            });
+
+            const statsTableBody = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
+            statsTableBody.innerHTML = '';
+
+            for (const engineer in statistics) {
+                const row = statsTableBody.insertRow();
+                row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
+            }
         }
 
         function updateChart(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const statistics = {};
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const statistics = {};
+            transactions.forEach(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-                transactions.forEach(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    if (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    ) {
-                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                    }
-                });
-
-                const engineers = Object.keys(statistics);
-                const transactionCounts = engineers.map(name => statistics[name]);
-                const colors = engineers.map((_, index) => `hsl(${index * 15}, 70%, 50%)`);
-
-                if (engineers.length === 0) {
-                    console.log("لا توجد بيانات لعرضها في الرسم البياني.");
-                    const chartContainer = document.getElementById('chartContainer');
-                    chartContainer.innerHTML = '<h2>الإحصاء البياني للمعاملات</h2><p>لا توجد بيانات كافية لعرض الرسم البياني.</p>';
-                    return;
+                if (
+                    (!engineer || transaction.engineer === engineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                ) {
+                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
                 }
+            });
 
-                if (myChart !== null) {
-                    myChart.destroy();
-                }
+            const engineers = Object.keys(statistics);
+            const transactionCounts = engineers.map(name => statistics[name]);
+            const colors = engineers.map((_, index) => `hsl(${index * 15}, 70%, 50%)`);
 
-                const ctx = document.getElementById('statisticsChart').getContext('2d');
-                if (!ctx) {
-                    console.error("لم يتم العثور على عنصر canvas!");
-                    return;
-                }
+            if (engineers.length === 0) {
+                console.log("لا توجد بيانات لعرضها في الرسم البياني.");
+                const chartContainer = document.getElementById('chartContainer');
+                chartContainer.innerHTML = '<h2>الإحصاء البياني للمعاملات</h2><p>لا توجد بيانات كافية لعرض الرسم البياني.</p>';
+                return;
+            }
 
-                myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: engineers,
-                        datasets: [{
-                            label: "عدد المعاملات",
-                            data: transactionCounts,
-                            backgroundColor: colors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'عدد المعاملات',
-                                    color: '#333',
-                                    font: { weight: 'bold' }
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#333',
-                                    font: { weight: 'bold' }
-                                }
-                            }
-                        },
-                        plugins: {
+            if (myChart !== null) {
+                myChart.destroy();
+            }
+
+            const ctx = document.getElementById('statisticsChart').getContext('2d');
+            if (!ctx) {
+                console.error("لم يتم العثور على عنصر canvas!");
+                return;
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: engineers,
+                    datasets: [{
+                        label: "عدد المعاملات",
+                        data: transactionCounts,
+                        backgroundColor: colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'إحصائيات المعاملات حسب المهندس',
-                                font: { size: 18, weight: 'bold' }
-                            },
-                            legend: {
-                                display: true,
-                                position: 'top'
+                                text: 'عدد المعاملات',
+                                color: '#333',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#333',
+                                font: { weight: 'bold' }
                             }
                         }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'إحصائيات المعاملات حسب المهندس',
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
                     }
-                });
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
+                }
+            });
         }
 
         function toggleStatistics() {
@@ -576,88 +522,74 @@
         }
 
         function exportTransactionsToExcel() {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const selectedEngineer = document.getElementById('engineer').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const selectedEngineer = document.getElementById('engineer').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
+            const filteredTransactions = transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
+                return (
+                    (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                );
+            });
 
-                    return (
-                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
+            if (filteredTransactions.length === 0) {
+                alert("لا توجد بيانات لتصديرها!");
+                return;
+            }
 
-                if (filteredTransactions.length === 0) {
-                    alert("لا توجد بيانات لتصديرها!");
-                    return;
-                }
+            const csvData = [
+                ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
+                ...filteredTransactions.map(t => [
+                    t.transaction_id,
+                    t.engineer,
+                    t.type,
+                    new Date(t.date).toLocaleDateString('ar-EG')
+                ])
+            ];
 
-                const csvData = [
-                    ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
-                    ...filteredTransactions.map(t => [
-                        t.id,
-                        t.engineer,
-                        t.type,
-                        new Date(t.date).toLocaleDateString('ar-EG')
-                    ])
-                ];
-
-                exportToCSV(csvData, 'Transactions_Export.csv');
-            };
+            exportToCSV(csvData, 'Transactions_Export.csv');
         }
 
         function exportChartToExcel() {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            const selectedEngineer = document.getElementById('engineer').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const selectedEngineer = document.getElementById('engineer').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
+            const statistics = {};
+            transactions.forEach(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
 
-                const statistics = {};
-                transactions.forEach(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    if (
-                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    ) {
-                        statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                    }
-                });
-
-                const engineers = Object.keys(statistics);
-                if (engineers.length === 0) {
-                    alert("لا توجد بيانات لتصديرها!");
-                    return;
+                if (
+                    (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                    (!start || transactionDate >= start) &&
+                    (!end || transactionDate <= end)
+                ) {
+                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
                 }
+            });
 
-                const csvData = [
-                    ['اسم المهندس', 'عدد المعاملات'],
-                    ...engineers.map(engineer => [engineer, statistics[engineer]])
-                ];
+            const engineers = Object.keys(statistics);
+            if (engineers.length === 0) {
+                alert("لا توجد بيانات لتصديرها!");
+                return;
+            }
 
-                exportToCSV(csvData, 'Statistics_Export.csv');
-            };
+            const csvData = [
+                ['اسم المهندس', 'عدد المعاملات'],
+                ...engineers.map(engineer => [engineer, statistics[engineer]])
+            ];
+
+            exportToCSV(csvData, 'Statistics_Export.csv');
         }
 
         function printTransactionsTable() {
