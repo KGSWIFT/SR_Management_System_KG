@@ -358,7 +358,7 @@
     </div>
 
     <script>
-        const API_URL = https://script.google.com/macros/s/AKfycbwSXReVFDDKh6LOxYcJ9TzMDreItHOU8E7KxowghnZOr098koVgFP2UmOE0auFClzLFZg/exec
+        const API_URL = "https://script.google.com/macros/s/AKfycbxCHPfPzDepysh-XvawhMXaJXyUQ87N7P2Ad697-JWmxzcosE_AG0kM6NoxIG69RiG3zA/exec";
 
         let transactions = [];
 
@@ -399,7 +399,7 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(transaction),
-                mode: "no-cors" // للتعامل مع مشاكل CORS إذا لزم الأمر
+                mode: "no-cors"
             })
             .then(() => {
                 alert("✅ تمت إضافة المعاملة بنجاح!");
@@ -408,7 +408,7 @@
             })
             .catch(error => {
                 console.error("❌ خطأ:", error);
-                alert("❌ حدث خطأ أثناء الإضافة.");
+                alert("❌ حدث خطأ أثناء الإضافة: " + error.message);
             });
         }
 
@@ -423,7 +423,7 @@
             })
             .catch(error => {
                 console.error("❌ خطأ أثناء الحذف:", error);
-                alert("❌ فشل في حذف المعاملة.");
+                alert("❌ فشل في حذف المعاملة: " + error.message);
             });
         }
 
@@ -455,7 +455,7 @@
             })
             .catch(error => {
                 console.error("❌ خطأ أثناء التحديث:", error);
-                alert("❌ فشل في تحديث المعاملة.");
+                alert("❌ فشل في تحديث المعاملة: " + error.message);
             });
         }
 
