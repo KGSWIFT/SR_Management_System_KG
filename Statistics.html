@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Statistics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <link rel="icon" href="KG_SWIFT2.ico">
     <style>
         body {
@@ -18,9 +19,7 @@
             color: white;
         }
 
-        h2 {
-            color: black;
-        }
+        h2 { color: black; }
 
         .container {
             max-width: 800px;
@@ -260,32 +259,62 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxCHPfPzDepysh-XvawhMXaJXyUQ87N7P2Ad697-JWmxzcosE_AG0kM6NoxIG69RiG3zA/exec"; // استبدل هذا برابط Web App الخاص بك
-        let transactions = [];
-        let myChart = null;
-        let showingChart = false;
+       <script>
+           const CLIENT_ID = '974167667588-2qbrdg75bogk9m7785smpl33p7qh7lkj.apps.googleusercontent.com';
+           const API_KEY = 'AIzaSyCWAswSS5I-uiHSUx7OyZTBa0HAf5n0Uro';
+           const SPREADSHEET_ID = '158Qh9_4P8o3On-xGMh7tzthIrtX0YqBUP2iFe6zbScg';
+           const RANGE = 'Sheet1!A2:D';
+
+          let transactions = [];
+          let myChart = null;
+          let showingChart = false;
+
+  
+</script>
 
         window.onload = function() {
-            setTimeout(() => {
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('content').style.visibility = 'visible';
-                loadData();
-            }, 3000);
+            gapi.load('client:auth2', initClient);
         };
 
-        function loadData() {
-            fetch(API_URL)
-                .then(response => response.json())
-                .then(data => {
-                    transactions = data;
-                    displayTransactions();
-                    displayStatistics();
-                    updateTotalTransactions(transactions);
-                })
-                .catch(error => {
-                    console.error("❌ فشل في تحميل البيانات:", error);
-                    alert("❌ حدث خطأ أثناء جلب البيانات!");
+        function initClient() {
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                scope: 'https://www.googleapis.com/auth/spreadsheets.readonly'
+            }).then(() => {
+                gapi.auth2.getAuthInstance().signIn().then(() => {
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        document.getElementById('content').style.visibility = 'visible';
+                        loadData();
+                    }, 3000);
                 });
+            }).catch(error => {
+                console.error('❌ خطأ في تهيئة العميل:', error);
+                alert('❌ حدث خطأ أثناء الاتصال!');
+            });
+        }
+
+        function loadData() {
+            gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: SPREADSHEET_ID,
+                range: RANGE
+            }).then(response => {
+                const values = response.result.values || [];
+                transactions = values.map(row => ({
+                    id: row[0] || '',
+                    engineer: row[1] || '',
+                    type: row[2] || '',
+                    date: row[3] || new Date().toISOString()
+                }));
+                displayTransactions();
+                displayStatistics();
+                updateTotalTransactions(transactions);
+            }).catch(error => {
+                console.error("❌ فشل في تحميل البيانات:", error);
+                alert("❌ حدث خطأ أثناء جلب البيانات!");
+            });
         }
 
         function updateTotalTransactions(transactions) {
@@ -350,7 +379,7 @@
             filteredTransactions.forEach(transaction => {
                 const row = tableBody.insertRow();
                 row.innerHTML = `
-                    <td>${transaction.transaction_id}</td>
+                    <td>${transaction.id}</td>
                     <td>${transaction.engineer}</td>
                     <td>${transaction.type}</td>
                     <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
@@ -440,30 +469,15 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'عدد المعاملات',
-                                color: '#333',
-                                font: { weight: 'bold' }
-                            }
+                            title: { display: true, text: 'عدد المعاملات', color: '#333', font: { weight: 'bold' } }
                         },
                         x: {
-                            ticks: {
-                                color: '#333',
-                                font: { weight: 'bold' }
-                            }
+                            ticks: { color: '#333', font: { weight: 'bold' } }
                         }
                     },
                     plugins: {
-                        title: {
-                            display: true,
-                            text: 'إحصائيات المعاملات حسب المهندس',
-                            font: { size: 18, weight: 'bold' }
-                        },
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
+                        title: { display: true, text: 'إحصائيات المعاملات حسب المهندس', font: { size: 18, weight: 'bold' } },
+                        legend: { display: true, position: 'top' }
                     }
                 }
             });
@@ -471,11 +485,7 @@
 
         function toggleStatistics() {
             const statsSection = document.getElementById('statisticsSection');
-            if (statsSection.style.display === 'none' || statsSection.style.display === '') {
-                statsSection.style.display = 'block';
-            } else {
-                statsSection.style.display = 'none';
-            }
+            statsSection.style.display = (statsSection.style.display === 'none' || statsSection.style.display === '') ? 'block' : 'none';
         }
 
         function toggleChartView() {
@@ -492,7 +502,6 @@
                 const selectedEngineer = document.getElementById('engineer').value;
                 const startDate = document.getElementById('startDate').value;
                 const endDate = document.getElementById('endDate').value;
-
                 updateChart(selectedEngineer, startDate, endDate);
             } else {
                 chartContainer.style.display = 'none';
@@ -547,7 +556,7 @@
             const csvData = [
                 ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
                 ...filteredTransactions.map(t => [
-                    t.transaction_id,
+                    t.id,
                     t.engineer,
                     t.type,
                     new Date(t.date).toLocaleDateString('ar-EG')
