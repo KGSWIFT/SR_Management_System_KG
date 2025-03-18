@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Transactions</title>
-    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -204,10 +203,10 @@
             <input type="text" id="username" placeholder="اسم المستخدم" required onkeypress="handleKeyPress(event)">
             <div class="password-container">
                 <input type="password" id="password" placeholder="كلمة المرور" required onkeypress="handleKeyPress(event)">
-                <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                <button type="button" class="password-toggle" onclick="togglePassword()"></button>
             </div>
             <button class="login-btn" onclick="checkCredentials()">دخول</button>
-            <button class="login-btn" onclick="goToHomePage()">العودة إلى الصفحة الرئيسية</button>
+            <button class="login-btn" onclick="goToHomePage()">العودة الى الصفحة الرئيسية</button>
         </div>
     </div>
 
@@ -257,8 +256,8 @@
             <option value="حديقة عامة">حديقة عامة</option>
             <option value="أبراج اتصالات">أبراج اتصالات</option>
             <option value="ملعب">ملعب</option>
-            <option value="سياحي">سياحي</option>
-            <option value="تجاري">تجاري</option>
+            <option value="سياحي ">سياحي </option>
+            <option value="تجاري ">تجاري</option>
             <option value="موافقة فنية سكنية">موافقة فنية سكنية</option>
             <option value="موافقة فنية تجارية">موافقة فنية تجارية</option>
             <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
@@ -340,31 +339,13 @@
     </div>
 
     <script>
-        const CLIENT_ID = '974167667588-2qbrdg75bogk9m7785smpl33p7qh7lkj.apps.googleusercontent.com';
-        const API_KEY = 'AIzaSyCWAswSS5I-uiHSUx7OyZTBa0HAf5n0Uro';
-        const SPREADSHEET_ID = '158Qh9_4P8o3On-xGMh7tzthIrtX0YqBUP2iFe6zbScg';
-        const RANGE = 'Sheet1!A2:D';
-
+        const API_URL = 'https://kg-swift-api.vercel.app'; // استبدل برابط API الخاص بك بعد النشر
         let transactions = [];
         let isAuthenticated = false;
 
         window.onload = function() {
-            gapi.load('client:auth2', initClient);
+            // لا حاجة لـ gapi
         };
-
-        function initClient() {
-            gapi.client.init({
-                apiKey: API_KEY,
-                clientId: CLIENT_ID,
-                discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-                scope: 'https://www.googleapis.com/auth/spreadsheets'
-            }).then(() => {
-                // تهيئة العميل بدون تسجيل دخول تلقائي
-            }).catch(error => {
-                console.error('❌ خطأ في تهيئة العميل:', error);
-                alert('❌ حدث خطأ أثناء الاتصال!');
-            });
-        }
 
         function checkCredentials() {
             const username = document.getElementById("username").value;
@@ -378,47 +359,34 @@
             };
 
             if (validUsers[username] && validUsers[username] === password) {
-                gapi.auth2.getAuthInstance().signIn().then(() => {
-                    isAuthenticated = true;
-                    document.getElementById("login-container").classList.add("hidden");
-                    document.getElementById("welcome").classList.remove("hidden");
-                    setTimeout(() => {
-                        document.getElementById("welcome").classList.add("hidden");
-                        document.getElementById("main-container").classList.remove("hidden");
-                        loadTransactionsFromSheets();
-                    }, 5000);
-                }).catch(error => {
-                    console.error('❌ خطأ في تسجيل الدخول:', error);
-                    alert('❌ فشل في تسجيل الدخول إلى Google!');
-                });
+                isAuthenticated = true;
+                document.getElementById("login-container").classList.add("hidden");
+                document.getElementById("welcome").classList.remove("hidden");
+                setTimeout(() => {
+                    document.getElementById("welcome").classList.add("hidden");
+                    document.getElementById("main-container").classList.remove("hidden");
+                    loadTransactions();
+                }, 5000);
             } else {
                 alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
             }
         }
 
-        function loadTransactionsFromSheets() {
-            gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: SPREADSHEET_ID,
-                range: RANGE
-            }).then(response => {
-                const values = response.result.values || [];
-                transactions = values.map(row => ({
-                    id: row[0] || '',
-                    engineer: row[1] || '',
-                    type: row[2] || '',
-                    date: row[3] || new Date().toISOString(),
-                    createdAt: new Date(row[3] || Date.now()).getTime()
-                }));
+        async function loadTransactions() {
+            try {
+                const response = await fetch(`${API_URL}/transactions`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                transactions = await response.json();
                 updateTransactionList();
                 updateTotalTransactions();
                 populateEngineerSelect();
-            }).catch(error => {
+            } catch (error) {
                 console.error('❌ فشل في جلب البيانات:', error);
                 alert('❌ حدث خطأ أثناء جلب البيانات!');
-            });
+            }
         }
 
-        function addTransaction() {
+        async function addTransaction() {
             const engineer = document.getElementById('engineer').value;
             const transactionId = document.getElementById('transactionId').value;
             const transactionType = document.getElementById('transactionType').value;
@@ -433,28 +401,28 @@
                 engineer,
                 type: transactionType,
                 date: new Date().toISOString(),
-                createdAt: new Date().getTime()
+                created_at: new Date().getTime()
             };
 
-            const values = [[transaction.id, transaction.engineer, transaction.type, transaction.date]];
-            gapi.client.sheets.spreadsheets.values.append({
-                spreadsheetId: SPREADSHEET_ID,
-                range: 'Sheet1!A:D',
-                valueInputOption: 'RAW',
-                resource: { values }
-            }).then(() => {
+            try {
+                const response = await fetch(`${API_URL}/transactions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(transaction)
+                });
+                if (!response.ok) throw new Error('Failed to add transaction');
                 transactions.push(transaction);
                 updateTransactionList();
                 updateTotalTransactions();
                 alert("✅ تمت إضافة المعاملة بنجاح!");
                 clearFields();
-            }).catch(error => {
+            } catch (error) {
                 console.error('❌ خطأ في إضافة المعاملة:', error);
                 alert('❌ فشل في إضافة المعاملة!');
-            });
+            }
         }
 
-        function deleteTransaction() {
+        async function deleteTransaction() {
             const transactionId = document.getElementById('transactionId').value;
             if (!transactionId) {
                 alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
@@ -467,32 +435,23 @@
                 return;
             }
 
-            const rowToDelete = index + 2;
-            gapi.client.sheets.spreadsheets.batchUpdate({
-                spreadsheetId: SPREADSHEET_ID,
-                requests: [{
-                    deleteDimension: {
-                        range: {
-                            sheetId: 0,
-                            dimension: 'ROWS',
-                            startIndex: rowToDelete - 1,
-                            endIndex: rowToDelete
-                        }
-                    }
-                }]
-            }).then(() => {
+            try {
+                const response = await fetch(`${API_URL}/transactions/${transactionId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete transaction');
                 transactions.splice(index, 1);
                 updateTransactionList();
                 updateTotalTransactions();
                 alert("✅ تم حذف المعاملة بنجاح.");
                 clearFields();
-            }).catch(error => {
+            } catch (error) {
                 console.error('❌ خطأ في الحذف:', error);
                 alert('❌ فشل في حذف المعاملة!');
-            });
+            }
         }
 
-        function editTransaction() {
+        async function editTransaction() {
             const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
             if (!transactionIdToEdit) return;
 
@@ -512,40 +471,36 @@
             }
 
             const updatedTransaction = {
-                id: newTransactionId,
                 engineer: newEngineer,
                 type: newTransactionType,
-                date: new Date().toISOString(),
-                createdAt: transactions[transactionIndex].createdAt
+                date: new Date().toISOString()
             };
 
-            const rowToUpdate = transactionIndex + 2;
-            gapi.client.sheets.spreadsheets.values.update({
-                spreadsheetId: SPREADSHEET_ID,
-                range: `Sheet1!A${rowToUpdate}:D${rowToUpdate}`,
-                valueInputOption: 'RAW',
-                resource: { values: [[updatedTransaction.id, updatedTransaction.engineer, updatedTransaction.type, updatedTransaction.date]] }
-            }).then(() => {
-                transactions[transactionIndex] = updatedTransaction;
+            try {
+                const response = await fetch(`${API_URL}/transactions/${transactionIdToEdit}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedTransaction)
+                });
+                if (!response.ok) throw new Error('Failed to update transaction');
+                transactions[transactionIndex] = { ...transactions[transactionIndex], ...updatedTransaction, id: newTransactionId };
                 updateTransactionList();
                 updateTotalTransactions();
                 alert("✅ تم تحديث المعاملة بنجاح!");
-            }).catch(error => {
+            } catch (error) {
                 console.error('❌ خطأ في التحديث:', error);
                 alert('❌ فشل في تحديث المعاملة!');
-            });
+            }
         }
 
         function logout() {
             const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
             if (confirmation) {
-                gapi.auth2.getAuthInstance().signOut().then(() => {
-                    transactions = [];
-                    document.getElementById("main-container").classList.add("hidden");
-                    document.getElementById("login-container").classList.remove("hidden");
-                    document.getElementById("username").value = "";
-                    document.getElementById("password").value = "";
-                });
+                transactions = [];
+                document.getElementById("main-container").classList.add("hidden");
+                document.getElementById("login-container").classList.remove("hidden");
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
             }
         }
 
@@ -579,7 +534,7 @@
         function filterRecentTransactions(transactionsToFilter) {
             const now = new Date().getTime();
             const twelveHoursInMs = 12 * 60 * 60 * 1000;
-            return transactionsToFilter.filter(transaction => now - transaction.createdAt <= twelveHoursInMs);
+            return transactionsToFilter.filter(transaction => now - transaction.created_at <= twelveHoursInMs);
         }
 
         function updateTransactionList() {
