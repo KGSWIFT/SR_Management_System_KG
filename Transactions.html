@@ -204,10 +204,10 @@
             <input type="text" id="username" placeholder="اسم المستخدم" required onkeypress="handleKeyPress(event)">
             <div class="password-container">
                 <input type="password" id="password" placeholder="كلمة المرور" required onkeypress="handleKeyPress(event)">
-                <button type="button" class="password-toggle" onclick="togglePassword()"></button>
+                <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
             </div>
             <button class="login-btn" onclick="checkCredentials()">دخول</button>
-            <button class="login-btn" onclick="goToHomePage()">العودة الى الصفحة الرئيسية</button>
+            <button class="login-btn" onclick="goToHomePage()">العودة إلى الصفحة الرئيسية</button>
         </div>
     </div>
 
@@ -257,8 +257,8 @@
             <option value="حديقة عامة">حديقة عامة</option>
             <option value="أبراج اتصالات">أبراج اتصالات</option>
             <option value="ملعب">ملعب</option>
-            <option value="سياحي ">سياحي </option>
-            <option value="تجاري ">تجاري</option>
+            <option value="سياحي">سياحي</option>
+            <option value="تجاري">تجاري</option>
             <option value="موافقة فنية سكنية">موافقة فنية سكنية</option>
             <option value="موافقة فنية تجارية">موافقة فنية تجارية</option>
             <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
@@ -283,7 +283,7 @@
     </div>
 
     <div class="container hidden" id="statistics-container">
-        <img src="images/KG_SWIFT.png" alt="شعار الشركة" class="logo">
+        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
         <h2>إحصائيات المعاملات</h2>
         
         <div class="total-transactions" id="totalTransactions">إجمالي عدد المعاملات: 0</div>
@@ -342,7 +342,7 @@
     <script>
         const CLIENT_ID = '974167667588-2qbrdg75bogk9m7785smpl33p7qh7lkj.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyCWAswSS5I-uiHSUx7OyZTBa0HAf5n0Uro';
-        const SPREADSHEET_ID ='158Qh9_4P8o3On-xGMh7tzthIrtX0YqBUP2iFe6zbScg';
+        const SPREADSHEET_ID = '158Qh9_4P8o3On-xGMh7tzthIrtX0YqBUP2iFe6zbScg';
         const RANGE = 'Sheet1!A2:D';
 
         let transactions = [];
