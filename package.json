@@ -1,5 +1,5 @@
 {
-    "name": "kg-swift-api",
+    "name": "sr-system-management-api",
     "version": "1.0.0",
     "main": "server.js",
     "scripts": {
