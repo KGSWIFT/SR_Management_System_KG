@@ -339,12 +339,12 @@
     </div>
 
     <script>
-        const API_URL =https://sr-system-management-oqs1bv0xp-khalid-alghazil-.vercel.app/transactions
+        const API_URL = 'https://sr-system-management-oqs1bv0xp-khalid-alghazil-.vercel.app';
         let transactions = [];
         let isAuthenticated = false;
 
         window.onload = function() {
-            // لا حاجة لـ gapi
+            console.log("Page loaded successfully");
         };
 
         function checkCredentials() {
@@ -358,7 +358,9 @@
                 "9684": "A@9684"
             };
 
+            console.log("Username:", username, "Password:", password);
             if (validUsers[username] && validUsers[username] === password) {
+                console.log("Credentials valid, proceeding...");
                 isAuthenticated = true;
                 document.getElementById("login-container").classList.add("hidden");
                 document.getElementById("welcome").classList.remove("hidden");
@@ -374,9 +376,12 @@
 
         async function loadTransactions() {
             try {
+                console.log('Fetching from:', `${API_URL}/transactions`);
                 const response = await fetch(`${API_URL}/transactions`);
-                if (!response.ok) throw new Error('Network response was not ok');
+                console.log('Response status:', response.status);
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
                 transactions = await response.json();
+                console.log('Transactions loaded:', transactions);
                 updateTransactionList();
                 updateTotalTransactions();
                 populateEngineerSelect();
