@@ -349,6 +349,16 @@
         let transactions = [];
         let db;
 
+        // تعريف المستخدمين مباشرة في الصفحة
+        const defaultUsers = [
+            { username: "admin", password: "ghazaloman123", isAdmin: true },
+            { username: "11221", password: "B@11221", isAdmin: false },
+            { username: "11731", password: "M@11731", isAdmin: false },
+            { username: "11220", password: "A@11220", isAdmin: false },
+            { username: "9684", password: "A@9684", isAdmin: false }
+        ];
+
+        // إعداد قاعدة البيانات لتخزين المعاملات فقط
         const request = indexedDB.open("TransactionsDB", 2);
 
         request.onupgradeneeded = event => {
@@ -356,31 +366,10 @@
             if (!db.objectStoreNames.contains("transactions")) {
                 db.createObjectStore("transactions", { keyPath: "id" });
             }
-            if (!db.objectStoreNames.contains("users")) {
-                db.createObjectStore("users", { keyPath: "username" });
-            }
         };
 
         request.onsuccess = event => {
             db = event.target.result;
-            // التحقق من وجود المستخدمين وإضافتهم إذا لم يكونوا موجودين
-            const tx = db.transaction("users", "readwrite");
-            const userStore = tx.objectStore("users");
-            const countRequest = userStore.count();
-
-            countRequest.onsuccess = () => {
-                if (countRequest.result === 0) { // إذا لم يكن هناك مستخدمون
-                    const defaultUsers = [
-                        { username: "admin", password: "123456", isAdmin: true },
-                        { username: "11221", password: "B@11221", isAdmin: false },
-                        { username: "11731", password: "M@11731", isAdmin: false },
-                        { username: "11220", password: "A@11220", isAdmin: false },
-                        { username: "9684", password: "A@9684", isAdmin: false }
-                    ];
-                    defaultUsers.forEach(user => userStore.add(user));
-                }
-            };
-
             loadTransactionsFromDB();
         };
 
@@ -408,24 +397,19 @@
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
-            const tx = db.transaction("users", "readonly");
-            const store = tx.objectStore("users");
-            const request = store.get(username);
+            // التحقق من بيانات المستخدم مباشرة من المصفوفة
+            const user = defaultUsers.find(u => u.username === username && u.password === password);
+            if (user) {
+                document.getElementById("login-container").classList.add("hidden");
+                document.getElementById("welcome").classList.remove("hidden");
 
-            request.onsuccess = function(e) {
-                const user = e.target.result;
-                if (user && user.password === password) {
-                    document.getElementById("login-container").classList.add("hidden");
-                    document.getElementById("welcome").classList.remove("hidden");
-
-                    setTimeout(() => {
-                        document.getElementById("welcome").classList.add("hidden");
-                        document.getElementById("main-container").classList.remove("hidden");
-                    }, 5000);
-                } else {
-                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
-                }
-            };
+                setTimeout(() => {
+                    document.getElementById("welcome").classList.add("hidden");
+                    document.getElementById("main-container").classList.remove("hidden");
+                }, 5000);
+            } else {
+                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+            }
         }
 
         function handleKeyPress(event) {
