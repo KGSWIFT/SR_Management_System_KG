@@ -123,7 +123,10 @@
 
         const defaultUsers = [
             { username: "admin", password: "ghazaloman123", isAdmin: true },
-            { username: "user1", password: "pass1", isAdmin: false }
+            { username: "11221", password: "B@11221", isAdmin: false },
+            { username: "11731", password: "M@11731", isAdmin: false },
+            { username: "11220", password: "A@11220", isAdmin: false },
+            { username: "9684", password: "A@9684", isAdmin: false }
         ];
 
         // إعداد قاعدة البيانات
@@ -135,13 +138,22 @@
                 db.createObjectStore("transactions", { keyPath: "id" });
             }
             if (!db.objectStoreNames.contains("users")) {
-                const userStore = db.createObjectStore("users", { keyPath: "username" });
-                defaultUsers.forEach(user => userStore.add(user));
+                db.createObjectStore("users", { keyPath: "username" });
             }
         };
 
         dbRequest.onsuccess = function(e) {
             db = e.target.result;
+            // التحقق من وجود المستخدمين وإضافتهم إذا لم يكونوا موجودين
+            const tx = db.transaction("users", "readwrite");
+            const userStore = tx.objectStore("users");
+            const countRequest = userStore.count();
+
+            countRequest.onsuccess = () => {
+                if (countRequest.result === 0) { // إذا لم يكن هناك مستخدمون
+                    defaultUsers.forEach(user => userStore.add(user));
+                }
+            };
         };
 
         // التحقق من بيانات الدخول
@@ -156,12 +168,14 @@
             request.onsuccess = function(e) {
                 const user = e.target.result;
                 if (user && user.password === password) {
+                    if (!user.isAdmin) {
+                        alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
+                        return;
+                    }
                     document.getElementById('loginContainer').classList.add('hidden');
-                    user.isAdmin ? 
-                        document.getElementById('adminPanel').classList.remove('hidden') :
-                        document.getElementById('mainSystem').classList.remove('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
                 } else {
-                    alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
+                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
                 }
             };
         }
