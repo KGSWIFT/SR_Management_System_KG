@@ -156,8 +156,8 @@
         }
 
         #password {
-            width: 100%;
-            box-sizing: border-box;
+            width: 100%; /* جعل حقل كلمة المرور يملأ كامل عرض الحاوية */
+            box-sizing: border-box; /* التأكد من أن الحشوة والحدود لا تزيد العرض */
         }
 
         .password-toggle {
@@ -173,9 +173,17 @@
         }
 
         @media print {
-            body * { visibility: hidden; }
-            #printableContent * { visibility: visible; }
-            #printableContent { position: absolute; left: 0; top: 0; }
+            body * {
+                visibility: hidden;
+            }
+            #printableContent * {
+                visibility: visible;
+            }
+            #printableContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
         }
 
         .transactions-list table {
@@ -252,12 +260,11 @@
         </select>
         <select id="transactionType">
             <option value="">نوع الطلب</option>
-            <option value="سكنــي">سكنــي</option>
             <option value="حديقة عامة">حديقة عامة</option>
             <option value="أبراج اتصالات">أبراج اتصالات</option>
             <option value="ملعب">ملعب</option>
-            <option value="سياحي ">سياحي </option>
-            <option value="تجاري ">تجاري</option>
+            <option value="سياحي سكني">سياحي سكني</option>
+            <option value="تجاري سكني">تجاري سكني</option>
             <option value="موافقة فنية سكنية">موافقة فنية سكنية</option>
             <option value="موافقة فنية تجارية">موافقة فنية تجارية</option>
             <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
@@ -282,7 +289,7 @@
     </div>
 
     <div class="container hidden" id="statistics-container">
-        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
+        <img src="images/KG_SWIFT.png" alt="شعار الشركة" class="logo">
         <h2>إحصائيات المعاملات</h2>
         
         <div class="total-transactions" id="totalTransactions">إجمالي عدد المعاملات: 0</div>
@@ -339,164 +346,33 @@
     </div>
 
     <script>
-        const API_URL = 'https://sr-system-management-oqs1bv0xp-khalid-alghazil-.vercel.app';
         let transactions = [];
-        let isAuthenticated = false;
+        let db;
 
-        window.onload = function() {
-            console.log("Page loaded successfully");
+        const request = indexedDB.open("TransactionsDB", 2);
+
+        request.onupgradeneeded = event => {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains("transactions")) {
+                db.createObjectStore("transactions", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("users")) {
+                const userStore = db.createObjectStore("users", { keyPath: "username" });
+                const defaultUsers = [
+                    { username: "admin", password: "ghazaloman123", isAdmin: true },
+                    { username: "11221", password: "B@11221", isAdmin: false },
+                    { username: "11731", password: "M@11731", isAdmin: false },
+                    { username: "11220", password: "A@11220", isAdmin: false },
+                    { username: "9684", password: "A@9684", isAdmin: false }
+                ];
+                defaultUsers.forEach(user => userStore.add(user));
+            }
         };
 
-        function checkCredentials() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const validUsers = {
-                "admin": "ghazaloman123",
-                "11221": "B@11221",
-                "11731": "M@11731",
-                "11220": "A@11220",
-                "9684": "A@9684"
-            };
-
-            console.log("Username:", username, "Password:", password);
-            if (validUsers[username] && validUsers[username] === password) {
-                console.log("Credentials valid, proceeding...");
-                isAuthenticated = true;
-                document.getElementById("login-container").classList.add("hidden");
-                document.getElementById("welcome").classList.remove("hidden");
-                setTimeout(() => {
-                    document.getElementById("welcome").classList.add("hidden");
-                    document.getElementById("main-container").classList.remove("hidden");
-                    loadTransactions();
-                }, 5000);
-            } else {
-                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
-            }
-        }
-
-        async function loadTransactions() {
-            try {
-                console.log('Fetching from:', `${API_URL}/transactions`);
-                const response = await fetch(`${API_URL}/transactions`);
-                console.log('Response status:', response.status);
-                if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
-                transactions = await response.json();
-                console.log('Transactions loaded:', transactions);
-                updateTransactionList();
-                updateTotalTransactions();
-                populateEngineerSelect();
-            } catch (error) {
-                console.error('❌ فشل في جلب البيانات:', error);
-                alert('❌ حدث خطأ أثناء جلب البيانات!');
-            }
-        }
-
-        async function addTransaction() {
-            const engineer = document.getElementById('engineer').value;
-            const transactionId = document.getElementById('transactionId').value;
-            const transactionType = document.getElementById('transactionType').value;
-
-            if (!engineer || !transactionId || !transactionType) {
-                alert("⚠️ الرجاء ملء جميع الحقول.");
-                return;
-            }
-
-            const transaction = {
-                id: transactionId,
-                engineer,
-                type: transactionType,
-                date: new Date().toISOString(),
-                created_at: new Date().getTime()
-            };
-
-            try {
-                const response = await fetch(`${API_URL}/transactions`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(transaction)
-                });
-                if (!response.ok) throw new Error('Failed to add transaction');
-                transactions.push(transaction);
-                updateTransactionList();
-                updateTotalTransactions();
-                alert("✅ تمت إضافة المعاملة بنجاح!");
-                clearFields();
-            } catch (error) {
-                console.error('❌ خطأ في إضافة المعاملة:', error);
-                alert('❌ فشل في إضافة المعاملة!');
-            }
-        }
-
-        async function deleteTransaction() {
-            const transactionId = document.getElementById('transactionId').value;
-            if (!transactionId) {
-                alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
-                return;
-            }
-
-            const index = transactions.findIndex(t => t.id === transactionId);
-            if (index === -1) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/transactions/${transactionId}`, {
-                    method: 'DELETE'
-                });
-                if (!response.ok) throw new Error('Failed to delete transaction');
-                transactions.splice(index, 1);
-                updateTransactionList();
-                updateTotalTransactions();
-                alert("✅ تم حذف المعاملة بنجاح.");
-                clearFields();
-            } catch (error) {
-                console.error('❌ خطأ في الحذف:', error);
-                alert('❌ فشل في حذف المعاملة!');
-            }
-        }
-
-        async function editTransaction() {
-            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
-            if (!transactionIdToEdit) return;
-
-            const transactionIndex = transactions.findIndex(t => t.id === transactionIdToEdit);
-            if (transactionIndex === -1) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
-            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transactions[transactionIndex].id);
-            const newEngineer = prompt("أدخل اسم المهندس الجديد", transactions[transactionIndex].engineer);
-            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transactions[transactionIndex].type);
-
-            if (!newTransactionId || !newEngineer || !newTransactionType) {
-                alert("⚠️ تم إلغاء التحديث.");
-                return;
-            }
-
-            const updatedTransaction = {
-                engineer: newEngineer,
-                type: newTransactionType,
-                date: new Date().toISOString()
-            };
-
-            try {
-                const response = await fetch(`${API_URL}/transactions/${transactionIdToEdit}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedTransaction)
-                });
-                if (!response.ok) throw new Error('Failed to update transaction');
-                transactions[transactionIndex] = { ...transactions[transactionIndex], ...updatedTransaction, id: newTransactionId };
-                updateTransactionList();
-                updateTotalTransactions();
-                alert("✅ تم تحديث المعاملة بنجاح!");
-            } catch (error) {
-                console.error('❌ خطأ في التحديث:', error);
-                alert('❌ فشل في تحديث المعاملة!');
-            }
-        }
+        request.onsuccess = event => {
+            db = event.target.result;
+            loadTransactionsFromDB();
+        };
 
         function logout() {
             const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
@@ -511,11 +387,41 @@
 
         function togglePassword() {
             const passwordInput = document.getElementById('password');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        }
+
+        function checkCredentials() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            const request = store.get(username);
+
+            request.onsuccess = function(e) {
+                const user = e.target.result;
+                if (user && user.password === password) {
+                    document.getElementById("login-container").classList.add("hidden");
+                    document.getElementById("welcome").classList.remove("hidden");
+
+                    setTimeout(() => {
+                        document.getElementById("welcome").classList.add("hidden");
+                        document.getElementById("main-container").classList.remove("hidden");
+                    }, 5000);
+                } else {
+                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+                }
+            };
         }
 
         function handleKeyPress(event) {
-            if (event.key === "Enter") checkCredentials();
+            if (event.key === "Enter") {
+                checkCredentials();
+            }
         }
 
         function goToHomePage() {
@@ -525,6 +431,7 @@
         function toggleStatistics() {
             const mainContainer = document.getElementById("main-container");
             const statsContainer = document.getElementById("statistics-container");
+
             if (mainContainer.classList.contains("hidden")) {
                 statsContainer.classList.add("hidden");
                 mainContainer.classList.remove("hidden");
@@ -536,10 +443,58 @@
             }
         }
 
+        function addTransaction() {
+            const engineer = document.getElementById('engineer').value;
+            const transactionId = document.getElementById('transactionId').value;
+            const transactionType = document.getElementById('transactionType').value;
+
+            if (!engineer || !transactionId || !transactionType) {
+                alert("⚠️ الرجاء ملء جميع الحقول.");
+                return;
+            }
+
+            const transaction = {
+                id: transactionId,
+                engineer,
+                type: transactionType,
+                date: new Date().toISOString(),
+                createdAt: new Date().getTime() // إضافة تاريخ الإنشاء
+            };
+
+            saveTransactionToDB(transaction);
+            transactions.push(transaction);
+            updateTransactionList();
+            updateTotalTransactions();
+            alert("✅ تمت إضافة المعاملة بنجاح!");
+            clearFields();
+        }
+
+        function saveTransactionToDB(transaction) {
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+            store.put(transaction);
+        }
+
+        function loadTransactionsFromDB() {
+            const tx = db.transaction("transactions", "readonly");
+            const store = tx.objectStore("transactions");
+            const request = store.getAll();
+
+            request.onsuccess = event => {
+                transactions = event.target.result;
+                updateTransactionList();
+                updateTotalTransactions();
+                populateEngineerSelect();
+            };
+        }
+
         function filterRecentTransactions(transactionsToFilter) {
             const now = new Date().getTime();
-            const twelveHoursInMs = 12 * 60 * 60 * 1000;
-            return transactionsToFilter.filter(transaction => now - transaction.created_at <= twelveHoursInMs);
+            const twelveHoursInMs = 12 * 60 * 60 * 1000; // 12 ساعة بدلاً من 24 ساعة
+            return transactionsToFilter.filter(transaction => {
+                const age = now - transaction.createdAt;
+                return age <= twelveHoursInMs; // عرض المعاملات التي لم تتجاوز 12 ساعة فقط
+            });
         }
 
         function updateTransactionList() {
@@ -549,7 +504,8 @@
 
         function updateTotalTransactions() {
             const recentTransactions = filterRecentTransactions(transactions);
-            document.getElementById('totalTransactions').innerText = `إجمالي عدد المعاملات: ${recentTransactions.length}`;
+            const totalTransactionsElement = document.getElementById('totalTransactions');
+            totalTransactionsElement.innerText = `إجمالي عدد المعاملات: ${recentTransactions.length}`;
         }
 
         function displayTransactions(transactionsToDisplay) {
@@ -565,6 +521,7 @@
             const table = document.createElement('table');
             const thead = document.createElement('thead');
             const tbody = document.createElement('tbody');
+
             const headerRow = document.createElement('tr');
             ['رقم المعاملة', 'اسم المهندس', 'نوع الطلب', 'تاريخ الإضافة'].forEach(text => {
                 const th = document.createElement('th');
@@ -592,6 +549,7 @@
             const recentTransactions = filterRecentTransactions(transactionsToDisplay);
             const statsTable = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
             statsTable.innerHTML = '';
+
             recentTransactions.forEach(transaction => {
                 const row = statsTable.insertRow();
                 row.insertCell(0).innerText = transaction.id;
@@ -609,6 +567,7 @@
             const filteredTransactions = transactions.filter(transaction => {
                 const transactionDate = new Date(transaction.date);
                 const matchesEngineer = selectedEngineer ? transaction.engineer === selectedEngineer : true;
+                
                 let matchesDate = true;
                 if (startDate && endDate) {
                     const start = new Date(startDate);
@@ -616,6 +575,7 @@
                     end.setHours(23, 59, 59);
                     matchesDate = transactionDate >= start && transactionDate <= end;
                 }
+
                 return matchesEngineer && matchesDate;
             });
 
@@ -634,6 +594,7 @@
 
             const statsTable = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
             statsTable.innerHTML = '';
+
             Object.entries(statistics).forEach(([engineer, count]) => {
                 const row = statsTable.insertRow();
                 row.insertCell(0).innerText = engineer;
@@ -661,10 +622,85 @@
             document.getElementById('transactionType').value = '';
         }
 
+        function deleteTransaction() {
+            const transactionId = document.getElementById('transactionId').value;
+            if (!transactionId) {
+                alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
+                return;
+            }
+
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+            const request = store.delete(transactionId);
+
+            request.onsuccess = () => {
+                transactions = transactions.filter(t => t.id !== transactionId);
+                updateTransactionList();
+                updateTotalTransactions();
+                alert("✅ تم حذف المعاملة بنجاح.");
+                clearFields();
+            };
+
+            request.onerror = () => {
+                alert("❌ حدث خطأ أثناء حذف المعاملة.");
+            };
+        }
+
+        function editTransaction() {
+            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
+            if (!transactionIdToEdit) return;
+
+            const transaction = transactions.find(t => t.id === transactionIdToEdit);
+            if (!transaction) {
+                alert("⚠️ لا توجد معاملة بهذا الرقم!");
+                return;
+            }
+
+            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
+            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
+            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transaction.type);
+
+            if (!newTransactionId || !newEngineer || !newTransactionType) {
+                alert("⚠️ تم إلغاء التحديث.");
+                return;
+            }
+
+            const updatedTransaction = {
+                id: newTransactionId,
+                engineer: newEngineer,
+                type: newTransactionType,
+                date: new Date().toISOString(),
+                createdAt: transaction.createdAt // الاحتفاظ بتاريخ الإنشاء الأصلي
+            };
+
+            const tx = db.transaction("transactions", "readwrite");
+            const store = tx.objectStore("transactions");
+
+            if (transactionIdToEdit !== newTransactionId) {
+                store.delete(transactionIdToEdit);
+            }
+            
+            store.put(updatedTransaction);
+
+            tx.oncomplete = () => {
+                transactions = transactions.map(t => 
+                    t.id === transactionIdToEdit ? updatedTransaction : t
+                );
+                updateTransactionList();
+                updateTotalTransactions();
+                alert("✅ تم تحديث المعاملة بنجاح!");
+            };
+
+            tx.onerror = () => {
+                alert("❌ حدث خطأ أثناء تحديث المعاملة.");
+            };
+        }
+
         function populateEngineerSelect() {
             const recentTransactions = filterRecentTransactions(transactions);
             const engineerSelect = document.getElementById('engineerFilter');
             const uniqueEngineers = [...new Set(recentTransactions.map(t => t.engineer))];
+            
             engineerSelect.innerHTML = '<option value="">جميع المهندسين</option>';
             uniqueEngineers.forEach(engineer => {
                 if (engineer) {
@@ -677,12 +713,22 @@
         }
 
         window.addEventListener('load', () => {
+            populateEngineerSelect();
+            
             const startDate = document.getElementById('startDate');
             const endDate = document.getElementById('endDate');
             const today = new Date().toISOString().split('T')[0];
+            
             startDate.value = today;
             endDate.value = today;
+            
+            loadTransactionsFromDB();
         });
+
+        request.onerror = event => {
+            console.error('Database error:', event.target.error);
+            alert('حدث خطأ في قاعدة البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+        };
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91ca8d846e8ebd1c',t:'MTc0MTM1NTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
