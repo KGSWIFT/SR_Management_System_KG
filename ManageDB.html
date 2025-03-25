@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM - Administrator</title>
-    <link rel="icon" href="KG_SWIFT2.ico"> <!-- الأيقونة كما هي -->
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -81,7 +80,7 @@
 <body>
     <!-- قسم تسجيل الدخول -->
     <div class="login-container" id="loginContainer">
-        <img src="KG_SWIFT.PNG" alt="الشعار" style="max-width: 120px; margin-bottom: 20px;">
+        <img src="KG_SWIFT.png" alt="الشعار" style="max-width: 120px; margin-bottom: 20px;">
         <h2 style="color: black;">Administrator</h2>
         <div class="login-form">
             <input type="text" id="username" placeholder="اسم المستخدم" required>
@@ -150,11 +149,6 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            if (!username || !password) {
-                alert("يرجى ملء جميع الحقول!");
-                return;
-            }
-
             const tx = db.transaction("users", "readonly");
             const store = tx.objectStore("users");
             const request = store.get(username);
@@ -166,9 +160,6 @@
                     user.isAdmin ? 
                         document.getElementById('adminPanel').classList.remove('hidden') :
                         document.getElementById('mainSystem').classList.remove('hidden');
-                    // إفراغ الحقلين بعد تسجيل الدخول الناجح
-                    document.getElementById('username').value = '';
-                    document.getElementById('password').value = '';
                 } else {
                     alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
                 }
@@ -180,19 +171,15 @@
             window.location.href = "index.html";
         }
 
-        // تفعيل زر Enter فقط عندما يكون الحقلان مملوءين
+        // تفعيل زر Enter لتسجيل الدخول
         document.getElementById('username').addEventListener('keydown', function(e) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (e.key === 'Enter' && username.trim() && password.trim()) {
+            if (e.key === 'Enter') {
                 checkCredentials();
             }
         });
 
         document.getElementById('password').addEventListener('keydown', function(e) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (e.key === 'Enter' && username.trim() && password.trim()) {
+            if (e.key === 'Enter') {
                 checkCredentials();
             }
         });
