@@ -104,16 +104,6 @@
         <input type="text" id="deleteId" placeholder="رقم المعاملة للحذف">
         <button onclick="deleteTransaction()" class="admin-btn">حذف معاملة</button>
         <button onclick="clearAllTransactions()" class="admin-btn">مسح الكل</button>
-        
-        <!-- إدارة المستخدمين -->
-        <h3>إدارة المستخدمين</h3>
-        <input type="text" id="newUsername" placeholder="اسم المستخدم الجديد">
-        <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
-        <button onclick="addUser()">إضافة مستخدم</button>
-        <input type="text" id="editUsername" placeholder="اسم المستخدم للتعديل">
-        <input type="password" id="editPassword" placeholder="كلمة المرور الجديدة">
-        <button onclick="editUser()">تعديل مستخدم</button>
-        <button onclick="getAllUsers()">عرض جميع المستخدمين</button>
 
         <button onclick="logout()" style="background: #2ecc71;">العودة للنظام</button>
     </div>
@@ -121,7 +111,8 @@
     <script>
         let db;
 
-        const defaultUsers = [
+        // تعريف المستخدمين مباشرة في الكود
+        const users = [
             { username: "admin", password: "ghazaloman123", isAdmin: true },
             { username: "11221", password: "B@11221", isAdmin: false },
             { username: "11731", password: "M@11731", isAdmin: false },
@@ -129,7 +120,7 @@
             { username: "9684", password: "A@9684", isAdmin: false }
         ];
 
-        // إعداد قاعدة البيانات
+        // إعداد قاعدة البيانات (للمعاملات فقط)
         const dbRequest = indexedDB.open("TransactionsDB", 2);
         
         dbRequest.onupgradeneeded = function(e) {
@@ -137,23 +128,10 @@
             if (!db.objectStoreNames.contains("transactions")) {
                 db.createObjectStore("transactions", { keyPath: "id" });
             }
-            if (!db.objectStoreNames.contains("users")) {
-                db.createObjectStore("users", { keyPath: "username" });
-            }
         };
 
         dbRequest.onsuccess = function(e) {
             db = e.target.result;
-            // التحقق من وجود المستخدمين وإضافتهم إذا لم يكونوا موجودين
-            const tx = db.transaction("users", "readwrite");
-            const userStore = tx.objectStore("users");
-            const countRequest = userStore.count();
-
-            countRequest.onsuccess = () => {
-                if (countRequest.result === 0) { // إذا لم يكن هناك مستخدمون
-                    defaultUsers.forEach(user => userStore.add(user));
-                }
-            };
         };
 
         // التحقق من بيانات الدخول
@@ -161,23 +139,18 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            const tx = db.transaction("users", "readonly");
-            const store = tx.objectStore("users");
-            const request = store.get(username);
-
-            request.onsuccess = function(e) {
-                const user = e.target.result;
-                if (user && user.password === password) {
-                    if (!user.isAdmin) {
-                        alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
-                        return;
-                    }
-                    document.getElementById('loginContainer').classList.add('hidden');
-                    document.getElementById('adminPanel').classList.remove('hidden');
-                } else {
-                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+            // التحقق من بيانات المستخدم مباشرة من القائمة
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                if (!user.isAdmin) {
+                    alert("أنت غير مخول للدخول للنظام، الرجاء الاتصال بمسؤول النظام!");
+                    return;
                 }
-            };
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+            }
         }
 
         // وظيفة العودة للصفحة الرئيسية
@@ -218,64 +191,6 @@
             const tx = db.transaction("transactions", "readwrite");
             tx.objectStore("transactions").clear();
             alert("تم مسح جميع البيانات!");
-        }
-
-        // وظائف إدارة المستخدمين
-        function addUser() {
-            const username = document.getElementById('newUsername').value;
-            const password = document.getElementById('newPassword').value;
-            if (!username || !password) {
-                alert("يرجى إدخال اسم المستخدم وكلمة المرور!");
-                return;
-            }
-
-            const newUser = { username, password, isAdmin: false };
-            const tx = db.transaction("users", "readwrite");
-            const store = tx.objectStore("users");
-            const request = store.add(newUser);
-
-            request.onsuccess = function() {
-                alert("تم إضافة المستخدم بنجاح!");
-                document.getElementById('newUsername').value = '';
-                document.getElementById('newPassword').value = '';
-            };
-            request.onerror = function() {
-                alert("اسم المستخدم موجود مسبقًا!");
-            };
-        }
-
-        function editUser() {
-            const username = document.getElementById('editUsername').value;
-            const newPassword = document.getElementById('editPassword').value;
-            if (!username || !newPassword) {
-                alert("يرجى إدخال اسم المستخدم وكلمة المرور الجديدة!");
-                return;
-            }
-
-            const tx = db.transaction("users", "readwrite");
-            const store = tx.objectStore("users");
-            const request = store.get(username);
-
-            request.onsuccess = function(e) {
-                const user = e.target.result;
-                if (user) {
-                    user.password = newPassword;
-                    store.put(user);
-                    alert("تم تعديل كلمة المرور بنجاح!");
-                    document.getElementById('editUsername').value = '';
-                    document.getElementById('editPassword').value = '';
-                } else {
-                    alert("اسم المستخدم غير موجود!");
-                }
-            };
-        }
-
-        function getAllUsers() {
-            const tx = db.transaction("users", "readonly");
-            const store = tx.objectStore("users");
-            store.getAll().onsuccess = function(e) {
-                alert(JSON.stringify(e.target.result, null, 2));
-            };
         }
 
         function logout() {
