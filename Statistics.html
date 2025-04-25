@@ -193,12 +193,39 @@
             margin: 0;
         }
 
+        /* تنسيق أزرار التقسيم الصفحي */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .pagination button {
+            background: #357abd;
+            padding: 10px 20px;
+            margin: 0 10px;
+            transition: background 0.2s;
+        }
+
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination button:not(:disabled):hover {
+            background: #2a6099;
+        }
+
         @media (max-width: 600px) {
             .total-transactions-box {
                 padding: 10px 20px;
             }
             #totalTransactions {
                 font-size: 18px;
+            }
+            .pagination button {
+                padding: 8px 15px;
+                margin: 0 5px;
             }
         }
 
@@ -207,6 +234,7 @@
             #printableTransactions, #printableTransactions * { visibility: visible; }
             #printableStatistics, #printableStatistics * { visibility: hidden; }
             #chartContainer.printing, #chartContainer.printing * { visibility: visible; }
+            .pagination { display: none; } /* إخفاء أزرار التقسيم عند الطباعة */
         }
     </style>
 </head>
@@ -301,6 +329,10 @@
                 </thead>
                 <tbody></tbody>
             </table>
+            <div class="pagination">
+                <button onclick="previousPage()" id="prevPage">السابق</button>
+                <button onclick="nextPage()" id="nextPage">التالي</button>
+            </div>
         </div>
 
         <div id="statisticsSection" style="display: none;">
@@ -327,6 +359,9 @@
     <script>
         let myChart = null;
         let showingChart = false;
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let filteredTransactions = [];
 
         window.onload = function() {
             setTimeout(() => {
@@ -378,6 +413,7 @@
                 return;
             }
 
+            currentPage = 1; // إعادة تعيين الصفحة إلى الأولى عند تطبيق فلتر
             displayTransactions(selectedEngineer, startDate, endDate);
             displayStatistics(selectedEngineer, startDate, endDate);
             updateTotalTransactions(selectedEngineer, startDate, endDate);
@@ -394,7 +430,7 @@
 
             request.onsuccess = function(event) {
                 const transactions = event.target.result;
-                const filteredTransactions = transactions.filter(transaction => {
+                filteredTransactions = transactions.filter(transaction => {
                     const transactionDate = new Date(transaction.date);
                     const start = startDate ? new Date(startDate) : null;
                     const end = endDate ? new Date(endDate) : null;
@@ -407,28 +443,56 @@
                     );
                 });
 
-                const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = '';
-
-                if (filteredTransactions.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
-                    return;
-                }
-
-                filteredTransactions.forEach(transaction => {
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${transaction.id}</td>
-                        <td>${transaction.engineer}</td>
-                        <td>${transaction.type}</td>
-                        <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
-                    `;
-                });
+                renderPage();
             };
 
             request.onerror = function(event) {
                 console.error("خطأ في جلب البيانات:", event.target.error);
             };
+        }
+
+        function renderPage() {
+            const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            if (filteredTransactions.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+            pageTransactions.forEach(transaction => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>${transaction.engineer}</td>
+                    <td>${transaction.type}</td>
+                    <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+                `;
+            });
+
+            // تحديث حالة أزرار التقسيم
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(filteredTransactions.length / rowsPerPage)) {
+                currentPage++;
+                renderPage();
+            }
         }
 
         function displayStatistics(engineer = '', startDate = '', endDate = '') {
@@ -813,7 +877,28 @@
         }
 
         function printTransactionsTable() {
+            // عند الطباعة، إظهار جميع المعاملات بدلاً من 10 فقط
+            const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            if (filteredTransactions.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+            } else {
+                filteredTransactions.forEach(transaction => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${transaction.id}</td>
+                        <td>${transaction.engineer}</td>
+                        <td>${transaction.type}</td>
+                        <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+                    `;
+                });
+            }
+
             window.print();
+
+            // إعادة عرض الصفحة الحالية بعد الطباعة
+            renderPage();
         }
 
         function printStatistics() {
