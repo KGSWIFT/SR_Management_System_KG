@@ -85,12 +85,13 @@
         }
 
         select, input[type="date"] {
-            padding: 12px;
-            margin-top: 15px;
-            width: 100%;
+            padding: 10px;
+            margin: 0 10px;
             border-radius: 8px;
             border: 1px solid #357abd;
             font-size: 16px;
+            background: white;
+            cursor: pointer;
         }
 
         .loading-screen {
@@ -197,6 +198,7 @@
         .pagination {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-top: 15px;
         }
 
@@ -216,6 +218,23 @@
             background: #2a6099;
         }
 
+        #pageInfo {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 15px;
+        }
+
+        #pageSelect {
+            padding: 8px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 1px solid #357abd;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
             .total-transactions-box {
                 padding: 10px 20px;
@@ -227,6 +246,13 @@
                 padding: 8px 15px;
                 margin: 0 5px;
             }
+            #pageInfo {
+                font-size: 14px;
+            }
+            #pageSelect {
+                padding: 6px;
+                font-size: 14px;
+            }
         }
 
         @media print {
@@ -234,7 +260,7 @@
             #printableTransactions, #printableTransactions * { visibility: visible; }
             #printableStatistics, #printableStatistics * { visibility: hidden; }
             #chartContainer.printing, #chartContainer.printing * { visibility: visible; }
-            .pagination { display: none; } /* إخفاء أزرار التقسيم عند الطباعة */
+            .pagination { display: none; } /* إخفاء أزرار التقسيم، نص الصفحة، والقائمة عند الطباعة */
         }
     </style>
 </head>
@@ -331,6 +357,8 @@
             </table>
             <div class="pagination">
                 <button onclick="previousPage()" id="prevPage">السابق</button>
+                <span id="pageInfo"></span>
+                <select id="pageSelect" onchange="goToPage(this.value)"></select>
                 <button onclick="nextPage()" id="nextPage">التالي</button>
             </div>
         </div>
@@ -459,6 +487,8 @@
                 tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
                 document.getElementById('prevPage').disabled = true;
                 document.getElementById('nextPage').disabled = true;
+                document.getElementById('pageInfo').textContent = '';
+                document.getElementById('pageSelect').innerHTML = '';
                 return;
             }
 
@@ -476,9 +506,24 @@
                 `;
             });
 
-            // تحديث حالة أزرار التقسيم
+            // تحديث حالة أزرار التقسيم ورقم الصفحة
             document.getElementById('prevPage').disabled = currentPage === 1;
             document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
+            document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${Math.ceil(filteredTransactions.length / rowsPerPage)}`;
+
+            // تحديث القائمة المنسدلة
+            const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
+            const pageSelect = document.getElementById('pageSelect');
+            pageSelect.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i === currentPage) {
+                    option.selected = true;
+                }
+                pageSelect.appendChild(option);
+            }
         }
 
         function previousPage() {
@@ -493,6 +538,11 @@
                 currentPage++;
                 renderPage();
             }
+        }
+
+        function goToPage(page) {
+            currentPage = parseInt(page);
+            renderPage();
         }
 
         function displayStatistics(engineer = '', startDate = '', endDate = '') {
