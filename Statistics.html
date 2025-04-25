@@ -162,6 +162,46 @@
             color: white;
         }
 
+        /* تنسيق العدد الكلي للمعاملات */
+        .total-transactions-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .total-transactions-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #357abd;
+            border-radius: 10px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .total-transactions-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #totalTransactions {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .total-transactions-box {
+                padding: 10px 20px;
+            }
+            #totalTransactions {
+                font-size: 18px;
+            }
+        }
+
         @media print {
             body * { visibility: hidden; }
             #printableTransactions, #printableTransactions * { visibility: visible; }
@@ -181,7 +221,11 @@
         <img src="KG_SWIFT.png" alt="KG SWIFT" class="logo" style="max-width: 120px; height: auto; margin-bottom: 20px;">
         <h2>KG SWIFT SYSTEM</h2>
         <p style="margin-bottom: 25px; font-size: 24px; color: black;">نظام تحويل المعاملات</p>
-        <p style="margin-bottom: 25px; font-size: 20px; color: black;" id="totalTransactions">العدد الكلي للمعاملات: 0</p>
+        <div class="total-transactions-container">
+            <div class="total-transactions-box">
+                <p id="totalTransactions">العدد الكلي للمعاملات: 0</p>
+            </div>
+        </div>
         <div id="transactionTypesStats" style="margin-bottom: 25px;">
             <h3 style="color: black; font-size: 18px;">عدد المعاملات حسب النوع</h3>
             <table id="transactionTypesTable">
@@ -797,4 +841,4 @@
         }
     </script>
 </body>
-            </html>
+</html>
