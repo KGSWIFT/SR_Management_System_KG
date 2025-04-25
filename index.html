@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Home Page</title>
     <link rel="icon" href="KG_SWIFT2.ico">
+    <!-- إضافة مكتبة Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -22,20 +24,19 @@
             position: relative;
         }
 
-        /* تنسيق النص الجديد "التشغيل التجريبي للمنصة" */
         .trial-header {
             position: absolute;
             top: 10px;
             width: 100%;
             text-align: center;
-            color: #ffd700; /* لون ذهبي بارز */
+            color: #ffd700;
             font-size: 28px;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            background: rgba(0, 0, 0, 0.5); /* خلفية شبه شفافة */
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 10px;
-            z-index: 1001; /* للتأكد من ظهوره فوق جميع العناصر */
+            z-index: 1001;
         }
 
         #welcome {
@@ -51,11 +52,11 @@
         }
 
         .content-box {
-            background: rgba(0, 0, 0, 0.8); /* خلفية سوداء شفافة */
+            background: rgba(0, 0, 0, 0.8);
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
-            width: 600px; /* زيادة العرض لاستيعاب ثلاثة أزرار */
+            width: 600px;
             margin-top: 20px;
         }
 
@@ -67,7 +68,6 @@
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
         }
 
-        /* تنسيق الأزرار */
         .button-container {
             display: flex;
             justify-content: space-between;
@@ -75,18 +75,30 @@
         }
 
         .button-box {
-            background: rgba(0, 0, 0, 0.8); /* خلفية سوداء شفافة */
+            background: rgba(0, 0, 0, 0.8);
             padding: 15px;
             border-radius: 10px;
-            width: 150px; /* عرض مشابه للصورة */
+            width: 150px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .button-box img {
-            width: 50px;
-            height: 50px;
+        /* تنسيق الأيقونات من Font Awesome */
+        .button-box i {
+            font-size: 50px;
             margin-bottom: 10px;
+        }
+
+        .button-box .user-icon {
+            color: #4a90e2; /* أزرق لزر الموظف */
+        }
+
+        .button-box .stats-icon {
+            color: #28a745; /* أخضر لزر الإحصائيات */
+        }
+
+        .button-box .admin-icon {
+            color: #ff6b6b; /* أحمر لزر مسؤول النظام */
         }
 
         .button-box h3 {
@@ -113,12 +125,11 @@
 
         .button-box button:hover {
             transform: scale(1.05);
-            box-shadow: 0 2px 5px rgba(255, 255,  Enum5, 0.3);
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.3);
         }
 
-        /* تخصيص الألوان لكل زر */
         .admin-button {
-            background: linear-gradient(45deg, #ff6b6b, #ff8787); /* لون زر مسؤول النظام (أحمر) */
+            background: linear-gradient(45deg, #ff6b6b, #ff8787);
         }
 
         .admin-button:hover {
@@ -126,7 +137,7 @@
         }
 
         .user-button {
-            background: linear-gradient(45deg, #4a90e2, #357abd); /* لون زر موظف (أزرق) */
+            background: linear-gradient(45deg, #4a90e2, #357abd);
         }
 
         .user-button:hover {
@@ -134,7 +145,7 @@
         }
 
         .stats-button {
-            background: linear-gradient(45deg, #28a745, #34c759); /* لون زر إحصائيات (أخضر) */
+            background: linear-gradient(45deg, #28a745, #34c759);
         }
 
         .stats-button:hover {
@@ -162,7 +173,6 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* تنسيق النافذة المنبثقة */
         .modal {
             display: none;
             position: fixed;
@@ -221,7 +231,6 @@
             background: #e55a5a;
         }
 
-        /* تنسيق نص حقوق الطبع والنشر */
         .footer {
             position: absolute;
             bottom: 70px;
@@ -245,14 +254,12 @@
     </style>
 </head>
 <body>
-    <!-- النص الجديد "التشغيل التجريبي للمنصة" -->
     <div class="trial-header">
         التشغيل التجريبي للمنصة
     </div>
 
     <button class="about-button" onclick="showAbout()">عــــنّا</button>
 
-    <!-- النافذة المنبثقة باللغة الإنجليزية -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <button class="close-button" onclick="closeAbout()">×</button>
@@ -286,21 +293,21 @@
         <div class="button-container">
             <!-- زر موظف -->
             <div class="button-box">
-                <img src="user-icon.png" alt="أيقونة موظف"> <!-- استبدل بمسار الأيقونة الزرقاء -->
+                <i class="fas fa-user user-icon"></i> <!-- أيقونة الموظف -->
                 <h3>موظف</h3>
                 <p>اضغط هنا لإدارة المعاملات ومتابعة الحالة</p>
                 <button class="user-button" onclick="window.location.href='Transactions.html'">دخول</button>
             </div>
             <!-- زر إحصائيات المعاملات -->
             <div class="button-box">
-                <img src="stats-icon.png" alt="أيقونة إحصائيات"> <!-- استبدل بمسار أيقونة مناسبة -->
+                <i class="fas fa-chart-bar stats-icon"></i> <!-- أيقونة الإحصائيات -->
                 <h3>إحصائيات</h3>
                 <p>اضغط هنا لعرض إحصائيات المعاملات</p>
                 <button class="stats-button" onclick="window.location.href='Statistics.html'">دخول</button>
             </div>
             <!-- زر مسؤول النظام -->
             <div class="button-box">
-                <img src="admin-icon.png" alt="أيقونة مسؤول"> <!-- استبدل بمسار الأيقونة الحمراء -->
+                <i class="fas fa-user-shield admin-icon"></i> <!-- أيقونة مسؤول النظام -->
                 <h3>مسؤول النظام</h3>
                 <p>اضغط هنا لإدارة النظام وتعديل البيانات</p>
                 <button class="admin-button" onclick="window.location.href='ManageDB.html'">دخول</button>
@@ -308,7 +315,6 @@
         </div>
     </div>
 
-    <!-- نص حقوق الطبع والنشر -->
     <div class="footer">جــــميـع الــــحقــــوق مـــــــحفوظـــــة 2025 KG™</div>
 
     <script>
