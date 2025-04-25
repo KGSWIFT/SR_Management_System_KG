@@ -200,7 +200,7 @@
             background: #357abd;
         }
 
-        #pageInfo {
+        #pageInfo, #pageInfoStats {
             font-size: 16px;
             font-weight: bold;
             color: #2c3e50;
@@ -222,7 +222,7 @@
                 padding: 8px 15px;
                 margin: 0 5px;
             }
-            #pageInfo {
+            #pageInfo, #pageInfoStats {
                 font-size: 14px;
             }
             #pageSelect {
@@ -348,6 +348,11 @@
         </div>
 
         <div class="transactions-list" id="transactionsList"></div>
+        <div class="pagination" id="mainPagination">
+            <button onclick="previousPageMain()" id="prevPageMain">السابق</button>
+            <span id="pageInfo"></span>
+            <button onclick="nextPageMain()" id="nextPageMain">التالي</button>
+        </div>
     </div>
 
     <div class="container hidden" id="statistics-container">
@@ -390,11 +395,11 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                <div class="pagination">
-                    <button onclick="previousPage()" id="prevPage">السابق</button>
-                    <span id="pageInfo"></span>
-                    <select id="pageSelect" onchange="goToPage(this.value)"></select>
-                    <button onclick="nextPage()" id="nextPage">التالي</button>
+                <div class="pagination" id="statsPagination">
+                    <button onclick="previousPageStats()" id="prevPageStats">السابق</button>
+                    <span id="pageInfoStats"></span>
+                    <select id="pageSelect" onchange="goToPageStats(this.value)"></select>
+                    <button onclick="nextPageStats()" id="nextPageStats">التالي</button>
                 </div>
             </div>
 
@@ -416,7 +421,8 @@
     <script>
         let transactions = [];
         let db;
-        let currentPage = 1;
+        let currentPageMain = 1;
+        let currentPageStats = 1;
         const rowsPerPage = 10;
         let filteredTransactions = [];
 
@@ -468,7 +474,6 @@
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
-            // التحقق من بيانات المستخدم مباشرة من المصفوفة
             const user = defaultUsers.find(u => u.username === username && u.password === password);
             if (user) {
                 document.getElementById("login-container").classList.add("hidden");
@@ -503,7 +508,7 @@
             } else {
                 mainContainer.classList.add("hidden");
                 statsContainer.classList.remove("hidden");
-                currentPage = 1;
+                currentPageStats = 1;
                 filterTransactions();
             }
         }
@@ -528,6 +533,7 @@
 
             saveTransactionToDB(transaction);
             transactions.push(transaction);
+            currentPageMain = 1;
             updateTransactionList();
             updateTotalTransactions();
             alert("✅ تمت إضافة المعاملة بنجاح!");
@@ -547,6 +553,7 @@
 
             request.onsuccess = event => {
                 transactions = event.target.result;
+                currentPageMain = 1;
                 updateTransactionList();
                 updateTotalTransactions();
                 populateEngineerSelect();
@@ -580,8 +587,14 @@
 
             if (recentTransactions.length === 0) {
                 transactionsList.innerHTML = '<p>لا توجد معاملات لعرضها.</p>';
+                document.getElementById('mainPagination').style.display = 'none';
                 return;
             }
+
+            const totalPages = Math.ceil(recentTransactions.length / rowsPerPage);
+            const startIndex = (currentPageMain - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageTransactions = recentTransactions.slice(startIndex, endIndex);
 
             const table = document.createElement('table');
             const thead = document.createElement('thead');
@@ -596,7 +609,7 @@
             thead.appendChild(headerRow);
             table.appendChild(thead);
 
-            recentTransactions.forEach(transaction => {
+            pageTransactions.forEach(transaction => {
                 const row = document.createElement('tr');
                 [transaction.id, transaction.engineer, transaction.type, new Date(transaction.date).toLocaleString('ar-EG')].forEach(text => {
                     const td = document.createElement('td');
@@ -608,27 +621,45 @@
 
             table.appendChild(tbody);
             transactionsList.appendChild(table);
+
+            document.getElementById('mainPagination').style.display = 'flex';
+            document.getElementById('pageInfo').textContent = `صفحة ${currentPageMain} من ${totalPages}`;
+            document.getElementById('prevPageMain').disabled = currentPageMain === 1;
+            document.getElementById('nextPageMain').disabled = currentPageMain === totalPages;
+        }
+
+        function previousPageMain() {
+            if (currentPageMain > 1) {
+                currentPageMain--;
+                updateTransactionList();
+            }
+        }
+
+        function nextPageMain() {
+            const recentTransactions = filterRecentTransactions(transactions);
+            const totalPages = Math.ceil(recentTransactions.length / rowsPerPage);
+            if (currentPageMain < totalPages) {
+                currentPageMain++;
+                updateTransactionList();
+            }
         }
 
         function displayStatisticsTransactions(transactionsToDisplay) {
             filteredTransactions = filterRecentTransactions(transactionsToDisplay);
-            renderPage();
+            renderPageStats();
         }
 
-        function renderPage() {
+        function renderPageStats() {
             const statsTable = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
             statsTable.innerHTML = '';
 
             if (filteredTransactions.length === 0) {
                 statsTable.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
-                document.getElementById('prevPage').disabled = true;
-                document.getElementById('nextPage').disabled = true;
-                document.getElementById('pageInfo').textContent = '';
-                document.getElementById('pageSelect').innerHTML = '';
+                document.getElementById('statsPagination').style.display = 'none';
                 return;
             }
 
-            const startIndex = (currentPage - 1) * rowsPerPage;
+            const startIndex = (currentPageStats - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
             const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
 
@@ -640,41 +671,40 @@
                 row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
             });
 
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
-            document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${Math.ceil(filteredTransactions.length / rowsPerPage)}`;
-
             const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
+            document.getElementById('statsPagination').style.display = 'flex';
+            document.getElementById('prevPageStats').disabled = currentPageStats === 1;
+            document.getElementById('nextPageStats').disabled = currentPageStats === totalPages;
+            document.getElementById('pageInfoStats').textContent = `صفحة ${currentPageStats} من ${totalPages}`;
+
             const pageSelect = document.getElementById('pageSelect');
             pageSelect.innerHTML = '';
             for (let i = 1; i <= totalPages; i++) {
                 const option = document.createElement('option');
                 option.value = i;
                 option.textContent = i;
-                if (i === currentPage) {
-                    option.selected = true;
-                }
+                if (i === currentPageStats) option.selected = true;
                 pageSelect.appendChild(option);
             }
         }
 
-        function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage();
+        function previousPageStats() {
+            if (currentPageStats > 1) {
+                currentPageStats--;
+                renderPageStats();
             }
         }
 
-        function nextPage() {
-            if (currentPage < Math.ceil(filteredTransactions.length / rowsPerPage)) {
-                currentPage++;
-                renderPage();
+        function nextPageStats() {
+            if (currentPageStats < Math.ceil(filteredTransactions.length / rowsPerPage)) {
+                currentPageStats++;
+                renderPageStats();
             }
         }
 
-        function goToPage(page) {
-            currentPage = parseInt(page);
-            renderPage();
+        function goToPageStats(page) {
+            currentPageStats = parseInt(page);
+            renderPageStats();
         }
 
         function filterTransactions() {
@@ -687,7 +717,7 @@
                 return;
             }
 
-            currentPage = 1;
+            currentPageStats = 1;
             const filteredTransactions = transactions.filter(transaction => {
                 const transactionDate = new Date(transaction.date);
                 const matchesEngineer = selectedEngineer ? transaction.engineer === selectedEngineer : true;
@@ -743,7 +773,7 @@
             }
 
             window.print();
-            renderPage();
+            renderPageStats();
         }
 
         function searchTransactions() {
@@ -753,6 +783,7 @@
                 tx.engineer.toLowerCase().includes(searchValue) ||
                 tx.type.toLowerCase().includes(searchValue)
             );
+            currentPageMain = 1;
             displayTransactions(filteredTransactions);
         }
 
@@ -775,6 +806,7 @@
 
             request.onsuccess = () => {
                 transactions = transactions.filter(t => t.id !== transactionId);
+                currentPageMain = 1;
                 updateTransactionList();
                 updateTotalTransactions();
                 alert("✅ تم حذف المعاملة بنجاح.");
@@ -826,6 +858,7 @@
                 transactions = transactions.map(t => 
                     t.id === transactionIdToEdit ? updatedTransaction : t
                 );
+                currentPageMain = 1;
                 updateTransactionList();
                 updateTotalTransactions();
                 alert("✅ تم تحديث المعاملة بنجاح!");
