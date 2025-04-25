@@ -1,254 +1,329 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KG SWIFT SYSTEM-Home Page</title>
-  <link rel="icon" href="KG_SWIFT2.ico">
-  <style>
-      body {
-          font-family: 'Times New Roman', serif;
-          direction: rtl;
-          text-align: center;
-          background: url('background3.png') no-repeat center center fixed;
-          background-size: cover;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          color: white;
-          padding: 20px;
-          position: relative;
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG SWIFT SYSTEM-Home Page</title>
+    <link rel="icon" href="KG_SWIFT2.ico">
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            direction: rtl;
+            text-align: center;
+            background: url('background3.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
 
-      .trial-header {
-          position: absolute;
-          top: 10px;
-          width: 100%;
-          text-align: center;
-          color: #ffd700;
-          font-size: 28px;
-          font-weight: bold;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-          background: rgba(0, 0, 0, 0.5);
-          padding: 10px;
-          border-radius: 10px;
-          z-index: 1001;
-      }
+        /* تنسيق النص الجديد "التشغيل التجريبي للمنصة" */
+        .trial-header {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: #ffd700; /* لون ذهبي بارز */
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5); /* خلفية شبه شفافة */
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 1001; /* للتأكد من ظهوره فوق جميع العناصر */
+        }
 
-      #welcome {
-          background: rgba(0, 0, 0, 0.8);
-          padding: 30px;
-          border-radius: 20px;
-          box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
-          animation: fadeIn 2s ease-in-out;
-      }
+        #welcome {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+            animation: fadeIn 2s ease-in-out;
+        }
 
-      .hidden {
-          display: none;
-      }
+        .hidden {
+            display: none;
+        }
 
-      .content-box {
-          background: rgba(255, 255, 255, 0.3);
-          padding: 30px;
-          border-radius: 15px;
-          box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
-          width: 350px;
-          margin-top: 20px;
-      }
+        .content-box {
+            background: rgba(0, 0, 0, 0.8); /* خلفية سوداء شفافة */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+            width: 600px; /* زيادة العرض لاستيعاب ثلاثة أزرار */
+            margin-top: 20px;
+        }
 
-      #main-content h2 {
-          font-weight: bold;
-          color: #000000;
-          margin-bottom: 25px;
-          font-size: 50px;
-          text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
-      }
+        #main-content h2 {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 25px;
+            font-size: 40px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+        }
 
-      .button {
-          padding: 15px 40px;
-          margin: 15px;
-          border: none;
-          border-radius: 10px;
-          background: linear-gradient(45deg, #4a90e2, #357abd);
-          color: white;
-          font-size: 20px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: transform 0.3s, box-shadow 0.3s;
-          width: 100%;
-      }
+        /* تنسيق الأزرار */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
 
-      .button:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
-      }
+        .button-box {
+            background: rgba(0, 0, 0, 0.8); /* خلفية سوداء شفافة */
+            padding: 15px;
+            border-radius: 10px;
+            width: 150px; /* عرض مشابه للصورة */
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
 
-      .admin-button {
-          background: #28a745;
-      }
+        .button-box img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
 
-      .admin-button:hover {
-          background: #218838;
-      }
+        .button-box h3 {
+            color: white;
+            font-size: 20px;
+            margin: 10px 0;
+        }
 
-      .about-button {
-          position: absolute;
-          top: 70px;
-          right: 20px;
-          padding: 8px 16px;
-          background: linear-gradient(45deg, #ff6b6b, #ff8787);
-          color: white;
-          font-size: 14px;
-          font-weight: bold;
-          border: none;
-          border-radius: 20px;
-          cursor: pointer;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
+        .button-box p {
+            color: white;
+            font-size: 14px;
+            margin: 5px 0;
+        }
 
-      .about-button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      }
+        .button-box button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-      .modal {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.7);
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-      }
+        .button-box button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(255, 255,  Enum5, 0.3);
+        }
 
-      .modal-content {
-          background: rgba(255, 255, 255, 0.95);
-          padding: 20px;
-          border-radius: 15px;
-          width: 90%;
-          max-width: 500px;
-          max-height: 80vh;
-          overflow-y: auto;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-          text-align: left;
-          color: #333;
-          position: relative;
-          animation: slideIn 0.3s ease-in-out;
-      }
+        /* تخصيص الألوان لكل زر */
+        .admin-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8787); /* لون زر مسؤول النظام (أحمر) */
+        }
 
-      .modal-content h3 {
-          color: #4a90e2;
-          margin-bottom: 15px;
-          font-size: 24px;
-      }
+        .admin-button:hover {
+            background: linear-gradient(45deg, #e55a5a, #e77b7b);
+        }
 
-      .modal-content p {
-          margin: 10px 0;
-          line-height: 1.5;
-      }
+        .user-button {
+            background: linear-gradient(45deg, #4a90e2, #357abd); /* لون زر موظف (أزرق) */
+        }
 
-      .modal-content .close-button {
-          position: absolute;
-          top: 10px;
-          left: 10px;
-          background: #ff6b6b;
-          color: white;
-          border: none;
-          border-radius: 50%;
-          width: 30px;
-          height: 30px;
-          font-size: 18px;
-          cursor: pointer;
-          transition: background 0.3s ease;
-      }
+        .user-button:hover {
+            background: linear-gradient(45deg, #3a80d2, #2a6aad);
+        }
 
-      .modal-content .close-button:hover {
-          background: #e55a5a;
-      }
+        .stats-button {
+            background: linear-gradient(45deg, #28a745, #34c759); /* لون زر إحصائيات (أخضر) */
+        }
 
-      .footer {
-          position: absolute;
-          bottom: 70px;
-          width: 100%;
-          text-align: center;
-          color: white;
-          font-size: 18px;
-          font-weight: bold;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-      }
+        .stats-button:hover {
+            background: linear-gradient(45deg, #218838, #2ba84a);
+        }
 
-      @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
-      }
+        .about-button {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8787);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-      @keyframes slideIn {
-          from { transform: translateY(-50px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-      }
-  </style>
+        .about-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* تنسيق النافذة المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            color: #333;
+            position: relative;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .modal-content h3 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .modal-content .close-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .modal-content .close-button:hover {
+            background: #e55a5a;
+        }
+
+        /* تنسيق نص حقوق الطبع والنشر */
+        .footer {
+            position: absolute;
+            bottom: 70px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-  <div class="trial-header">التشغيل التجريبي للمنصة</div>
+    <!-- النص الجديد "التشغيل التجريبي للمنصة" -->
+    <div class="trial-header">
+        التشغيل التجريبي للمنصة
+    </div>
 
-  <button class="about-button" onclick="showAbout()">عــــنّا</button>
+    <button class="about-button" onclick="showAbout()">عــــنّا</button>
 
-  <div id="aboutModal" class="modal">
-      <div class="modal-content">
-          <button class="close-button" onclick="closeAbout()">×</button>
-          <h3>About SR Management System (SWIFT KG)</h3>
-          <p>The SR Management System (SWIFT KG) is a manual application designed to support the management of engineering requests and projects.</p>
-          <p><strong>Key Details About the Application:</strong></p>
-          <p>- Application Name: SWIFT KG<br>
-             - Version: 1.0<br>
-             - Created on: January 2025<br>
-             - Contact Phone: (+968) 97099711<br>
-             - Email: <a href="mailto:info@kg-system.com">info@kg-system.com</a><br>
-             - Trademark: KG</p>
-          <p>This application aims to manage and track transactions efficiently. For any inquiries or support, users are encouraged to reach out via the provided contact information.</p>
-          <p><strong>Creators:</strong></p>
-          <p>- Khalid Al-Ghazali<br>
-             - Talal Al-Ghazali<br>
-             - Al-Amir Al-Ghazali</p>
-          <p><strong>Intellectual Property Rights:</strong></p>
-          <p>All rights to the SR Management System (SWIFT KG) are reserved. Unauthorized use, reproduction, or distribution of this application or its components is prohibited. For permissions or inquiries regarding intellectual property rights, please contact the creators directly.</p>
-          <p>Feel free to reach out if you have any further questions or need assistance!</p>
-      </div>
-  </div>
+    <!-- النافذة المنبثقة باللغة الإنجليزية -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeAbout()">×</button>
+            <h3>About SR Management System (SWIFT KG)</h3>
+            <p>The SR Management System (SWIFT KG) is a manual application designed to support the management of engineering requests and projects.</p>
+            <p><strong>Key Details About the Application:</strong></p>
+            <p>- Application Name: SWIFT KG<br>
+               - Version: 1.0<br>
+               - Created on: January 2025<br>
+               - Contact Phone: (+968) 97099711<br>
+               - Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4b3bcb5aeb5b5b8fae4e3fabfb5b394b3b9b5bdb8fab7bbb9">[email protected]</a><br>
+               - Trademark: KG</p>
+            <p>This application aims to manage and track transactions efficiently. For any inquiries or support, users are encouraged to reach out via the provided contact information.</p>
+            <p><strong>Creators:</strong></p>
+            <p>- Khalid Al-Ghazali<br>
+               - Talal Al-Ghazali<br>
+               - Al-Amir Al-Ghazali</p>
+            <p><strong>Intellectual Property Rights:</strong></p>
+            <p>All rights to the SR Management System (SWIFT KG) are reserved. Unauthorized use, reproduction, or distribution of this application or its components is prohibited. For permissions or inquiries regarding intellectual property rights, please contact the creators directly.</p>
+            <p>Feel free to reach out if you have any further questions or need assistance!</p>
+        </div>
+    </div>
 
-  <div id="welcome">
-      <h2>WELCOME TO KG SWIFT SYSTEM</h2>
-      <img src="KG_SWIFT.png" alt="شعار الشركة" style="width: 220px; height: auto; border-radius: 10px;">
-  </div>
+    <div id="welcome">
+        <h2>WELCOME TO KG SWIFT SYSTEM</h2>
+        <img src="KG_SWIFT.png" alt="شعار الشركة" style="width: 220px; height: auto; border-radius: 10px;">
+    </div>
 
-  <div id="main-content" class="hidden content-box">
-      <h2>اختيار العمل</h2>
-      <button class="button" onclick="window.location.href='Transactions.html'">إدارة المعاملات</button>
-      <button class="button" onclick="window.location.href='Statistics.html'">إحصائيات المعاملات</button>
-      <button class="button admin-button" onclick="window.location.href='ManageDB.html'">مسؤول النظام</button>
-  </div>
+    <div id="main-content" class="hidden content-box">
+        <h2>اختيار العمل</h2>
+        <div class="button-container">
+            <!-- زر موظف -->
+            <div class="button-box">
+                <img src="user-icon.png" alt="أيقونة موظف"> <!-- استبدل بمسار الأيقونة الزرقاء -->
+                <h3>موظف</h3>
+                <p>اضغط هنا لإدارة المعاملات ومتابعة الحالة</p>
+                <button class="user-button" onclick="window.location.href='Transactions.html'">دخول</button>
+            </div>
+            <!-- زر إحصائيات المعاملات -->
+            <div class="button-box">
+                <img src="stats-icon.png" alt="أيقونة إحصائيات"> <!-- استبدل بمسار أيقونة مناسبة -->
+                <h3>إحصائيات</h3>
+                <p>اضغط هنا لعرض إحصائيات المعاملات</p>
+                <button class="stats-button" onclick="window.location.href='Statistics.html'">دخول</button>
+            </div>
+            <!-- زر مسؤول النظام -->
+            <div class="button-box">
+                <img src="admin-icon.png" alt="أيقونة مسؤول"> <!-- استبدل بمسار الأيقونة الحمراء -->
+                <h3>مسؤول النظام</h3>
+                <p>اضغط هنا لإدارة النظام وتعديل البيانات</p>
+                <button class="admin-button" onclick="window.location.href='ManageDB.html'">دخول</button>
+            </div>
+        </div>
+    </div>
 
-  <div class="footer">جــــميـع الــــحقــــوق مـــــــحفوظـــــة 2025 KG™</div>
+    <!-- نص حقوق الطبع والنشر -->
+    <div class="footer">جــــميـع الــــحقــــوق مـــــــحفوظـــــة 2025 KG™</div>
 
-  <script>
-      setTimeout(() => {
-          document.getElementById("welcome").classList.add("hidden");
-          document.getElementById("main-content").classList.remove("hidden");
-      }, 5000);
+    <script>
+        setTimeout(() => {
+            document.getElementById("welcome").classList.add("hidden");
+            document.getElementById("main-content").classList.remove("hidden");
+        }, 5000);
 
-      function showAbout() {
-          document.getElementById("aboutModal").style.display = "flex";
-      }
+        function showAbout() {
+            document.getElementById("aboutModal").style.display = "flex";
+        }
 
-      function closeAbout() {
-          document.getElementById("aboutModal").style.display = "none";
-      }
-  </script>
+        function closeAbout() {
+            document.getElementById("aboutModal").style.display = "none";
+        }
+    </script>
 </body>
 </html>
