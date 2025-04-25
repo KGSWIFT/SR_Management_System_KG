@@ -207,7 +207,7 @@
         </div>
 
         <select id="engineer" onchange="filterTransactions()">
-            <option value="">جميع المهندسين</option>     
+            <option value="">جميع المهندسين</option>
             <option value="سالم عيسى العامري">المهندس سالم عيسى العامري</option>
             <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
             <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
@@ -381,6 +381,10 @@
                     `;
                 });
             };
+
+            request.onerror = function(event) {
+                console.error("خطأ في جلب البيانات:", event.target.error);
+            };
         }
 
         function displayStatistics(engineer = '', startDate = '', endDate = '') {
@@ -415,6 +419,10 @@
                     const row = statsTableBody.insertRow();
                     row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
                 }
+            };
+
+            request.onerror = function(event) {
+                console.error("خطأ في جلب البيانات:", event.target.error);
             };
         }
 
@@ -679,6 +687,10 @@
 
                 exportToCSV(csvData, 'Transactions_Export.csv');
             };
+
+            request.onerror = function(event) {
+                console.error("خطأ في جلب البيانات:", event.target.error);
+            };
         }
 
         function exportChartToExcel() {
@@ -701,20 +713,26 @@
                     return (
                         (!selectedEngineer || transaction.engineer === selectedEngineer) &&
                         (!start || transactionDate >= start) &&
-                        (!end~~أبراج اتصالات': 0,
-                        'ملعب': 0,
-                        'سياحي سكني': 0,
-                        'تجاري سكني': 0,
-                        'موافقة فنية سكنية': 0,
-                        'موافقة فنية تجارية': 0,
-                        'سكني متعدد الطوابق': 0,
-                        'صناعي': 0,
-                        'مسجد': 0,
-                        'سكني تجاري': 0,
-                        'كنيسة': 0
-                    };
+                        (!end || transactionDate <= end)
+                    );
+                });
 
                 const statistics = {};
+                const typeStats = {
+                    "حديقة عامة": 0,
+                    "أبراج اتصالات": 0,
+                    "ملعب": 0,
+                    "سياحي سكني": 0,
+                    "تجاري سكني": 0,
+                    "موافقة فنية سكنية": 0,
+                    "موافقة فنية تجارية": 0,
+                    "سكني متعدد الطوابق": 0,
+                    "صناعي": 0,
+                    "مسجد": 0,
+                    "سكني تجاري": 0,
+                    "كنيسة": 0
+                };
+
                 filteredTransactions.forEach(transaction => {
                     statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
                     if (typeStats.hasOwnProperty(transaction.type)) {
@@ -743,6 +761,10 @@
                 }
 
                 exportToCSV(csvData, 'Statistics_Export.csv');
+            };
+
+            request.onerror = function(event) {
+                console.error("خطأ في جلب البيانات:", event.target.error);
             };
         }
 
@@ -775,4 +797,4 @@
         }
     </script>
 </body>
-</html>
+            </html>
