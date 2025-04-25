@@ -172,6 +172,65 @@
             cursor: pointer;
         }
 
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .pagination button {
+            background: #4a90e2;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: auto;
+        }
+
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination button:not(:disabled):hover {
+            background: #357abd;
+        }
+
+        #pageInfo {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 15px;
+        }
+
+        #pageSelect {
+            padding: 8px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 2px solid #4a90e2;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .pagination button {
+                padding: 8px 15px;
+                margin: 0 5px;
+            }
+            #pageInfo {
+                font-size: 14px;
+            }
+            #pageSelect {
+                padding: 6px;
+                font-size: 14px;
+            }
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -183,6 +242,9 @@
                 position: absolute;
                 left: 0;
                 top: 0;
+            }
+            .pagination {
+                display: none;
             }
         }
 
@@ -328,6 +390,12 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div class="pagination">
+                    <button onclick="previousPage()" id="prevPage">السابق</button>
+                    <span id="pageInfo"></span>
+                    <select id="pageSelect" onchange="goToPage(this.value)"></select>
+                    <button onclick="nextPage()" id="nextPage">التالي</button>
+                </div>
             </div>
 
             <div id="engineerStats">
@@ -348,6 +416,9 @@
     <script>
         let transactions = [];
         let db;
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let filteredTransactions = [];
 
         // تعريف المستخدمين مباشرة في الصفحة
         const defaultUsers = [
@@ -432,8 +503,8 @@
             } else {
                 mainContainer.classList.add("hidden");
                 statsContainer.classList.remove("hidden");
-                displayStatisticsTransactions(transactions);
-                displayStatistics(transactions);
+                currentPage = 1;
+                filterTransactions();
             }
         }
 
@@ -540,17 +611,70 @@
         }
 
         function displayStatisticsTransactions(transactionsToDisplay) {
-            const recentTransactions = filterRecentTransactions(transactionsToDisplay);
+            filteredTransactions = filterRecentTransactions(transactionsToDisplay);
+            renderPage();
+        }
+
+        function renderPage() {
             const statsTable = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
             statsTable.innerHTML = '';
 
-            recentTransactions.forEach(transaction => {
+            if (filteredTransactions.length === 0) {
+                statsTable.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
+                document.getElementById('pageInfo').textContent = '';
+                document.getElementById('pageSelect').innerHTML = '';
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+            pageTransactions.forEach(transaction => {
                 const row = statsTable.insertRow();
                 row.insertCell(0).innerText = transaction.id;
                 row.insertCell(1).innerText = transaction.engineer;
                 row.insertCell(2).innerText = transaction.type;
                 row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
             });
+
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
+            document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${Math.ceil(filteredTransactions.length / rowsPerPage)}`;
+
+            const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
+            const pageSelect = document.getElementById('pageSelect');
+            pageSelect.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i === currentPage) {
+                    option.selected = true;
+                }
+                pageSelect.appendChild(option);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(filteredTransactions.length / rowsPerPage)) {
+                currentPage++;
+                renderPage();
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = parseInt(page);
+            renderPage();
         }
 
         function filterTransactions() {
@@ -558,6 +682,12 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية!");
+                return;
+            }
+
+            currentPage = 1;
             const filteredTransactions = transactions.filter(transaction => {
                 const transactionDate = new Date(transaction.date);
                 const matchesEngineer = selectedEngineer ? transaction.engineer === selectedEngineer : true;
@@ -573,9 +703,8 @@
                 return matchesEngineer && matchesDate;
             });
 
-            const recentTransactions = filterRecentTransactions(filteredTransactions);
-            displayStatisticsTransactions(recentTransactions);
-            displayStatistics(recentTransactions);
+            displayStatisticsTransactions(filteredTransactions);
+            displayStatistics(filteredTransactions);
             updateTotalTransactions();
         }
 
@@ -597,7 +726,24 @@
         }
 
         function printReport() {
+            const statsTable = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            statsTable.innerHTML = '';
+
+            const recentTransactions = filterRecentTransactions(filteredTransactions);
+            if (recentTransactions.length === 0) {
+                statsTable.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+            } else {
+                recentTransactions.forEach(transaction => {
+                    const row = statsTable.insertRow();
+                    row.insertCell(0).innerText = transaction.id;
+                    row.insertCell(1).innerText = transaction.engineer;
+                    row.insertCell(2).innerText = transaction.type;
+                    row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
+                });
+            }
+
             window.print();
+            renderPage();
         }
 
         function searchTransactions() {
