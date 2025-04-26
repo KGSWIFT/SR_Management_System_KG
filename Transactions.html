@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Transactions</title>
     <style>
+        /* يبقى CSS كما هو دون أي تغيير */
         body {
             font-family: 'Times New Roman', serif;
             direction: rtl;
@@ -248,7 +249,7 @@
             }
         }
 
-        .transactions-list table {
+        . ASSERTION FAILED: input is not a valid base64 string transactions-list table {
             width: 100%;
             margin: 20px 0;
         }
@@ -419,8 +420,9 @@
     </div>
 
     <script>
+        const SCRIPT_URL = 'YOUR_SCRIPT_DEPLOYMENT_URL'; // استبدل برابط نشر السكريبت
+
         let transactions = [];
-        let db;
         let currentPageMain = 1;
         let currentPageStats = 1;
         const rowsPerPage = 10;
@@ -434,21 +436,6 @@
             { username: "11220", password: "A@11220", isAdmin: false },
             { username: "9684", password: "A@9684", isAdmin: false }
         ];
-
-        // إعداد قاعدة البيانات لتخزين المعاملات فقط
-        const request = indexedDB.open("TransactionsDB", 2);
-
-        request.onupgradeneeded = event => {
-            db = event.target.result;
-            if (!db.objectStoreNames.contains("transactions")) {
-                db.createObjectStore("transactions", { keyPath: "id" });
-            }
-        };
-
-        request.onsuccess = event => {
-            db = event.target.result;
-            loadTransactionsFromDB();
-        };
 
         function logout() {
             const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
@@ -495,7 +482,7 @@
         }
 
         function goToHomePage() {
-            window.location.href = "index.html";
+            window.location.href = " Wickham.html";
         }
 
         function toggleStatistics() {
@@ -523,41 +510,143 @@
                 return;
             }
 
-            const transaction = {
-                id: transactionId,
-                engineer,
-                type: transactionType,
-                date: new Date().toISOString(),
-                createdAt: new Date().getTime()
-            };
+            const params = new URLSearchParams();
+            params.append('action', 'addTransaction');
+            params.append('id', transactionId);
+            params.append('engineer', engineer);
+            params.append('type', transactionType);
+            params.append('date', new Date().toISOString());
+            params.append('createdAt', new Date().getTime());
 
-            saveTransactionToDB(transaction);
-            transactions.push(transaction);
-            currentPageMain = 1;
-            updateTransactionList();
-            updateTotalTransactions();
-            alert("✅ تمت إضافة المعاملة بنجاح!");
-            clearFields();
-        }
-
-        function saveTransactionToDB(transaction) {
-            const tx = db.transaction("transactions", "readwrite");
-            const store = tx.objectStore("transactions");
-            store.put(transaction);
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const transaction = {
+                        id: transactionId,
+                        engineer,
+                        type: transactionType,
+                        date: new Date().toISOString(),
+                        createdAt: new Date().getTime()
+                    };
+                    transactions.push(transaction);
+                    currentPageMain = 1;
+                    updateTransactionList();
+                    updateTotalTransactions();
+                    alert("✅ تمت إضافة المعاملة بنجاح!");
+                    clearFields();
+                }
+            })
+            .catch(error => {
+                console.error('Error adding transaction:', error);
+                alert('حدث خطأ أثناء إضافة المعاملة');
+            });
         }
 
         function loadTransactionsFromDB() {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            fetch(`${SCRIPT_URL}?action=getTransactions`)
+                .then(response => response.json())
+                .then(data => {
+                    transactions = data.transactions || [];
+                    currentPageMain = 1;
+                    updateTransactionList();
+                    updateTotalTransactions();
+                    populateEngineerSelect();
+                })
+                .catch(error => {
+                    console.error('Error loading transactions:', error);
+                    alert('حدث خطأ أثناء جلب البيانات من Google Sheets');
+                });
+        }
 
-            request.onsuccess = event => {
-                transactions = event.target.result;
-                currentPageMain = 1;
-                updateTransactionList();
-                updateTotalTransactions();
-                populateEngineerSelect();
-            };
+        function deleteTransaction() {
+            const transactionId = document.getElementById('transactionId').value;
+            if (!transactionId) {
+                alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
+                return;
+            }
+
+            fetch(`${SCRIPT_URL}?action=deleteTransaction&id=${encodeURIComponent(transactionId)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        transactions = transactions.filter(t => t.id !== transactionId);
+                        currentPageMain = 1;
+                        updateTransactionList();
+                        updateTotalTransactions();
+                        alert("✅ تم حذف المعاملة بنجاح.");
+                        clearFields();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting transaction:', error);
+                    alert('حدث خطأ أثناء حذف المعاملة');
+                });
+        }
+
+        function editTransaction() {
+            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
+            if (!transactionIdToEdit) return;
+
+            const transaction = transactions.find(t => t.id === transactionIdToEdit);
+            if (!transaction) {
+                alert("⚠️ لا توجد معاملة بهذا الرقم!");
+                return;
+            }
+
+            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
+            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
+            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transaction.type);
+
+            if (!newTransactionId || !newEngineer || !newTransactionType) {
+                alert("⚠️ تم إلغاء التحديث.");
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('action', 'editTransaction');
+            params.append('oldId', transactionIdToEdit);
+            params.append('id', newTransactionId);
+            params.append('engineer', newEngineer);
+            params.append('type', newTransactionType);
+            params.append('date', new Date().toISOString());
+            params.append('createdAt', transaction.createdAt);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    transactions = transactions.map(t => 
+                        t.id === transactionIdToEdit ? {
+                            id: newTransactionId,
+                            engineer: newEngineer,
+                            type: newTransactionType,
+                            date: new Date().toISOString(),
+                            createdAt: transaction.createdAt
+                        } : t
+                    );
+                    currentPageMain = 1;
+                    updateTransactionList();
+                    updateTotalTransactions();
+                    alert("✅ تم تحديث المعاملة بنجاح!");
+                }
+            })
+            .catch(error => {
+                console.error('Error updating transaction:', error);
+                alert('حدث خطأ أثناء تحديث المعاملة');
+            });
         }
 
         function filterRecentTransactions(transactionsToFilter) {
@@ -793,82 +882,6 @@
             document.getElementById('transactionType').value = '';
         }
 
-        function deleteTransaction() {
-            const transactionId = document.getElementById('transactionId').value;
-            if (!transactionId) {
-                alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
-                return;
-            }
-
-            const tx = db.transaction("transactions", "readwrite");
-            const store = tx.objectStore("transactions");
-            const request = store.delete(transactionId);
-
-            request.onsuccess = () => {
-                transactions = transactions.filter(t => t.id !== transactionId);
-                currentPageMain = 1;
-                updateTransactionList();
-                updateTotalTransactions();
-                alert("✅ تم حذف المعاملة بنجاح.");
-                clearFields();
-            };
-
-            request.onerror = () => {
-                alert("❌ حدث خطأ أثناء حذف المعاملة.");
-            };
-        }
-
-        function editTransaction() {
-            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
-            if (!transactionIdToEdit) return;
-
-            const transaction = transactions.find(t => t.id === transactionIdToEdit);
-            if (!transaction) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
-            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
-            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
-            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transaction.type);
-
-            if (!newTransactionId || !newEngineer || !newTransactionType) {
-                alert("⚠️ تم إلغاء التحديث.");
-                return;
-            }
-
-            const updatedTransaction = {
-                id: newTransactionId,
-                engineer: newEngineer,
-                type: newTransactionType,
-                date: new Date().toISOString(),
-                createdAt: transaction.createdAt
-            };
-
-            const tx = db.transaction("transactions", "readwrite");
-            const store = tx.objectStore("transactions");
-
-            if (transactionIdToEdit !== newTransactionId) {
-                store.delete(transactionIdToEdit);
-            }
-            
-            store.put(updatedTransaction);
-
-            tx.oncomplete = () => {
-                transactions = transactions.map(t => 
-                    t.id === transactionIdToEdit ? updatedTransaction : t
-                );
-                currentPageMain = 1;
-                updateTransactionList();
-                updateTotalTransactions();
-                alert("✅ تم تحديث المعاملة بنجاح!");
-            };
-
-            tx.onerror = () => {
-                alert("❌ حدث خطأ أثناء تحديث المعاملة.");
-            };
-        }
-
         function populateEngineerSelect() {
             const recentTransactions = filterRecentTransactions(transactions);
             const engineerSelect = document.getElementById('engineerFilter');
@@ -886,8 +899,6 @@
         }
 
         window.addEventListener('load', () => {
-            populateEngineerSelect();
-            
             const startDate = document.getElementById('startDate');
             const endDate = document.getElementById('endDate');
             const today = new Date().toISOString().split('T')[0];
@@ -897,11 +908,7 @@
             
             loadTransactionsFromDB();
         });
-
-        request.onerror = event => {
-            console.error('Database error:', event.target.error);
-            alert('حدث خطأ في قاعدة البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
-        };
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9367b5a2cedfb019',t:'MTc0NTY4NzU5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
