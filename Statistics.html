@@ -163,7 +163,6 @@
             color: white;
         }
 
-        /* تنسيق العدد الكلي للمعاملات */
         .total-transactions-container {
             display: flex;
             justify-content: center;
@@ -194,7 +193,6 @@
             margin: 0;
         }
 
-        /* تنسيق أزرار التقسيم الصفحي */
         .pagination {
             display: flex;
             justify-content: center;
@@ -205,44 +203,7 @@
         .pagination button {
             background: #357abd;
             padding: 10px 20px;
-            margin: 0 10px;
-            transition: background 0.2s;
-        }
-
-        .pagination button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .pagination button:not(:disabled):hover {
-            background: #2a6099;
-        }
-
-        #pageInfo {
-            font-size: 16px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 0 15px;
-        }
-
-        #pageSelect {
-            padding: 8px;
-            margin: 0 10px;
-            border-radius: 8px;
-            border: 1px solid #357abd;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            .total-transactions-box {
-                padding: 10px 20px;
-            }
-            #totalTransactions {
-                font-size: 18px;
-            }
-            .pagination button {
+            margin: 0 10    button {
                 padding: 8px 15px;
                 margin: 0 5px;
             }
@@ -260,7 +221,7 @@
             #printableTransactions, #printableTransactions * { visibility: visible; }
             #printableStatistics, #printableStatistics * { visibility: hidden; }
             #chartContainer.printing, #chartContainer.printing * { visibility: visible; }
-            .pagination { display: none; } /* إخفاء أزرار التقسيم، نص الصفحة، والقائمة عند الطباعة */
+            .pagination { display: none; }
         }
     </style>
 </head>
@@ -346,448 +307,345 @@
         <div id="printableTransactions">
             <table id="transactionsTable">
                 <thead>
+                    symmetrically around the center.
+                    <th>رقم المعاملة</th>
+                    <th>اسم المهندس</th>
+                    <th>نوع المعاملة</th>
+                    <th>التاريخ</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="pagination">
+            <button onclick="previousPage()" id="prevPage">السابق</button>
+            <span id="pageInfo"></span>
+            <select id="pageSelect" onchange="goToPage(this.value)"></select>
+            <button onclick="nextPage()" id="nextPage">التالي</button>
+        </div>
+    </div>
+
+    <div id="statisticsSection" style="display: none;">
+        <h2>إحصائيات إضافية</h2>
+        <div id="printableStatistics">
+            <table id="statisticsTable">
+                <thead>
                     <tr>
-                        <th>رقم المعاملة</th>
                         <th>اسم المهندس</th>
-                        <th>نوع المعاملة</th>
-                        <th>التاريخ</th>
+                        <th>عدد المعاملات</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <div class="pagination">
-                <button onclick="previousPage()" id="prevPage">السابق</button>
-                <span id="pageInfo"></span>
-                <select id="pageSelect" onchange="goToPage(this.value)"></select>
-                <button onclick="nextPage()" id="nextPage">التالي</button>
-            </div>
-        </div>
-
-        <div id="statisticsSection" style="display: none;">
-            <h2>إحصائيات إضافية</h2>
-            <div id="printableStatistics">
-                <table id="statisticsTable">
-                    <thead>
-                        <tr>
-                            <th>اسم المهندس</th>
-                            <th>عدد المعاملات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="chartContainer">
-            <h2>الإحصاء البياني للمعاملات</h2>
-            <canvas id="statisticsChart"></canvas>
         </div>
     </div>
 
-    <script>
-        let myChart = null;
-        let showingChart = false;
-        let currentPage = 1;
-        const rowsPerPage = 10;
-        let filteredTransactions = [];
+    <div id="chartContainer">
+        <h2>الإحصاء البياني للمعاملات</h2>
+        <canvas id="statisticsChart"></canvas>
+    </div>
+</div>
 
-        window.onload = function() {
-            setTimeout(() => {
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('content').style.visibility = 'visible';
-                initializeDatabase();
-            }, 3000);
+<script>
+    // استبدل هذا الرابط برابط نشر Google Apps Script الخاص بك
+    const SCRIPT_URL = "YOUR_SCRIPT_DEPLOYMENT_URL";
+    let myChart = null;
+    let showingChart = false;
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let filteredTransactions = [];
+    let allTransactions = [];
+
+    window.onload = function() {
+        setTimeout(() => {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('content').style.visibility = 'visible';
+            loadData();
+        }, 1000);
+    };
+
+    function loadData() {
+        fetch(`${SCRIPT_URL}?action=getTransactions`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error loading data:", data.error);
+                    alert("حدث خطأ في جلب البيانات: " + data.error);
+                    return;
+                }
+                
+                allTransactions = data.transactions || [];
+                filteredTransactions = [...allTransactions];
+                
+                // تعيين تاريخ اليوم كقيمة افتراضية
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('startDate').value = today;
+                document.getElementById('endDate').value = today;
+                
+                displayTransactions();
+                displayStatistics();
+                updateTotalTransactions();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("حدث خطأ في جلب البيانات من الخادم");
+            });
+    }
+
+    function filterTransactions() {
+        const selectedEngineer = document.getElementById('engineer').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية!");
+            return;
+        }
+
+        currentPage = 1; // إعادة تعيين الصفحة إلى الأولى عند تطبيق فلتر
+        filteredTransactions = allTransactions.filter(transaction => {
+            const transactionDate = new Date(transaction.date);
+            const start = startDate ? new Date(startDate) : null;
+            const end = endDate ? new Date(endDate) : null;
+            if (end) end.setHours(23, 59, 59);
+
+            return (
+                (!selectedEngineer || transaction.engineer === selectedEngineer) &&
+                (!start || transactionDate >= start) &&
+                (!end || transactionDate <= end)
+            );
+        });
+
+        displayTransactions();
+        displayStatistics();
+        updateTotalTransactions();
+
+        if (showingChart) {
+            updateChart();
+        }
+    }
+
+    function displayTransactions() {
+        const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+
+        if (filteredTransactions.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+            document.getElementById('prevPage').disabled = true;
+            document.getElementById('nextPage').disabled = true;
+            document.getElementById('pageInfo').textContent = '';
+            document.getElementById('pageSelect').innerHTML = '';
+            return;
+        }
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+        pageTransactions.forEach(transaction => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${transaction.id}</td>
+                <td>${transaction.engineer}</td>
+                <td>${transaction.type}</td>
+                <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+            `;
+        });
+
+        // تحديث حالة أزرار التقسيم ورقم الصفحة
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
+        document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${Math.ceil(filteredTransactions.length / rowsPerPage)}`;
+
+        // تحديث القائمة المنسدلة
+        const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
+        const pageSelect = document.getElementById('pageSelect');
+        pageSelect.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            if (i === currentPage) {
+                option.selected = true;
+            }
+            pageSelect.appendChild(option);
+        }
+    }
+
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayTransactions();
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < Math.ceil(filteredTransactions.length / rowsPerPage)) {
+            currentPage++;
+            displayTransactions();
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = parseInt(page);
+        displayTransactions();
+    }
+
+    function displayStatistics() {
+        const statistics = {};
+        filteredTransactions.forEach(transaction => {
+            statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+        });
+
+        const statsTableBody = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
+        statsTableBody.innerHTML = '';
+
+        for (const engineer in statistics) {
+            const row = statsTableBody.insertRow();
+            row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
+        }
+    }
+
+    function updateTotalTransactions() {
+        const total = filteredTransactions.length;
+        document.getElementById('totalTransactions').textContent = `العدد الكلي للمعاملات: ${total}`;
+
+        // إحصائيات حسب نوع المعاملة
+        const typeStats = {
+            "حديقة عامة": 0,
+            "أبراج اتصالات": 0,
+            "ملعب": 0,
+            "سياحي سكني": 0,
+            "تجاري سكني": 0,
+            "موافقة فنية سكنية": 0,
+            "موافقة فنية تجارية": 0,
+            "سكني متعدد الطوابق": 0,
+            "صناعي": 0,
+            "مسجد": 0,
+            "سكني تجاري": 0,
+            "كنيسة": 0
         };
 
-        let db;
-
-        function initializeDatabase() {
-            const request = indexedDB.open("TransactionsDB", 2);
-
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                if (!db.objectStoreNames.contains("transactions")) {
-                    db.createObjectStore("transactions", { keyPath: "id" });
-                }
-                if (!db.objectStoreNames.contains("users")) {
-                    db.createObjectStore("users", { keyPath: "username" });
-                }
-            };
-
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                loadData();
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في فتح قاعدة البيانات:", event.target.error);
-                alert("حدث خطأ في فتح قاعدة البيانات!");
-            };
-        }
-
-        function loadData() {
-            displayTransactions();
-            displayStatistics();
-            updateTotalTransactions();
-        }
-
-        function filterTransactions() {
-            const selectedEngineer = document.getElementById('engineer').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-                alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية!");
-                return;
+        filteredTransactions.forEach(transaction => {
+            if (typeStats.hasOwnProperty(transaction.type)) {
+                typeStats[transaction.type]++;
             }
+        });
 
-            currentPage = 1; // إعادة تعيين الصفحة إلى الأولى عند تطبيق فلتر
-            displayTransactions(selectedEngineer, startDate, endDate);
-            displayStatistics(selectedEngineer, startDate, endDate);
-            updateTotalTransactions(selectedEngineer, startDate, endDate);
+        // تحديث جدول أنواع المعاملات
+        const typesTableBody = document.getElementById('transactionTypesTable').getElementsByTagName('tbody')[0];
+        typesTableBody.innerHTML = '';
 
-            if (showingChart) {
-                updateChart(selectedEngineer, startDate, endDate);
-            }
-        }
-
-        function displayTransactions(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                renderPage();
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
-        }
-
-        function renderPage() {
-            const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = '';
-
-            if (filteredTransactions.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
-                document.getElementById('prevPage').disabled = true;
-                document.getElementById('nextPage').disabled = true;
-                document.getElementById('pageInfo').textContent = '';
-                document.getElementById('pageSelect').innerHTML = '';
-                return;
-            }
-
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
-
-            pageTransactions.forEach(transaction => {
-                const row = tableBody.insertRow();
+        let hasData = false;
+        for (const type in typeStats) {
+            if (typeStats[type] > 0) {
+                hasData = true;
+                const row = typesTableBody.insertRow();
                 row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${transaction.engineer}</td>
-                    <td>${transaction.type}</td>
-                    <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
+                    <td>${type}</td>
+                    <td>${typeStats[type]}</td>
                 `;
-            });
-
-            // تحديث حالة أزرار التقسيم ورقم الصفحة
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = endIndex >= filteredTransactions.length;
-            document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${Math.ceil(filteredTransactions.length / rowsPerPage)}`;
-
-            // تحديث القائمة المنسدلة
-            const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
-            const pageSelect = document.getElementById('pageSelect');
-            pageSelect.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i === currentPage) {
-                    option.selected = true;
-                }
-                pageSelect.appendChild(option);
             }
         }
 
-        function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage();
-            }
+        if (!hasData) {
+            typesTableBody.innerHTML = '<tr><td colspan="2">لا توجد بيانات لعرضها.</td></tr>';
+        }
+    }
+
+    function updateChart() {
+        const statistics = {};
+        filteredTransactions.forEach(transaction => {
+            statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+        });
+
+        const engineers = Object.keys(statistics);
+        const transactionCounts = engineers.map(name => statistics[name]);
+        const colors = engineers.map((_, index) => `hsl(${index * 15}, 70%, 50%)`);
+
+        if (engineers.length === 0) {
+            console.log("لا توجد بيانات لعرضها في الرسم البياني.");
+            const chartContainer = document.getElementById('chartContainer');
+            chartContainer.innerHTML = '<h2>الإحصاء البياني للمعاملات</h2><p>لا توجد بيانات كافية لعرض الرسم البياني.</p>';
+            return;
         }
 
-        function nextPage() {
-            if (currentPage < Math.ceil(filteredTransactions.length / rowsPerPage)) {
-                currentPage++;
-                renderPage();
-            }
+        if (myChart !== null) {
+            myChart.destroy();
         }
 
-        function goToPage(page) {
-            currentPage = parseInt(page);
-            renderPage();
+        const ctx = document.getElementById('statisticsChart').getContext('2d');
+        if (!ctx) {
+            console.error("لم يتم العثور على عنصر canvas!");
+            return;
         }
 
-        function displayStatistics(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                const statistics = {};
-                filteredTransactions.forEach(transaction => {
-                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                });
-
-                const statsTableBody = document.getElementById('statisticsTable').getElementsByTagName('tbody')[0];
-                statsTableBody.innerHTML = '';
-
-                for (const engineer in statistics) {
-                    const row = statsTableBody.insertRow();
-                    row.innerHTML = `<td>${engineer}</td><td>${statistics[engineer]}</td>`;
-                }
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
-        }
-
-        function updateTotalTransactions(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                // تحديث العدد الكلي للمعاملات
-                const total = filteredTransactions.length;
-                document.getElementById('totalTransactions').textContent = `العدد الكلي للمعاملات: ${total}`;
-
-                // إحصائيات حسب نوع المعاملة
-                const typeStats = {
-                    "حديقة عامة": 0,
-                    "أبراج اتصالات": 0,
-                    "ملعب": 0,
-                    "سياحي سكني": 0,
-                    "تجاري سكني": 0,
-                    "موافقة فنية سكنية": 0,
-                    "موافقة فنية تجارية": 0,
-                    "سكني متعدد الطوابق": 0,
-                    "صناعي": 0,
-                    "مسجد": 0,
-                    "سكني تجاري": 0,
-                    "كنيسة": 0
-                };
-
-                filteredTransactions.forEach(transaction => {
-                    if (typeStats.hasOwnProperty(transaction.type)) {
-                        typeStats[transaction.type]++;
-                    }
-                });
-
-                // تحديث جدول أنواع المعاملات
-                const typesTableBody = document.getElementById('transactionTypesTable').getElementsByTagName('tbody')[0];
-                typesTableBody.innerHTML = '';
-
-                let hasData = false;
-                for (const type in typeStats) {
-                    if (typeStats[type] > 0) {
-                        hasData = true;
-                        const row = typesTableBody.insertRow();
-                        row.innerHTML = `
-                            <td>${type}</td>
-                            <td>${typeStats[type]}</td>
-                        `;
-                    }
-                }
-
-                if (!hasData) {
-                    typesTableBody.innerHTML = '<tr><td colspan="2">لا توجد بيانات لعرضها.</td></tr>';
-                }
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
-        }
-
-        function updateChart(engineer = '', startDate = '', endDate = '') {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!engineer || transaction.engineer === engineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                const statistics = {};
-                filteredTransactions.forEach(transaction => {
-                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                });
-
-                const engineers = Object.keys(statistics);
-                const transactionCounts = engineers.map(name => statistics[name]);
-                const colors = engineers.map((_, index) => `hsl(${index * 15}, 70%, 50%)`);
-
-                if (engineers.length === 0) {
-                    console.log("لا توجد بيانات لعرضها في الرسم البياني.");
-                    const chartContainer = document.getElementById('chartContainer');
-                    chartContainer.innerHTML = '<h2>الإحصاء البياني للمعاملات</h2><p>لا توجد بيانات كافية لعرض الرسم البياني.</p>';
-                    return;
-                }
-
-                if (myChart !== null) {
-                    myChart.destroy();
-                }
-
-                const ctx = document.getElementById('statisticsChart').getContext('2d');
-                if (!ctx) {
-                    console.error("لم يتم العثور على عنصر canvas!");
-                    return;
-                }
-
-                myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: engineers,
-                        datasets: [{
-                            label: "عدد المعاملات",
-                            data: transactionCounts,
-                            backgroundColor: colors
-                        }]
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: engineers,
+                datasets: [{
+                    label: "عدد المعاملات",
+                    data: transactionCounts,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'عدد المعاملات',
+                            color: '#333',
+                            font: { weight: 'bold' }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'عدد المعاملات',
-                                    color: '#333',
-                                    font: { weight: 'bold' }
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#333',
-                                    font: { weight: 'bold' }
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'إحصائيات المعاملات حسب المهندس',
-                                font: { size: 18, weight: 'bold' }
-                            },
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            }
+                    x: {
+                        ticks: {
+                            color: '#333',
+                            font: { weight: 'bold' }
                         }
                     }
-                });
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
-        }
-
-        function toggleStatistics() {
-            const statsSection = document.getElementById('statisticsSection');
-            if (statsSection.style.display === 'none' || statsSection.style.display === '') {
-                statsSection.style.display = 'block';
-            } else {
-                statsSection.style.display = 'none';
-            }
-        }
-
-        function toggleChartView() {
-            const chartContainer = document.getElementById('chartContainer');
-            const printChartButton = document.getElementById('printChartButton');
-            const exportChartButton = document.getElementById('exportChartButton');
-
-            if (chartContainer.style.display === 'none' || chartContainer.style.display === '') {
-                chartContainer.style.display = 'block';
-                printChartButton.style.display = 'inline-block';
-                exportChartButton.style.display = 'inline-block';
-                showingChart = true;
-
-                const selectedEngineer = document.getElementById('engineer').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-
-                updateChart(selectedEngineer, startDate, endDate);
-            } else {
-                chartContainer.style.display = 'none';
-                printChartButton.style.display = 'none';
-                exportChartButton.style.display = 'none';
-                showingChart = false;
-                if (myChart !== null) {
-                    myChart.destroy();
-                    myChart = null;
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'إحصائيات المعاملات حسب المهندس',
+                        font: { size: 18, weight: 'bold' }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
                 }
             }
+        });
+    }
+
+    function toggleStatistics() {
+        const statsSection = document.getElementById('statisticsSection');
+        if (statsSection.style.display === 'none' || statsSection.style.display === '') {
+            statsSection.style.display = 'block';
+        } else {
+            statsSection.style.display = 'none';
         }
+    }
+
+    function toggleChartView() {
+        const chartContainer = document.getElementById('chartContainer');
+        const printChartButton = document.getElementById('printChartButton');
+        const exportChartButton = document.getElementById('exportChartButton');
+
+        if (chartContainer.style.display === 'none' || chartContainer.style.display === '') {
+            chartContainer.style.display = 'block';
+            printChartButton.style.display = 'inline-block';
+            exportChartButton.style.display = 'inline-block';
+            showingChart = true;
+            updateChart();
+        } else {
+ Stu is a character in the popular animated series "Adventure Time." He is a magical, shape-shifting dog who is the best friend and adoptive brother of Finn the Human. Jake has the ability to stretch, grow, and morph his body into various shapes and sizes, which he uses to help Finn on their adventures in the Land of Ooo. Jake is laid-back, wise, and often provides comic relief, but he can also be brave and loyal when the situation calls for it. His relaxed attitude and magical abilities make him a fan favorite, and his catchphrase, "Magic Man's gonna get it," is iconic among fans of the show.
 
         function exportToCSV(data, filename) {
             const csvRows = [];
@@ -805,129 +663,72 @@
         }
 
         function exportTransactionsToExcel() {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
+            if (filteredTransactions.length === 0) {
+                alert("لا توجد بيانات لتصديرها!");
+                return;
+            }
 
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const selectedEngineer = document.getElementById('engineer').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
+            const csvData = [
+                ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
+                ...filteredTransactions.map(t => [
+                    t.id,
+                    t.engineer,
+                    t.type,
+                    new Date(t.date).toLocaleDateString('ar-EG')
+                ])
+            ];
 
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                if (filteredTransactions.length === 0) {
-                    alert("لا توجد بيانات لتصديرها!");
-                    return;
-                }
-
-                const csvData = [
-                    ['رقم المعاملة', 'اسم المهندس', 'نوع المعاملة', 'التاريخ'],
-                    ...filteredTransactions.map(t => [
-                        t.id,
-                        t.engineer,
-                        t.type,
-                        new Date(t.date).toLocaleDateString('ar-EG')
-                    ])
-                ];
-
-                exportToCSV(csvData, 'Transactions_Export.csv');
-            };
-
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
+            exportToCSV(csvData, 'Transactions_Export.csv');
         }
 
         function exportChartToExcel() {
-            const tx = db.transaction("transactions", "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function(event) {
-                const transactions = event.target.result;
-                const selectedEngineer = document.getElementById('engineer').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-
-                const filteredTransactions = transactions.filter(transaction => {
-                    const transactionDate = new Date(transaction.date);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate) : null;
-                    if (end) end.setHours(23, 59, 59);
-
-                    return (
-                        (!selectedEngineer || transaction.engineer === selectedEngineer) &&
-                        (!start || transactionDate >= start) &&
-                        (!end || transactionDate <= end)
-                    );
-                });
-
-                const statistics = {};
-                const typeStats = {
-                    "حديقة عامة": 0,
-                    "أبراج اتصالات": 0,
-                    "ملعب": 0,
-                    "سياحي سكني": 0,
-                    "تجاري سكني": 0,
-                    "موافقة فنية سكنية": 0,
-                    "موافقة فنية تجارية": 0,
-                    "سكني متعدد الطوابق": 0,
-                    "صناعي": 0,
-                    "مسجد": 0,
-                    "سكني تجاري": 0,
-                    "كنيسة": 0
-                };
-
-                filteredTransactions.forEach(transaction => {
-                    statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
-                    if (typeStats.hasOwnProperty(transaction.type)) {
-                        typeStats[transaction.type]++;
-                    }
-                });
-
-                const engineers = Object.keys(statistics);
-                if (engineers.length === 0) {
-                    alert("لا توجد بيانات لتصديرها!");
-                    return;
-                }
-
-                const csvData = [
-                    ['اسم المهندس', 'عدد المعاملات'],
-                    ...engineers.map(engineer => [engineer, statistics[engineer]])
-                ];
-
-                // إضافة إحصائيات الأنواع إلى ملف CSV
-                csvData.push([]); // إضافة سطر فارغ للفصل
-                csvData.push(['نوع المعاملة', 'عدد المعاملات']);
-                for (const type in typeStats) {
-                    if (typeStats[type] > 0) {
-                        csvData.push([type, typeStats[type]]);
-                    }
-                }
-
-                exportToCSV(csvData, 'Statistics_Export.csv');
+            const statistics = {};
+            const typeStats = {
+                "حديقة عامة": 0,
+                "أبراج اتصالات": 0,
+                "ملعب": 0,
+                "سياحي سكني": 0,
+                "تجاري سكني": 0,
+                "موافقة فنية سكنية": 0,
+                "موافقة فنية تجارية": 0,
+                "سكني متعدد الطوابق": 0,
+                "صناعي": 0,
+                "مسجد": 0,
+                "سكني تجاري": 0,
+                "كنيسة": 0
             };
 
-            request.onerror = function(event) {
-                console.error("خطأ في جلب البيانات:", event.target.error);
-            };
+            filteredTransactions.forEach(transaction => {
+                statistics[transaction.engineer] = (statistics[transaction.engineer] || 0) + 1;
+                if (typeStats.hasOwnProperty(transaction.type)) {
+                    typeStats[transaction.type]++;
+                }
+            });
+
+            const engineers = Object.keys(statistics);
+            if (engineers.length === 0) {
+                alert("لا توجد بيانات لتصديرها!");
+                return;
+            }
+
+            const csvData = [
+                ['اسم المهندس', 'عدد المعاملات'],
+                ...engineers.map(engineer => [engineer, statistics[engineer]])
+            ];
+
+            // إضافة إحصائيات الأنواع إلى ملف CSV
+            csvData.push([]); // إضافة سطر فارغ للفصل
+            csvData.push(['نوع المعاملة', 'عدد المعاملات']);
+            for (const type in typeStats) {
+                if (typeStats[type] > 0) {
+                    csvData.push([type, typeStats[type]]);
+                }
+            }
+
+            exportToCSV(csvData, 'Statistics_Export.csv');
         }
 
         function printTransactionsTable() {
-            // عند الطباعة، إظهار جميع المعاملات بدلاً من 10 فقط
             const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
@@ -946,9 +747,7 @@
             }
 
             window.print();
-
-            // إعادة عرض الصفحة الحالية بعد الطباعة
-            renderPage();
+            displayTransactions();
         }
 
         function printStatistics() {
@@ -975,5 +774,6 @@
             window.location.href = "index.html";
         }
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9374bc3d2cd5bf9c',t:'MTc0NTgyNDE3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
-    </html>
+</html>
