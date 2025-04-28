@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,82 +14,71 @@
             min-height: 100vh;
             padding: 20px;
             color: white;
-        }.login-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 40px;
-        background: rgba(255, 255, 255, 0.4);
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-    }
-
-    .management-container {
-        max-width: 1000px;
-        margin: 20px auto;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        color: #2c3e50;
-    }
-
-    input, button, select {
-        padding: 12px 20px;
-        margin: 10px auto;
-        border: 2px solid #4a90e2;
-        border-radius: 8px;
-        width: 80%;
-        font-size: 16px;
-        transition: all 0.3s ease;
-    }
-
-    button {
-        background: #4a90e2;
-        color: white;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #357abd;
-        transform: translateY(-2px);
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    .admin-btn {
-        background: #e74c3c !important;
-        margin-top: 20px;
-    }
-
-    .back-btn {
-        background: #2ecc71;
-        border: 2px solid #27ae60;
-    }
-
-    .back-btn:hover {
-        background: #27ae60;
-        transform: translateY(-2px);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ccc;
-    }
-
-    #pagination-controls {
-        margin-top: 20px;
-    }
-</style>
-
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .management-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+        }
+        input, button, select {
+            padding: 12px 20px;
+            margin: 10px auto;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            width: 80%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button {
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+        .hidden {
+            display: none;
+        }
+        .admin-btn {
+            background: #e74c3c !important;
+            margin-top: 20px;
+        }
+        .back-btn {
+            background: #2ecc71;
+            border: 2px solid #27ae60;
+        }
+        .back-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        #pagination-controls {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container" id="loginContainer">
@@ -100,182 +90,234 @@
             <button onclick="checkCredentials()">دخول</button>
             <button class="back-btn" onclick="goToHome()">العودة للصفحة الرئيسية</button>
         </div>
-    </div><div class="management-container hidden" id="mainSystem">
-    <h2>نظام إدارة المعاملات</h2>
-    <button onclick="showAdminPanel()">الوصول لوحة الإدارة</button>
-</div>
-
-<div class="management-container hidden" id="adminPanel">
-    <h2>لوحة إدارة المعاملات</h2>
-    <input type="text" id="searchBox" placeholder="ابحث عن معاملة..." oninput="filterTransactions()">
-    <table id="transactionTable">
-        <thead>
-            <tr>
-                <th>رقم</th>
-                <th>المعاملة</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="pagination-controls">
-        <button onclick="previousPage()">السابق</button>
-        <select id="pageSelect" onchange="goToPage()"></select>
-        <button onclick="nextPage()">التالي</button>
     </div>
+    <div class="management-container hidden" id="mainSystem">
+        <h2>نظام إدارة المعاملات</h2>
+        <button onclick="showAdminPanel()">الوصول لوحة الإدارة</button>
+    </div>
+    <div class="management-container hidden" id="adminPanel">
+        <h2>لوحة إدارة المعاملات</h2>
+        <input type="text" id="searchBox" placeholder="ابحث عن معاملة..." oninput="filterTransactions()">
+        <table id="transactionTable">
+            <thead>
+                <tr>
+                    <th>رقم المعاملة</th>
+                    <th>اسم المهندس</th>
+                    <th>نوع المعاملة</th>
+                    <th>التاريخ</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="pagination-controls">
+            <button onclick="previousPage()">السابق</button>
+            <select id="pageSelect" onchange="goToPage()"></select>
+            <button onclick="nextPage()">التالي</button>
+        </div>
+        <input type="text" id="deleteId" placeholder="رقم المعاملة للحذف">
+        <button onclick="deleteTransaction()" class="admin-btn">حذف معاملة</button>
+        <button onclick="clearAllTransactions()" class="admin-btn">مسح الكل</button>
+        <button onclick="logout()" style="background: #2ecc71;">العودة للنظام</button>
+    </div>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrF0NNfYzXCiEwWyL_ok0aeTmzrNLV7ghjBesC9FXFaYs-2C-v-_QYiyvlLhIJhN9JOA/exec";
+        let transactions = [];
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
-    <input type="text" id="deleteId" placeholder="رقم المعاملة للحذف">
-    <button onclick="deleteTransaction()" class="admin-btn">حذف معاملة</button>
-    <button onclick="clearAllTransactions()" class="admin-btn">مسح الكل</button>
-    <button onclick="logout()" style="background: #2ecc71;">العودة للنظام</button>
-</div>
+        function checkCredentials() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const users = [
+                { username: "admin", password: "ghazaloman123", isAdmin: true },
+                { username: "11221", password: "B@11221", isAdmin: false },
+                { username: "11731", password: "M@11731", isAdmin: false },
+                { username: "11220", password: "A@11220", isAdmin: false },
+                { username: "9684", password: "A@9684", isAdmin: false }
+            ];
 
-<script>
-    let db;
-    let transactions = [];
-    let currentPage = 1;
-    const rowsPerPage = 10;
-
-    const dbRequest = indexedDB.open("TransactionsDB", 2);
-
-    dbRequest.onupgradeneeded = function(e) {
-        db = e.target.result;
-        if (!db.objectStoreNames.contains("transactions")) {
-            db.createObjectStore("transactions", { keyPath: "id" });
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user && user.isAdmin) {
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadTransactions();
+            } else {
+                alert("اسم المستخدم أو كلمة المرور غير صحيحة أو ليس لديك صلاحية!");
+            }
         }
-    };
 
-    dbRequest.onsuccess = function(e) {
-        db = e.target.result;
-        loadTransactions();
-    };
+        function goToHome() {
+            window.location.href = "index.html";
+        }
 
-    function checkCredentials() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const users = [
-            { username: "admin", password: "ghazaloman123", isAdmin: true },
-            { username: "11221", password: "B@11221", isAdmin: false },
-            { username: "11731", password: "M@11731", isAdmin: false },
-            { username: "11220", password: "A@11220", isAdmin: false },
-            { username: "9684", password: "A@9684", isAdmin: false }
-        ];
+        document.getElementById('username').addEventListener('keydown', e => e.key === 'Enter' && checkCredentials());
+        document.getElementById('password').addEventListener('keydown', e => e.key === 'Enter' && checkCredentials());
 
-        const user = users.find(u => u.username === username && u.password === password);
-        if (user && user.isAdmin) {
-            document.getElementById('loginContainer').classList.add('hidden');
+        function loadTransactions() {
+            fetch(`${SCRIPT_URL}?action=getTransactions`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error loading transactions:", data.error);
+                        alert("حدث خطأ في جلب المعاملات: " + data.error);
+                        return;
+                    }
+                    transactions = data.transactions || [];
+                    currentPage = 1;
+                    renderTable();
+                    renderPageSelector();
+                })
+                .catch(error => {
+                    console.error("Error fetching transactions:", error);
+                    alert("حدث خطأ في جلب المعاملات: " + error.message);
+                    document.querySelector("#transactionTable tbody").innerHTML = 
+                        '<tr><td colspan="4">فشل تحميل البيانات. يرجى التحقق من الاتصال بالخادم.</td></tr>';
+                });
+        }
+
+        function renderTable() {
+            const tableBody = document.querySelector("#transactionTable tbody");
+            tableBody.innerHTML = "";
+            const filtered = filterData(transactions);
+            const start = (currentPage - 1) * rowsPerPage;
+            const pageItems = filtered.slice(start, start + rowsPerPage);
+            if (pageItems.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+            } else {
+                pageItems.forEach(tx => {
+                    const row = `<tr>
+                        <td>${tx.id}</td>
+                        <td>${tx.engineer}</td>
+                        <td>${tx.type}</td>
+                        <td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            }
+        }
+
+        function renderPageSelector() {
+            const pageSelect = document.getElementById("pageSelect");
+            const totalPages = Math.ceil(filterData(transactions).length / rowsPerPage);
+            pageSelect.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.text = `صفحة ${i}`;
+                if (i === currentPage) option.selected = true;
+                pageSelect.appendChild(option);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                renderPageSelector();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filterData(transactions).length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                renderPageSelector();
+            }
+        }
+
+        function goToPage() {
+            currentPage = parseInt(document.getElementById("pageSelect").value);
+            renderTable();
+        }
+
+        function deleteTransaction() {
+            const id = document.getElementById('deleteId').value;
+            if (!id) {
+                alert("يرجى إدخال رقم المعاملة!");
+                return;
+            }
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=deleteTransaction&id=${encodeURIComponent(id)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("تم الحذف بنجاح!");
+                        loadTransactions();
+                        document.getElementById('deleteId').value = '';
+                    } else {
+                        alert("خطأ: " + (data.error || "فشل الحذف"));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error deleting transaction:", error);
+                    alert("حدث خطأ أثناء الحذف: " + error.message);
+                });
+        }
+
+        function clearAllTransactions() {
+            if (!confirm("هل أنت متأكد من مسح جميع المعاملات؟ لا يمكن التراجع عن هذا الإجراء!")) {
+                return;
+            }
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=clearTransactions'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("تم مسح جميع المعاملات بنجاح!");
+                        loadTransactions();
+                    } else {
+                        alert("خطأ: " + (data.error || "فشل المسح"));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error clearing transactions:", error);
+                    alert("حدث خطأ أثناء المسح: " + error.message);
+                });
+        }
+
+        function logout() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginContainer').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('mainSystem').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
             loadTransactions();
-        } else {
-            alert("اسم المستخدم أو كلمة المرور غير صحيحة أو ليس لديك صلاحية!");
         }
-    }
 
-    function goToHome() {
-        window.location.href = "index.html";
-    }
+        function filterData(data) {
+            const term = document.getElementById('searchBox').value.toLowerCase();
+            return data.filter(tx => 
+                tx.id.toString().toLowerCase().includes(term) ||
+                (tx.engineer || "").toLowerCase().includes(term) ||
+                (tx.type || "").toLowerCase().includes(term) ||
+                new Date(tx.date).toLocaleDateString('ar-EG').toLowerCase().includes(term)
+            );
+        }
 
-    document.getElementById('username').addEventListener('keydown', e => e.key === 'Enter' && checkCredentials());
-    document.getElementById('password').addEventListener('keydown', e => e.key === 'Enter' && checkCredentials());
-
-    function loadTransactions() {
-        const tx = db.transaction("transactions", "readonly");
-        const store = tx.objectStore("transactions");
-        store.getAll().onsuccess = function(e) {
-            transactions = e.target.result;
+        function filterTransactions() {
             currentPage = 1;
             renderTable();
             renderPageSelector();
-        };
-    }
-
-    function renderTable() {
-        const tableBody = document.querySelector("#transactionTable tbody");
-        tableBody.innerHTML = "";
-        const filtered = filterData(transactions);
-        const start = (currentPage - 1) * rowsPerPage;
-        const pageItems = filtered.slice(start, start + rowsPerPage);
-        pageItems.forEach((tx, index) => {
-            const row = `<tr><td>${tx.id}</td><td>${tx.value || ""}</td></tr>`;
-            tableBody.innerHTML += row;
-        });
-    }
-
-    function renderPageSelector() {
-        const pageSelect = document.getElementById("pageSelect");
-        const totalPages = Math.ceil(filterData(transactions).length / rowsPerPage);
-        pageSelect.innerHTML = "";
-        for (let i = 1; i <= totalPages; i++) {
-            const option = document.createElement("option");
-            option.value = i;
-            option.text = `صفحة ${i}`;
-            if (i === currentPage) option.selected = true;
-            pageSelect.appendChild(option);
         }
-    }
-
-    function previousPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-            renderPageSelector();
-        }
-    }
-
-    function nextPage() {
-        const totalPages = Math.ceil(filterData(transactions).length / rowsPerPage);
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderTable();
-            renderPageSelector();
-        }
-    }
-
-    function goToPage() {
-        currentPage = parseInt(document.getElementById("pageSelect").value);
-        renderTable();
-    }
-
-    function deleteTransaction() {
-        const id = document.getElementById('deleteId').value;
-        const tx = db.transaction("transactions", "readwrite");
-        tx.objectStore("transactions").delete(id);
-        tx.oncomplete = () => {
-            loadTransactions();
-            alert("تم الحذف بنجاح!");
-        };
-    }
-
-    function clearAllTransactions() {
-        const tx = db.transaction("transactions", "readwrite");
-        tx.objectStore("transactions").clear();
-        tx.oncomplete = () => {
-            loadTransactions();
-            alert("تم مسح جميع البيانات!");
-        };
-    }
-
-    function logout() {
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('loginContainer').classList.remove('hidden');
-    }
-
-    function showAdminPanel() {
-        document.getElementById('mainSystem').classList.add('hidden');
-        document.getElementById('adminPanel').classList.remove('hidden');
-    }
-
-    function filterData(data) {
-        const term = document.getElementById('searchBox').value.toLowerCase();
-        return data.filter(tx => tx.id.toString().includes(term) || (tx.value || "").toLowerCase().includes(term));
-    }
-
-    function filterTransactions() {
-        currentPage = 1;
-        renderTable();
-        renderPageSelector();
-    }
-</script>
-
+    </script>
 </body>
 </html>
