@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Transactions</title>
     <style>
-        /* يبقى CSS كما هو دون أي تغيير */
         body {
             font-family: 'Times New Roman', serif;
             direction: rtl;
@@ -208,26 +207,12 @@
             margin: 0 15px;
         }
 
-        #pageSelect {
-            padding: 8px;
-            margin: 0 10px;
-            border-radius: 8px;
-            border: 2px solid #4a90e2;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-        }
-
         @media (max-width: 600px) {
             .pagination button {
                 padding: 8px 15px;
                 margin: 0 5px;
             }
             #pageInfo, #pageInfoStats {
-                font-size: 14px;
-            }
-            #pageSelect {
-                padding: 6px;
                 font-size: 14px;
             }
         }
@@ -249,7 +234,7 @@
             }
         }
 
-        . ASSERTION FAILED: input is not a valid base64 string transactions-list table {
+        .transactions-list table {
             width: 100%;
             margin: 20px 0;
         }
@@ -399,7 +384,6 @@
                 <div class="pagination" id="statsPagination">
                     <button onclick="previousPageStats()" id="prevPageStats">السابق</button>
                     <span id="pageInfoStats"></span>
-                    <select id="pageSelect" onchange="goToPageStats(this.value)"></select>
                     <button onclick="nextPageStats()" id="nextPageStats">التالي</button>
                 </div>
             </div>
@@ -428,7 +412,6 @@
         const rowsPerPage = 10;
         let filteredTransactions = [];
 
-        // تعريف المستخدمين مباشرة في الصفحة
         const defaultUsers = [
             { username: "admin", password: "123456", isAdmin: true },
             { username: "11221", password: "B@11221", isAdmin: false },
@@ -765,16 +748,6 @@
             document.getElementById('prevPageStats').disabled = currentPageStats === 1;
             document.getElementById('nextPageStats').disabled = currentPageStats === totalPages;
             document.getElementById('pageInfoStats').textContent = `صفحة ${currentPageStats} من ${totalPages}`;
-
-            const pageSelect = document.getElementById('pageSelect');
-            pageSelect.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i === currentPageStats) option.selected = true;
-                pageSelect.appendChild(option);
-            }
         }
 
         function previousPageStats() {
@@ -789,11 +762,6 @@
                 currentPageStats++;
                 renderPageStats();
             }
-        }
-
-        function goToPageStats(page) {
-            currentPageStats = parseInt(page);
-            renderPageStats();
         }
 
         function filterTransactions() {
@@ -909,6 +877,7 @@
             loadTransactionsFromDB();
         });
     </script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9367b5a2cedfb019',t:'MTc0NTY4NzU5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9367b5a2cedfb019',t:'MTc0NTY4NzU5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'937c320c6b184523',t:'MTc0NTkwMjQwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
