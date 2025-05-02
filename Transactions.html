@@ -86,7 +86,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .login-container {
@@ -97,6 +97,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
+            z-index: 1100;
         }
 
         .login-form {
@@ -271,9 +272,10 @@
 
         .modal-buttons {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             gap: 10px;
             margin-top: 20px;
+            padding: 0 10px;
         }
 
         .modal-buttons button {
@@ -283,7 +285,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: auto;
+            flex: 1;
         }
 
         .modal-buttons button.edit-btn {
@@ -374,7 +376,7 @@
             }
             .modal-content {
                 width: 95%;
-                margin: 20% auto;
+                margin: 15% auto;
             }
         }
 
@@ -665,7 +667,7 @@
                 <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
                 <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
                 <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
-                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
             </select>
             <div class="date-range-container">
                 <div class="date-input-group">
@@ -697,40 +699,6 @@
     </div>
 
     <script>
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-            return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-                try {
-                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                    var firstSheetName = workbook.SheetNames[0];
-                    var worksheet = workbook.Sheets[firstSheetName];
-
-                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                    var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                    var headerRowIndex = filteredData.findIndex((row, index) =>
-                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                    );
-                    if (headerRowIndex === -1 || headerRowIndex > 25) {
-                        headerRowIndex = 0;
-                    }
-
-                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
-                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                    return csv;
-                } catch (e) {
-                    console.error(e);
-                    return "";
-                }
-            }
-            return gk_fileData[filename] || "";
-        }
-
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmp4gQJpBVpFDwYmUdTz_Pg4Rh3sGhuIM--l4YgqXo2yU-HrJGpgPQKXs_rCt2PWjzLw/exec";
 
         let transactions = [];
@@ -933,6 +901,10 @@
         }
 
         function openEditDeleteModal() {
+            if (stopTransfers.length === 0) {
+                alert("⚠️ لا توجد بيانات إيقاف تحويل لتعديلها أو حذفها!");
+                return;
+            }
             document.getElementById('editDeleteModal').style.display = 'block';
             document.getElementById('modalEngineer').value = '';
             document.getElementById('modalStartDate').value = '';
@@ -1023,7 +995,9 @@
                 })
                 .catch(error => {
                     console.error('Error loading transactions:', error);
-                    alert('حدث خطأ أثناء جلب البيانات من Google Sheets');
+                    alert('حدث خطأ أثناء جلب البيانات من Google Sheets. الرجاء التحقق من الاتصال بالإنترنت والمحاولة لاحقًا.');
+                    document.getElementById("main-container").classList.add("hidden");
+                    document.getElementById("login-container").classList.remove("hidden");
                 });
         }
 
@@ -1354,13 +1328,24 @@
         }
 
         window.addEventListener('load', () => {
-            const startDate = document.getElementById('startDate');
-            const endDate = document.getElementById('endDate');
+            // Initialize date inputs
+            const startDate = document.getElementById('stopStartDate');
+            const endDate = document.getElementById('stopEndDate');
             const today = new Date().toISOString().split('T')[0];
             
             startDate.value = today;
             endDate.value = today;
             
+            // Ensure only login container is visible
+            document.getElementById('login-container').classList.remove('hidden');
+            document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('main-container').classList.add('hidden');
+            document.getElementById('statistics-container').classList.add('hidden');
+            document.getElementById('stop-transfer-container').classList.add('hidden');
+            document.getElementById('editDeleteModal').style.display = 'none';
+            document.getElementById('stopTransferWarningModal').style.display = 'none';
+            
+            // Load transactions
             loadTransactionsFromDB();
         });
     </script>
