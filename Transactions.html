@@ -651,23 +651,6 @@
                 <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
                 <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
                 <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
-                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
-                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
-                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
-                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
-                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
-                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
-                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
-                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
-                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
-                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
-                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
-                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
-                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
-                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
-                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
-                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
-                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
             </select>
             <div class="date-range-container">
                 <div class="date-input-group">
@@ -794,7 +777,7 @@
             } else {
                 mainContainer.classList.add("hidden");
                 stopTransferContainer.classList.remove("hidden");
-                displayStopTransfers();
+                loadStopTransfers();
             }
         }
 
@@ -871,6 +854,19 @@
             document.getElementById('stopTransferWarningModal').style.display = 'none';
         }
 
+        function loadStopTransfers() {
+            fetch(`${SCRIPT_URL}?action=getStopTransfers`)
+                .then(response => response.json())
+                .then(data => {
+                    stopTransfers = data.stopTransfers || [];
+                    displayStopTransfers();
+                })
+                .catch(error => {
+                    console.error('Error loading stop transfers:', error);
+                    alert('حدث خطأ أثناء جلب بيانات إيقاف التحويل');
+                });
+        }
+
         function addStopTransfer() {
             const engineer = document.getElementById('stopEngineer').value;
             const startDate = document.getElementById('stopStartDate').value;
@@ -886,18 +882,33 @@
                 return;
             }
 
-            const stopTransfer = {
-                engineer,
-                startDate,
-                endDate
-            };
+            const params = new URLSearchParams();
+            params.append('action', 'addStopTransfer');
+            params.append('engineer', engineer);
+            params.append('startDate', startDate);
+            params.append('endDate', endDate);
 
-            stopTransfers.push(stopTransfer);
-            displayStopTransfers();
-            alert("✅ تمت إضافة إيقاف التحويل بنجاح!");
-            document.getElementById('stopEngineer').value = '';
-            document.getElementById('stopStartDate').value = '';
-            document.getElementById('stopEndDate').value = '';
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    stopTransfers.push({ engineer, startDate, endDate });
+                    displayStopTransfers();
+                    alert("✅ تمت إضافة إيقاف التحويل بنجاح!");
+                    document.getElementById('stopEngineer').value = '';
+                    document.getElementById('stopStartDate').value = '';
+                    document.getElementById('stopEndDate').value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error adding stop transfer:', error);
+                alert('حدث خطأ أثناء إضافة إيقاف التحويل');
+            });
         }
 
         function openEditDeleteModal() {
@@ -942,28 +953,67 @@
                 return;
             }
 
-            const index = stopTransfers.findIndex(stop => stop.engineer === engineer);
-            if (index !== -1) {
-                stopTransfers[index] = { engineer, startDate, endDate };
-                displayStopTransfers();
-                alert("✅ تم تعديل إيقاف التحويل بنجاح!");
-                closeEditDeleteModal();
-            } else {
-                alert("⚠️ لا يوجد إيقاف تحويل لهذا المهندس!");
-            }
+            const params = new URLSearchParams();
+            params.append('action', 'editStopTransfer');
+            params.append('engineer', engineer);
+            params.append('startDate', startDate);
+            params.append('endDate', endDate);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const index = stopTransfers.findIndex(stop => stop.engineer === engineer);
+                    if (index !== -1) {
+                        stopTransfers[index] = { engineer, startDate, endDate };
+                        displayStopTransfers();
+                        alert("✅ تم تعديل إيقاف التحويل بنجاح!");
+                        closeEditDeleteModal();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error editing stop transfer:', error);
+                alert('حدث خطأ أثناء تعديل إيقاف التحويل');
+            });
         }
 
         function deleteStopTransfer() {
             const engineer = document.getElementById('modalEngineer').value;
-            const index = stopTransfers.findIndex(stop => stop.engineer === engineer);
-            if (index !== -1) {
-                stopTransfers.splice(index, 1);
-                displayStopTransfers();
-                alert("✅ تم حذف إيقاف التحويل بنجاح!");
-                closeEditDeleteModal();
-            } else {
-                alert("⚠️ لا يوجد إيقاف تحويل لهذا المهندس!");
+
+            if (!engineer) {
+                alert("⚠️ الرجاء اختيار مهندس!");
+                return;
             }
+
+            const params = new URLSearchParams();
+            params.append('action', 'deleteStopTransfer');
+            params.append('engineer', engineer);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    stopTransfers = stopTransfers.filter(stop => stop.engineer !== engineer);
+                    displayStopTransfers();
+                    alert("✅ تم حذف إيقاف التحويل بنجاح!");
+                    closeEditDeleteModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting stop transfer:', error);
+                alert('حدث خطأ أثناء حذف إيقاف التحويل');
+            });
         }
 
         function displayStopTransfers() {
@@ -1329,8 +1379,8 @@
 
         window.addEventListener('load', () => {
             // Initialize date inputs
-            const startDate = document.getElementById('stopStartDate');
-            const endDate = document.getElementById('stopEndDate');
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
             const today = new Date().toISOString().split('T')[0];
             
             startDate.value = today;
@@ -1345,8 +1395,9 @@
             document.getElementById('editDeleteModal').style.display = 'none';
             document.getElementById('stopTransferWarningModal').style.display = 'none';
             
-            // Load transactions
+            // Load transactions and stop transfers
             loadTransactionsFromDB();
+            loadStopTransfers();
         });
     </script>
     <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9395ce21f9986744',t:'MTc0NjE3MDk0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
