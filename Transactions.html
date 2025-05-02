@@ -552,8 +552,8 @@
         </div>
 
         <div class="button-container">
-            <button onclick="addStopTransfer()">إضافة إيقاف التحويل</button>
-            <button onclick="openEditDeleteModal()">تعديل/حذف إيقاف التحويل</button>
+            <button onclick="addStopTransfer()">إيقاف التحويل</button>
+            <button onclick="openEditDeleteModal()">التـــعـديـــــل</button>
             <button onclick="toggleStopTransfer()">العودة للصفحة الرئيسية</button>
         </div>
 
@@ -575,7 +575,7 @@
     <div id="editDeleteModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditDeleteModal()">×</span>
-            <h3>تعديل أو حذف إيقاف التحويل</h3>
+            <h3>تعديل/حذف إيقاف التحويل</h3>
             <select id="modalEngineer" onchange="loadStopTransferDetails()">
                 <option value="">اختيار المهندس</option>
                 <option value="سالم عيسى العامري">المهندس سالم عيسى العامري</option>
@@ -946,7 +946,7 @@
 
             const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
             const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
-            const newTransactionType = prompt("أدخل نوع الطلب الجديد", transaction.type);
+            const newTransactionType = prompt("أدخل نوع الاستعمال الجديد", transaction.type);
 
             if (!newTransactionId || !newEngineer || !newTransactionType) {
                 alert("⚠️ تم إلغاء التحديث.");
