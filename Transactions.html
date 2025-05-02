@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -169,6 +130,10 @@
             color: white;
         }
 
+        #stopTransferTable td {
+            color: black;
+        }
+
         #statistics-container, #stop-transfer-container {
             margin-top: 20px;
         }
@@ -260,24 +225,34 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+            background: linear-gradient(135deg, #ffffff, #f0f4f8);
+            margin: 10% auto;
+            padding: 25px;
+            border: none;
+            width: 90%;
             max-width: 500px;
-            border-radius: 10px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             text-align: right;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .modal-content h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .close {
@@ -285,13 +260,13 @@
             float: left;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
         }
 
         .close:hover,
         .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+            color: #e74c3c;
         }
 
         .modal-buttons {
@@ -301,10 +276,89 @@
             margin-top: 20px;
         }
 
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: auto;
+        }
+
+        .modal-buttons button.edit-btn {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .modal-buttons button.edit-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons button.delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal-buttons button.delete-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons button.cancel-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .modal-buttons button.cancel-btn:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
         .modal-message {
             font-size: 18px;
             color: #2c3e50;
             margin-bottom: 20px;
+            line-height: 1.5;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #stopTransferWarningModal .modal-content {
+            background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+            border: 2px solid #f39c12;
+        }
+
+        #stopTransferWarningModal .modal-buttons button {
+            background: #f39c12;
+            color: white;
+        }
+
+        #stopTransferWarningModal .modal-buttons button:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        #editDeleteModal select#modalEngineer {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 70%;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (max-width: 600px) {
@@ -317,6 +371,10 @@
             }
             .button-container {
                 flex-wrap: wrap;
+            }
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
             }
         }
 
@@ -575,7 +633,7 @@
     <div id="editDeleteModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditDeleteModal()">×</span>
-            <h3>تعديل/حذف إيقاف التحويل</h3>
+            <h3>تعديل أو حذف إيقاف التحويل</h3>
             <select id="modalEngineer" onchange="loadStopTransferDetails()">
                 <option value="">اختيار المهندس</option>
                 <option value="سالم عيسى العامري">المهندس سالم عيسى العامري</option>
@@ -594,9 +652,9 @@
                 </div>
             </div>
             <div class="modal-buttons">
-                <button onclick="editStopTransfer()">تعديل</button>
-                <button onclick="deleteStopTransfer()">حذف</button>
-                <button onclick="closeEditDeleteModal()">إلغاء</button>
+                <button class="edit-btn" onclick="editStopTransfer()">تعديل</button>
+                <button class="delete-btn" onclick="deleteStopTransfer()">حذف</button>
+                <button class="cancel-btn" onclick="closeEditDeleteModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -613,6 +671,40 @@
     </div>
 
     <script>
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmp4gQJpBVpFDwYmUdTz_Pg4Rh3sGhuIM--l4YgqXo2yU-HrJGpgPQKXs_rCt2PWjzLw/exec";
 
         let transactions = [];
@@ -722,7 +814,6 @@
                 return;
             }
 
-            // Check if engineer has an active stop transfer
             const today = new Date();
             const activeStop = stopTransfers.find(stop => 
                 stop.engineer === engineer && 
@@ -1237,5 +1328,6 @@
             loadTransactionsFromDB();
         });
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9395ce21f9986744',t:'MTc0NjE3MDk0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
