@@ -682,7 +682,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOmmWHaMZICsji_I9SyL81oWZWdLCYqp4o3P6ucwx5p9-ydzfJzSmQwsQPjp-UvNX2/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwgtfnYAsaNjLnh95dn2HQDPXCEDWmVI64kJo8O-8zgEP3KAnkt-ECuaWAJ50XDECiVA/exec";
 
         let transactions = [];
         let stopTransfers = [];
@@ -698,6 +698,16 @@
             { username: "11220", password: "A@11220", isAdmin: false },
             { username: "9684", password: "A@9684", isAdmin: false }
         ];
+
+        // Sanitize input to ensure it's a number
+        function sanitizeInput(input) {
+            const trimmed = input.trim();
+            const number = Number(trimmed);
+            if (isNaN(number)) {
+                throw new Error("رقم المعاملة يجب أن يكون رقمًا صحيحًا");
+            }
+            return number;
+        }
 
         function logout() {
             const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
@@ -782,10 +792,16 @@
         }
 
         function addTransaction() {
-            const engineer = document.getElementById('engineer').value;
-            const transactionId = document.getElementById('transactionId').value;
-            const transactionType = document.getElementById('transactionType').value;
-            const requestType = document.getElementById('requestType').value;
+            let engineer, transactionId, transactionType, requestType;
+            try {
+                engineer = document.getElementById('engineer').value;
+                transactionId = sanitizeInput(document.getElementById('transactionId').value);
+                transactionType = document.getElementById('transactionType').value;
+                requestType = document.getElementById('requestType').value;
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
 
             if (!engineer || !transactionId || !transactionType || !requestType) {
                 alert("⚠️ الرجاء ملء جميع الحقول.");
@@ -818,7 +834,12 @@
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -841,7 +862,7 @@
             })
             .catch(error => {
                 console.error('Error adding transaction:', error);
-                alert('حدث خطأ أثناء إضافة المعاملة');
+                alert(`حدث خطأ أثناء إضافة المعاملة: ${error.message}`);
             });
         }
 
@@ -856,14 +877,19 @@
 
         function loadStopTransfers() {
             fetch(`${SCRIPT_URL}?action=getStopTransfers`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     stopTransfers = data.stopTransfers || [];
                     displayStopTransfers();
                 })
                 .catch(error => {
                     console.error('Error loading stop transfers:', error);
-                    alert('حدث خطأ أثناء جلب بيانات إيقاف التحويل');
+                    alert(`حدث خطأ أثناء جلب بيانات إيقاف التحويل: ${error.message}`);
                 });
         }
 
@@ -892,7 +918,12 @@
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -907,7 +938,7 @@
             })
             .catch(error => {
                 console.error('Error adding stop transfer:', error);
-                alert('حدث خطأ أثناء إضافة إيقاف التحويل');
+                alert(`حدث خطأ أثناء إضافة إيقاف التحويل: ${error.message}`);
             });
         }
 
@@ -963,7 +994,12 @@
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -979,7 +1015,7 @@
             })
             .catch(error => {
                 console.error('Error editing stop transfer:', error);
-                alert('حدث خطأ أثناء تعديل إيقاف التحويل');
+                alert(`حدث خطأ أثناء تعديل إيقاف التحويل: ${error.message}`);
             });
         }
 
@@ -999,7 +1035,12 @@
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -1012,7 +1053,7 @@
             })
             .catch(error => {
                 console.error('Error deleting stop transfer:', error);
-                alert('حدث خطأ أثناء حذف إيقاف التحويل');
+                alert(`حدث خطأ أثناء حذف إيقاف التحويل: ${error.message}`);
             });
         }
 
@@ -1035,7 +1076,12 @@
 
         function loadTransactionsFromDB() {
             fetch(`${SCRIPT_URL}?action=getTransactions`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     transactions = data.transactions || [];
                     currentPageMain = 1;
@@ -1045,26 +1091,38 @@
                 })
                 .catch(error => {
                     console.error('Error loading transactions:', error);
-                    alert('حدث خطأ أثناء جلب البيانات من Google Sheets. الرجاء التحقق من الاتصال بالإنترنت والمحاولة لاحقًا.');
+                    alert(`حدث خطأ أثناء جلب البيانات من Google Sheets: ${error.message}`);
                     document.getElementById("main-container").classList.add("hidden");
                     document.getElementById("login-container").classList.remove("hidden");
                 });
         }
 
         function deleteTransaction() {
-            const transactionId = document.getElementById('transactionId').value;
+            let transactionId;
+            try {
+                transactionId = sanitizeInput(document.getElementById('transactionId').value);
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+
             if (!transactionId) {
                 alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
                 return;
             }
 
             fetch(`${SCRIPT_URL}?action=deleteTransaction&id=${encodeURIComponent(transactionId)}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.error) {
                         alert(data.error);
                     } else {
-                        transactions = transactions.filter(t => t.id !== transactionId);
+                        transactions = transactions.filter(t => Number(t.id) !== transactionId);
                         currentPageMain = 1;
                         updateTransactionList();
                         updateTotalTransactions();
@@ -1074,24 +1132,36 @@
                 })
                 .catch(error => {
                     console.error('Error deleting transaction:', error);
-                    alert('حدث خطأ أثناء حذف المعاملة');
+                    alert(`حدث خطأ أثناء حذف المعاملة: ${error.message}`);
                 });
         }
 
         function editTransaction() {
-            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
-            if (!transactionIdToEdit) return;
+            let transactionIdToEdit;
+            try {
+                transactionIdToEdit = sanitizeInput(prompt("أدخل رقم المعاملة لتحديثها", ""));
+                if (!transactionIdToEdit) return;
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
 
-            const transaction = transactions.find(t => t.id === transactionIdToEdit);
+            const transaction = transactions.find(t => Number(t.id) === transactionIdToEdit);
             if (!transaction) {
                 alert("⚠️ لا توجد معاملة بهذا الرقم!");
                 return;
             }
 
-            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
-            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
-            const newTransactionType = prompt("أدخل نوع الاستعمال الجديد", transaction.type);
-            const newRequestType = prompt("أدخل نوع الطلب الجديد", transaction.requestType);
+            let newTransactionId, newEngineer, newTransactionType, newRequestType;
+            try {
+                newTransactionId = sanitizeInput(prompt("أدخل رقم المعاملة الجديد", transaction.id));
+                newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
+                newTransactionType = prompt("أدخل نوع الاستعمال الجديد", transaction.type);
+                newRequestType = prompt("أدخل نوع الطلب الجديد", transaction.requestType);
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
 
             if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
                 alert("⚠️ تم إلغاء التحديث.");
@@ -1112,13 +1182,18 @@
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     alert(data.error);
                 } else {
                     transactions = transactions.map(t => 
-                        t.id === transactionIdToEdit ? {
+                        Number(t.id) === transactionIdToEdit ? {
                             id: newTransactionId,
                             engineer: newEngineer,
                             type: newTransactionType,
@@ -1135,7 +1210,7 @@
             })
             .catch(error => {
                 console.error('Error updating transaction:', error);
-                alert('حدث خطأ أثناء تحديث المعاملة');
+                alert(`حدث خطأ أثناء تحديث المعاملة: ${error.message}`);
             });
         }
 
@@ -1345,7 +1420,7 @@
         function searchTransactions() {
             const searchValue = document.getElementById('search').value.toLowerCase();
             const filteredTransactions = transactions.filter(tx => 
-                tx.id.toLowerCase().includes(searchValue) || 
+                String(tx.id).toLowerCase().includes(searchValue) || 
                 tx.engineer.toLowerCase().includes(searchValue) ||
                 tx.type.toLowerCase().includes(searchValue) ||
                 tx.requestType.toLowerCase().includes(searchValue)
@@ -1400,6 +1475,5 @@
             loadStopTransfers();
         });
     </script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9395ce21f9986744',t:'MTc0NjE3MDk0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
