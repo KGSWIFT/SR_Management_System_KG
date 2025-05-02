@@ -473,14 +473,18 @@
             <option value="أبراج اتصالات">أبراج اتصالات</option>
             <option value="ملعب">ملعب</option>
             <option value="سياحي">سياحي</option>
-            <option value="سكني">سكني</option>
-            <option value="موافقة فنية سكنية">موافقة فنية سكنية</option>
-            <option value="موافقة فنية تجارية">موافقة فنية تجارية</option>
-            <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
+            <option value="سكني">سكني</option> 
             <option value="صناعي">صناعي</option>
             <option value="مسجد">مسجد</option>
             <option value="سكني تجاري">سكني تجاري</option>
             <option value="كنيسة">كنيسة</option>
+        </select>
+        <select id="requestType">
+            <option value="">نوع الطلب</option>
+            <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
+            <option value="موافقة فنية">موافقة فنية</option>
+            <option value="إضافة وتعديل">إضافة وتعديل</option>
+            <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
         </select>
 
         <input type="text" id="search" placeholder="بحث عن المعاملات" oninput="searchTransactions()">
@@ -538,6 +542,7 @@
                             <th>رقم المعاملة</th>
                             <th>اسم المهندس</th>
                             <th>نوع الاستعمال</th>
+                            <th>نوع الطلب</th>
                             <th>التاريخ</th>
                         </tr>
                     </thead>
@@ -640,6 +645,27 @@
                 <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
                 <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
                 <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option
             </select>
             <div class="date-range-container">
                 <div class="date-input-group">
@@ -808,8 +834,9 @@
             const engineer = document.getElementById('engineer').value;
             const transactionId = document.getElementById('transactionId').value;
             const transactionType = document.getElementById('transactionType').value;
+            const requestType = document.getElementById('requestType').value;
 
-            if (!engineer || !transactionId || !transactionType) {
+            if (!engineer || !transactionId || !transactionType || !requestType) {
                 alert("⚠️ الرجاء ملء جميع الحقول.");
                 return;
             }
@@ -832,6 +859,7 @@
             params.append('id', transactionId);
             params.append('engineer', engineer);
             params.append('type', transactionType);
+            params.append('requestType', requestType);
             params.append('date', new Date().toISOString());
             params.append('createdAt', new Date().getTime());
 
@@ -848,6 +876,7 @@
                         id: transactionId,
                         engineer,
                         type: transactionType,
+                        requestType,
                         date: new Date().toISOString(),
                         createdAt: new Date().getTime()
                     };
@@ -1038,8 +1067,9 @@
             const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
             const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
             const newTransactionType = prompt("أدخل نوع الاستعمال الجديد", transaction.type);
+            const newRequestType = prompt("أدخل نوع الطلب الجديد", transaction.requestType);
 
-            if (!newTransactionId || !newEngineer || !newTransactionType) {
+            if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
                 alert("⚠️ تم إلغاء التحديث.");
                 return;
             }
@@ -1050,6 +1080,7 @@
             params.append('id', newTransactionId);
             params.append('engineer', newEngineer);
             params.append('type', newTransactionType);
+            params.append('requestType', newRequestType);
             params.append('date', new Date().toISOString());
             params.append('createdAt', transaction.createdAt);
 
@@ -1067,6 +1098,7 @@
                             id: newTransactionId,
                             engineer: newEngineer,
                             type: newTransactionType,
+                            requestType: newRequestType,
                             date: new Date().toISOString(),
                             createdAt: transaction.createdAt
                         } : t
@@ -1124,7 +1156,7 @@
             const tbody = document.createElement('tbody');
 
             const headerRow = document.createElement('tr');
-            ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'تاريخ الإضافة'].forEach(text => {
+            ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'نوع الطلب', 'تاريخ الإضافة'].forEach(text => {
                 const th = document.createElement('th');
                 th.textContent = text;
                 headerRow.appendChild(th);
@@ -1134,7 +1166,7 @@
 
             pageTransactions.forEach(transaction => {
                 const row = document.createElement('tr');
-                [transaction.id, transaction.engineer, transaction.type, new Date(transaction.date).toLocaleString('ar-EG')].forEach(text => {
+                [transaction.id, transaction.engineer, transaction.type, transaction.requestType, new Date(transaction.date).toLocaleString('ar-EG')].forEach(text => {
                     const td = document.createElement('td');
                     td.textContent = text;
                     row.appendChild(td);
@@ -1177,7 +1209,7 @@
             statsTable.innerHTML = '';
 
             if (filteredTransactions.length === 0) {
-                statsTable.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                statsTable.innerHTML = '<tr><td colspan="5">لا توجد بيانات لعرضها.</td></tr>';
                 document.getElementById('statsPagination').style.display = 'none';
                 return;
             }
@@ -1191,7 +1223,8 @@
                 row.insertCell(0).innerText = transaction.id;
                 row.insertCell(1).innerText = transaction.engineer;
                 row.insertCell(2).innerText = transaction.type;
-                row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
+                row.insertCell(3).innerText = transaction.requestType;
+                row.insertCell(4).innerText = new Date(transaction.date).toLocaleString('ar-EG');
             });
 
             const totalPages = Math.ceil(filteredTransactions.length / rowsPerPage);
@@ -1269,14 +1302,15 @@
 
             const recentTransactions = filterRecentTransactions(filteredTransactions);
             if (recentTransactions.length === 0) {
-                statsTable.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                statsTable.innerHTML = '<tr><td colspan="5">لا توجد بيانات لعرضها.</td></tr>';
             } else {
                 recentTransactions.forEach(transaction => {
                     const row = statsTable.insertRow();
                     row.insertCell(0).innerText = transaction.id;
                     row.insertCell(1).innerText = transaction.engineer;
                     row.insertCell(2).innerText = transaction.type;
-                    row.insertCell(3).innerText = new Date(transaction.date).toLocaleString('ar-EG');
+                    row.insertCell(3).innerText = transaction.requestType;
+                    row.insertCell(4).innerText = new Date(transaction.date).toLocaleString('ar-EG');
                 });
             }
 
@@ -1289,7 +1323,8 @@
             const filteredTransactions = transactions.filter(tx => 
                 tx.id.toLowerCase().includes(searchValue) || 
                 tx.engineer.toLowerCase().includes(searchValue) ||
-                tx.type.toLowerCase().includes(searchValue)
+                tx.type.toLowerCase().includes(searchValue) ||
+                tx.requestType.toLowerCase().includes(searchValue)
             );
             currentPageMain = 1;
             displayTransactions(filteredTransactions);
@@ -1299,6 +1334,7 @@
             document.getElementById('engineer').value = '';
             document.getElementById('transactionId').value = '';
             document.getElementById('transactionType').value = '';
+            document.getElementById('requestType').value = '';
         }
 
         function populateEngineerSelect() {
