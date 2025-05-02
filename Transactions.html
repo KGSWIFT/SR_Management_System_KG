@@ -699,6 +699,36 @@
             { username: "9684", password: "A@9684", isAdmin: false }
         ];
 
+        // Sanitize input to ensure it's a number
+        function sanitizeInput(input) {
+            return Number(input.trim());
+        }
+
+        // Fetch with retry to handle network issues
+        function fetchWithRetry(url, options, retries = 3) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': navigator.userAgent
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                if (retries > 0) {
+                    console.warn(`Retrying... (${retries} attempts left)`);
+                    return fetchWithRetry(url, options, retries - 1);
+                }
+                throw error;
+            });
+        }
+
         function logout() {
             const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
             if (confirmation) {
@@ -783,7 +813,7 @@
 
         function addTransaction() {
             const engineer = document.getElementById('engineer').value;
-            const transactionId = document.getElementById('transactionId').value;
+            const transactionId = sanitizeInput(document.getElementById('transactionId').value);
             const transactionType = document.getElementById('transactionType').value;
             const requestType = document.getElementById('requestType').value;
 
@@ -814,11 +844,10 @@
             params.append('date', new Date().toISOString());
             params.append('createdAt', new Date().getTime());
 
-            fetch(SCRIPT_URL, {
+            fetchWithRetry(SCRIPT_URL, {
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -855,8 +884,7 @@
         }
 
         function loadStopTransfers() {
-            fetch(`${SCRIPT_URL}?action=getStopTransfers`)
-                .then(response => response.json())
+            fetchWithRetry(`${SCRIPT_URL}?action=getStopTransfers`, {})
                 .then(data => {
                     stopTransfers = data.stopTransfers || [];
                     displayStopTransfers();
@@ -888,11 +916,10 @@
             params.append('startDate', startDate);
             params.append('endDate', endDate);
 
-            fetch(SCRIPT_URL, {
+            fetchWithRetry(SCRIPT_URL, {
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -959,11 +986,10 @@
             params.append('startDate', startDate);
             params.append('endDate', endDate);
 
-            fetch(SCRIPT_URL, {
+            fetchWithRetry(SCRIPT_URL, {
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -995,11 +1021,10 @@
             params.append('action', 'deleteStopTransfer');
             params.append('engineer', engineer);
 
-            fetch(SCRIPT_URL, {
+            fetchWithRetry(SCRIPT_URL, {
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
@@ -1034,8 +1059,7 @@
         }
 
         function loadTransactionsFromDB() {
-            fetch(`${SCRIPT_URL}?action=getTransactions`)
-                .then(response => response.json())
+            fetchWithRetry(`${SCRIPT_URL}?action=getTransactions`, {})
                 .then(data => {
                     transactions = data.transactions || [];
                     currentPageMain = 1;
@@ -1052,19 +1076,18 @@
         }
 
         function deleteTransaction() {
-            const transactionId = document.getElementById('transactionId').value;
+            const transactionId = sanitizeInput(document.getElementById('transactionId').value);
             if (!transactionId) {
                 alert("⚠️ الرجاء إدخال رقم المعاملة لحذفها.");
                 return;
             }
 
-            fetch(`${SCRIPT_URL}?action=deleteTransaction&id=${encodeURIComponent(transactionId)}`)
-                .then(response => response.json())
+            fetchWithRetry(`${SCRIPT_URL}?action=deleteTransaction&id=${encodeURIComponent(transactionId)}`, {})
                 .then(data => {
                     if (data.error) {
                         alert(data.error);
                     } else {
-                        transactions = transactions.filter(t => t.id !== transactionId);
+                        transactions = transactions.filter(t => Number(t.id) !== transactionId);
                         currentPageMain = 1;
                         updateTransactionList();
                         updateTotalTransactions();
@@ -1078,59 +1101,79 @@
                 });
         }
 
+        function deleteTransactionById(transactionId) {
+            transactionId = sanitizeInput(transactionId);
+            fetchWithRetry(`${SCRIPT_URL}?action=deleteTransaction&id=${encodeURIComponent(transactionId)}`, {})
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        transactions = transactions.filter(t => Number(t.id) !== transactionId);
+                        currentPageMain = 1;
+                        updateTransactionList();
+                        updateTotalTransactions();
+                        alert("✅ تم حذف المعاملة بنجاح.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting transaction:', error);
+                    alert('حدث خطأ أثناء حذف المعاملة');
+                });
+        }
+
+        function populateEditForm(transaction) {
+            document.getElementById('transactionId').value = transaction.id;
+            document.getElementById('engineer').value = transaction.engineer;
+            document.getElementById('transactionType').value = transaction.type;
+            document.getElementById('requestType').value = transaction.requestType;
+            alert('تم تحميل بيانات المعاملة. قم بتعديل الحقول ثم اضغط "تحديث الطلب".');
+        }
+
         function editTransaction() {
-            const transactionIdToEdit = prompt("أدخل رقم المعاملة لتحديثها", "");
-            if (!transactionIdToEdit) return;
+            const oldId = sanitizeInput(document.getElementById('transactionId').value);
+            const newId = sanitizeInput(document.getElementById('transactionId').value);
+            const engineer = document.getElementById('engineer').value;
+            const transactionType = document.getElementById('transactionType').value;
+            const requestType = document.getElementById('requestType').value;
 
-            const transaction = transactions.find(t => t.id === transactionIdToEdit);
-            if (!transaction) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
-            const newTransactionId = prompt("أدخل رقم المعاملة الجديد", transaction.id);
-            const newEngineer = prompt("أدخل اسم المهندس الجديد", transaction.engineer);
-            const newTransactionType = prompt("أدخل نوع الاستعمال الجديد", transaction.type);
-            const newRequestType = prompt("أدخل نوع الطلب الجديد", transaction.requestType);
-
-            if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
-                alert("⚠️ تم إلغاء التحديث.");
+            if (!newId || !engineer || !transactionType || !requestType) {
+                alert("⚠️ الرجاء ملء جميع الحقول.");
                 return;
             }
 
             const params = new URLSearchParams();
             params.append('action', 'editTransaction');
-            params.append('oldId', transactionIdToEdit);
-            params.append('id', newTransactionId);
-            params.append('engineer', newEngineer);
-            params.append('type', newTransactionType);
-            params.append('requestType', newRequestType);
+            params.append('oldId', oldId);
+            params.append('id', newId);
+            params.append('engineer', engineer);
+            params.append('type', transactionType);
+            params.append('requestType', requestType);
             params.append('date', new Date().toISOString());
-            params.append('createdAt', transaction.createdAt);
+            params.append('createdAt', new Date().getTime());
 
-            fetch(SCRIPT_URL, {
+            fetchWithRetry(SCRIPT_URL, {
                 method: 'POST',
                 body: params
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
                 } else {
                     transactions = transactions.map(t => 
-                        t.id === transactionIdToEdit ? {
-                            id: newTransactionId,
-                            engineer: newEngineer,
-                            type: newTransactionType,
-                            requestType: newRequestType,
+                        Number(t.id) === oldId ? {
+                            id: newId,
+                            engineer,
+                            type: transactionType,
+                            requestType,
                             date: new Date().toISOString(),
-                            createdAt: transaction.createdAt
+                            createdAt: t.createdAt
                         } : t
                     );
                     currentPageMain = 1;
                     updateTransactionList();
                     updateTotalTransactions();
                     alert("✅ تم تحديث المعاملة بنجاح!");
+                    clearFields();
                 }
             })
             .catch(error => {
@@ -1180,7 +1223,7 @@
             const tbody = document.createElement('tbody');
 
             const headerRow = document.createElement('tr');
-            ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'نوع الطلب', 'تاريخ الإضافة'].forEach(text => {
+            ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'نوع الطلب', 'تاريخ الإضافة', 'إجراءات'].forEach(text => {
                 const th = document.createElement('th');
                 th.textContent = text;
                 headerRow.appendChild(th);
@@ -1195,6 +1238,16 @@
                     td.textContent = text;
                     row.appendChild(td);
                 });
+                const actionTd = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.textContent = 'تعديل';
+                editButton.onclick = () => populateEditForm(transaction);
+                actionTd.appendChild(editButton);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'حذف';
+                deleteButton.onclick = () => deleteTransactionById(transaction.id);
+                actionTd.appendChild(deleteButton);
+                row.appendChild(actionTd);
                 tbody.appendChild(row);
             });
 
@@ -1345,7 +1398,7 @@
         function searchTransactions() {
             const searchValue = document.getElementById('search').value.toLowerCase();
             const filteredTransactions = transactions.filter(tx => 
-                tx.id.toLowerCase().includes(searchValue) || 
+                String(tx.id).toLowerCase().includes(searchValue) || 
                 tx.engineer.toLowerCase().includes(searchValue) ||
                 tx.type.toLowerCase().includes(searchValue) ||
                 tx.requestType.toLowerCase().includes(searchValue)
@@ -1400,6 +1453,5 @@
             loadStopTransfers();
         });
     </script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9395ce21f9986744',t:'MTc0NjE3MDk0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
