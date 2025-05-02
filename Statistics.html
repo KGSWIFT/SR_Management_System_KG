@@ -283,7 +283,7 @@
             <table id="transactionTypesTable">
                 <thead>
                     <tr>
-                        <th>نوع الاستعمال</th>
+                        <th>النوع</th>
                         <th>العدد</th>
                     </tr>
                 </thead>
@@ -348,6 +348,7 @@
                         <th>رقم المعاملة</th>
                         <th>اسم المهندس</th>
                         <th>نوع الاستعمال</th>
+                        <th>نوع الطلب</th>
                         <th>التاريخ</th>
                     </tr>
                 </thead>
@@ -383,7 +384,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmp4gQJpBVpFDwYmUdTz_Pg4Rh3sGhuIM--l4YgqXo2yU-HrJGpgPQKXs_rCt2PWjzLw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWetjpwhWwlKxv08kLpzutsK4kgGPqKNDjUMwDB-DSuXkq-1gVcqGjuDigsMmK9IpqGg/exec";
         let myChart = null;
         let showingChart = false;
         let currentPage = 1;
@@ -437,7 +438,7 @@
                     document.getElementById('loadingScreen').style.display = 'none';
                     document.getElementById('content').style.visibility = 'visible';
                     document.getElementById('transactionsTable').getElementsByTagName('tbody')[0].innerHTML = 
-                        '<tr><td colspan="4">فشل تحميل البيانات. يرجى التحقق من الاتصال بالخادم.</td></tr>';
+                        '<tr><td colspan="5">فشل تحميل البيانات. يرجى التحقق من الاتصال بالخادم.</td></tr>';
                 });
         }
 
@@ -479,7 +480,7 @@
             tableBody.innerHTML = '';
 
             if (filteredTransactions.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5">لا توجد بيانات لعرضها.</td></tr>';
                 document.getElementById('prevPage').disabled = true;
                 document.getElementById('nextPage').disabled = true;
                 document.getElementById('pageInfo').textContent = '';
@@ -497,6 +498,7 @@
                     <td>${transaction.id}</td>
                     <td>${transaction.engineer}</td>
                     <td>${transaction.type}</td>
+                    <td>${transaction.requestType || 'غير محدد'}</td>
                     <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
                 `;
             });
@@ -559,22 +561,32 @@
             const total = filteredTransactions.length;
             document.getElementById('totalTransactions').textContent = `العدد الكلي للمعاملات: ${total}`;
 
-            // إحصائيات حسب نوع الاستعمال
+            // إحصائيات حسب نوع الاستعمال ونوع الطلب
             const typeStats = {
                 "حديقة عامة": 0,
                 "أبراج اتصالات": 0,
                 "ملعب": 0,
-                "سكني": 0, 
-                "0 :تجاري,
-                "0 :صناعي,         
+                "سياحي": 0,
+                "سكني": 0,
+                "صناعي": 0,
                 "مسجد": 0,
                 "سكني تجاري": 0,
-                "كنيسة": 0,
+                "كنيسة": 0
+            };
+
+            const requestTypeStats = {
+                "إباحة بناء جديدة": 0,
+                "موافقة فنية": 0,
+                "إضافة وتعديل": 0,
+                "سكني متعدد الطوابق": 0
             };
 
             filteredTransactions.forEach(transaction => {
                 if (typeStats.hasOwnProperty(transaction.type)) {
                     typeStats[transaction.type]++;
+                }
+                if (transaction.requestType && requestTypeStats.hasOwnProperty(transaction.requestType)) {
+                    requestTypeStats[transaction.requestType]++;
                 }
             });
 
@@ -583,6 +595,9 @@
             typesTableBody.innerHTML = '';
 
             let hasData = false;
+
+            // إضافة إحصائيات نوع الاستعمال
+            typesTableBody.insertRow().innerHTML = `<td colspan="2" style="background: #f0f0f0; font-weight: bold;">نوع الاستعمال</td>`;
             for (const type in typeStats) {
                 if (typeStats[type] > 0) {
                     hasData = true;
@@ -590,6 +605,22 @@
                     row.innerHTML = `
                         <td>${type}</td>
                         <td>${typeStats[type]}</td>
+                    `;
+                }
+            }
+
+            // إضافة فاصل
+            typesTableBody.insertRow().innerHTML = `<td colspan="2" style="background: #f0f0f0;"></td>`;
+
+            // إضافة إحصائيات نوع الطلب
+            typesTableBody.insertRow().innerHTML = `<td colspan="2" style="background: #f0f0f0; font-weight: bold;">نوع الطلب</td>`;
+            for (const requestType in requestTypeStats) {
+                if (requestTypeStats[requestType] > 0) {
+                    hasData = true;
+                    const row = typesTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${requestType}</td>
+                        <td>${requestTypeStats[requestType]}</td>
                     `;
                 }
             }
@@ -725,11 +756,12 @@
             }
 
             const csvData = [
-                ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'التاريخ'],
+                ['رقم المعاملة', 'اسم المهندس', 'نوع الاستعمال', 'نوع الطلب', 'التاريخ'],
                 ...filteredTransactions.map(t => [
                     t.id,
                     t.engineer,
                     t.type,
+                    t.requestType || 'غير محدد',
                     new Date(t.date).toLocaleDateString('ar-EG')
                 ])
             ];
@@ -739,16 +771,22 @@
 
         function exportChartToExcel() {
             const statistics = {};
-           const typeStats = {
-                 "حديقة عامة": 0,
+            const typeStats = {
+                "حديقة عامة": 0,
                 "أبراج اتصالات": 0,
                 "ملعب": 0,
-                "سكني": 0, 
-                "0 :تجاري,
-                "0 :صناعي,         
+                "سياحي": 0,
+                "سكني": 0,
+                "صناعي": 0,
                 "مسجد": 0,
                 "سكني تجاري": 0,
-                "كنيسة": 0,
+                "كنيسة": 0
+            };
+            const requestTypeStats = {
+                "إباحة بناء جديدة": 0,
+                "موافقة فنية": 0,
+                "إضافة وتعديل": 0,
+                "سكني متعدد الطوابق": 0
             };
 
             filteredTransactions.forEach(transaction => {
@@ -756,10 +794,13 @@
                 if (typeStats.hasOwnProperty(transaction.type)) {
                     typeStats[transaction.type]++;
                 }
+                if (transaction.requestType && requestTypeStats.hasOwnProperty(transaction.requestType)) {
+                    requestTypeStats[transaction.requestType]++;
+                }
             });
 
             const engineers = Object.keys(statistics);
-            if (engineers.length === 0) {
+            if (engineers.length === 0 && Object.values(typeStats).every(val => val === 0) && Object.values(requestTypeStats).every(val => val === 0)) {
                 alert("لا توجد بيانات لتصديرها!");
                 return;
             }
@@ -769,12 +810,21 @@
                 ...engineers.map(engineer => [engineer, statistics[engineer]])
             ];
 
-            // إضافة إحصائيات الأنواع إلى ملف CSV
-            csvData.push([]); // إضافة سطر فارغ للفصل
-            csvData.push(['نوع المعاملة', 'عدد المعاملات']);
+            // إضافة إحصائيات نوع الاستعمال
+            csvData.push([]);
+            csvData.push(['نوع الاستعمال', 'عدد المعاملات']);
             for (const type in typeStats) {
                 if (typeStats[type] > 0) {
                     csvData.push([type, typeStats[type]]);
+                }
+            }
+
+            // إضافة إحصائيات نوع الطلب
+            csvData.push([]);
+            csvData.push(['نوع الطلب', 'عدد المعاملات']);
+            for (const requestType in requestTypeStats) {
+                if (requestTypeStats[requestType] > 0) {
+                    csvData.push([requestType, requestTypeStats[requestType]]);
                 }
             }
 
@@ -786,7 +836,7 @@
             tableBody.innerHTML = '';
 
             if (filteredTransactions.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5">لا توجد بيانات لعرضها.</td></tr>';
             } else {
                 filteredTransactions.forEach(transaction => {
                     const row = tableBody.insertRow();
@@ -794,6 +844,7 @@
                         <td>${transaction.id}</td>
                         <td>${transaction.engineer}</td>
                         <td>${transaction.type}</td>
+                        <td>${transaction.requestType || 'غير محدد'}</td>
                         <td>${new Date(transaction.date).toLocaleDateString('ar-EG')}</td>
                     `;
                 });
@@ -827,5 +878,5 @@
             window.location.href = "index.html";
         }
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93975d866a66bf95',t:'MTc0NjE4NzMwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
