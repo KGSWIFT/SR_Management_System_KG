@@ -56,7 +56,7 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
-            width: 600px;
+            width: 800px; /* زيادة العرض لاستيعاب الأزرار الإضافية */
             margin-top: 20px;
         }
 
@@ -71,16 +71,20 @@
         .button-container {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap; /* السماح بالتفاف الأزرار في الصفوف */
             margin-top: 20px;
+            gap: 15px; /* إضافة مسافة بين الأزرار */
         }
 
         .button-box {
             background: rgba(0, 0, 0, 0.8);
             padding: 15px;
             border-radius: 10px;
-            width: 150px;
+            width: 170px; /* تعديل العرض ليكون متناسباً */
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            flex: 1 1 170px; /* مرونة في الحجم */
+            min-width: 170px;
         }
 
         /* تنسيق الأيقونات من Font Awesome */
@@ -99,6 +103,10 @@
 
         .button-box .admin-icon {
             color: #ff6b6b; /* أحمر لزر مسؤول النظام */
+        }
+
+        .button-box .reports-icon {
+            color: #ffa500; /* برتقالي لزر التقارير */
         }
 
         .button-box h3 {
@@ -121,6 +129,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
         }
 
         .button-box button:hover {
@@ -130,6 +139,7 @@
 
         .admin-button {
             background: linear-gradient(45deg, #ff6b6b, #ff8787);
+            color: white;
         }
 
         .admin-button:hover {
@@ -138,6 +148,7 @@
 
         .user-button {
             background: linear-gradient(45deg, #4a90e2, #357abd);
+            color: white;
         }
 
         .user-button:hover {
@@ -146,10 +157,20 @@
 
         .stats-button {
             background: linear-gradient(45deg, #28a745, #34c759);
+            color: white;
         }
 
         .stats-button:hover {
             background: linear-gradient(45deg, #218838, #2ba84a);
+        }
+
+        .reports-button {
+            background: linear-gradient(45deg, #ffa500, #ffb732);
+            color: white;
+        }
+
+        .reports-button:hover {
+            background: linear-gradient(45deg, #e69500, #e6a52a);
         }
 
         .about-button {
@@ -251,6 +272,23 @@
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
+        /* تحسين التنسيق للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .content-box {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .button-box {
+                width: 45%;
+                min-width: 140px;
+            }
+            
+            #main-content h2 {
+                font-size: 32px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -293,11 +331,12 @@
         <div class="button-container">
             <!-- زر المعاملات -->
             <div class="button-box">
-                <i class="fas fa-exchange-alt"></i> <!-- أيقونة الموظف -->
-                <h3>إدارة المعاملات </h3>
+                <i class="fas fa-exchange-alt user-icon"></i> <!-- أيقونة الموظف -->
+                <h3>إدارة المعاملات</h3>
                 <p>اضغط هنا لإدارة المعاملات ومتابعة الحالة</p>
                 <button class="user-button" onclick="window.location.href='Transactions.html'">دخول</button>
             </div>
+            
             <!-- زر إحصائيات المعاملات -->
             <div class="button-box">
                 <i class="fas fa-chart-bar stats-icon"></i> <!-- أيقونة الإحصائيات -->
@@ -305,6 +344,15 @@
                 <p>اضغط هنا لعرض إحصائيات المعاملات</p>
                 <button class="stats-button" onclick="window.location.href='Statistics.html'">دخول</button>
             </div>
+            
+            <!-- زر التقارير الشاملة -->
+            <div class="button-box">
+                <i class="fas fa-file-alt reports-icon"></i> <!-- أيقونة التقارير -->
+                <h3>التقارير الشاملة</h3>
+                <p>اضغط هنا لعرض التقارير والتحليلات المتقدمة</p>
+                <button class="reports-button" onclick="window.location.href='report.html'">دخول</button>
+            </div>
+            
             <!-- زر مسؤول النظام -->
             <div class="button-box">
                 <i class="fas fa-user-shield admin-icon"></i> <!-- أيقونة مسؤول النظام -->
@@ -314,10 +362,12 @@
             </div>
         </div>
     </div>
-  <footer class="footer">
+    
+    <footer class="footer">
         <p class="bold">جــــميـع الــــحقــــوق مـــــــحفوظـــــة 2025 KG™</p>
         <p class="bold">Created by Khalid AlGhazali</p>
     </footer>
+    
     <script>
         setTimeout(() => {
             document.getElementById("welcome").classList.add("hidden");
