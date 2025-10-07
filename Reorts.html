@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG SWIFT SYSTEM - التقارير الشاملة</title>
+    <link rel="icon" href="KG_SWIFT2.ico">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            direction: rtl;
+            background: url('background2.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #4a90e2;
+        }
+
+        .header img {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #34495e;
+            font-size: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .date-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .date-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input[type="date"], select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #357abd;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            page-break-inside: avoid;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4a90e2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+
+            .controls, .button-group, button {
+                display: none !important;
+            }
+
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 30px;
+            }
+
+            .chart-container {
+                page-break-inside: avoid;
+            }
+
+            @page {
+                margin: 2cm;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p style="font-size: 20px; color: #2c3e50; font-weight: bold;">جاري تحميل التقارير...</p>
+            <button onclick="useSampleData()" style="margin-top: 20px; background: #e74c3c;">تحميل بيانات تجريبية</button>
+        </div>
+    </div>
+
+    <div class="container" id="content" style="display: none;">
+        <div class="header">
+            <img src="KG_SWIFT.png" alt="KG SWIFT">
+            <h1>KG SWIFT SYSTEM</h1>
+            <p>التقارير والإحصائيات الشاملة</p>
+        </div>
+
+        <div class="controls">
+            <div class="date-group">
+                <label for="startDate">من تاريخ:</label>
+                <input type="date" id="startDate" onchange="filterData()">
+            </div>
+            <div class="date-group">
+                <label for="endDate">إلى تاريخ:</label>
+                <input type="date" id="endDate" onchange="filterData()">
+            </div>
+            <div class="date-group">
+                <label for="engineer">المهندس:</label>
+                <select id="engineer" onchange="filterData()">
+                    <option value="">جميع المهندسين</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="printAll()">طباعة جميع التقارير</button>
+            <button onclick="printSection('summary')">طباعة الملخص</button>
+            <button onclick="printSection('usage-stats')">طباعة إحصائيات الاستعمال</button>
+            <button onclick="printSection('request-stats')">طباعة إحصائيات الطلبات</button>
+            <button onclick="printSection('engineer-stats')">طباعة إحصائيات المهندسين</button>
+            <button onclick="exportAllToExcel()">تصدير الكل إلى Excel</button>
+            <button onclick="reloadWithSampleData()">تحميل بيانات تجريبية</button>
+            <button onclick="location.reload()">إعادة تحميل</button>
+            <button onclick="window.location.href='index.html'">العودة للصفحة الرئيسية</button>
+        </div>
+
+        <!-- ملخص عام -->
+        <div class="section" id="summary">
+            <h2>📊 الملخص العام</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>إجمالي المعاملات</h3>
+                    <div class="number" id="totalTransactions">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>عدد المهندسين</h3>
+                    <div class="number" id="totalEngineers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>متوسط المعاملات الشهري</h3>
+                    <div class="number" id="monthlyAverage">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>الفترة الزمنية</h3>
+                    <div class="number" id="timePeriod" style="font-size: 20px;">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات حسب نوع الاستعمال -->
+        <div class="section" id="usage-stats">
+            <h2>📈 إحصائيات حسب نوع الاستعمال</h2>
+            <table id="usageTable">
+                <thead>
+                    <tr>
+                        <th>نوع الاستعمال</th>
+                        <th>عدد المعاملات</th>
+                        <th>النسبة المئوية</th>
+                        <th>المتوسط الشهري</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="chart-container">
+                <canvas id="usageChart"></canvas>
+            </div>
+        </div>
+
+        <!-- إحصائيات حسب نوع الطلب -->
+        <div class="section" id="request-stats">
+            <h2>📋 إحصائيات حسب نوع الطلب</h2>
+            <table id="requestTable">
+                <thead>
+                    <tr>
+                        <th>نوع الطلب</th>
+                        <th>عدد المعاملات</th>
+                        <th>النسبة المئوية</th>
+                        <th>المتوسط الشهري</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="chart-container">
+                <canvas id="requestChart"></canvas>
+            </div>
+        </div>
+
+        <!-- إحصائيات المهندسين -->
+        <div class="section" id="engineer-stats">
+            <h2>👷 إحصائيات المهندسين</h2>
+            <table id="engineerTable">
+                <thead>
+                    <tr>
+                        <th>اسم المهندس</th>
+                        <th>عدد المعاملات</th>
+                        <th>النسبة المئوية</th>
+                        <th>المتوسط الشهري</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="chart-container">
+                <canvas id="engineerChart"></canvas>
+            </div>
+        </div>
+
+        <!-- معدلات شهرية حسب نوع الاستعمال -->
+        <div class="section" id="monthly-usage">
+            <h2>📅 المعدلات الشهرية - نوع الاستعمال</h2>
+            <div class="chart-container">
+                <canvas id="monthlyUsageChart"></canvas>
+            </div>
+        </div>
+
+        <!-- معدلات شهرية حسب نوع الطلب -->
+        <div class="section" id="monthly-request">
+            <h2>📅 المعدلات الشهرية - نوع الطلب</h2>
+            <div class="chart-container">
+                <canvas id="monthlyRequestChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwgtfnYAsaNjLnh95dn2HQDPXCEDWmVI64kJo8O-8zgEP3KAnkt-ECuaWAJ50XDECiVA/exec";
+        let allTransactions = [];
+        let filteredTransactions = [];
+        let charts = {};
+
+        const engineers = [
+            "سالم عيسى العامري", "أسماء سعيد السعدية", "رحمة سيف الصبحية",
+            "عائشة راشد الغيثية", "منى سعيد الحضرمية", "أنوار علي الهنائية",
+            "أشواق علي التميمية", "خديجة عبدالله البيمانية", "فاطمة محمد العدوية",
+            "المختار عبدالله الفارسي", "طلال محمد الحجري", "محمد خميس السيابي",
+            "هاجر عبدالله الجابرية", "أصيلة حمود البوسعيدية", "هبة سليمان الفلاحية",
+            "جمانة سعيد المسكرية", "مازن سعيد الذهلي", "عبدالله محمد الفارسي",
+            "هيثم راشد البداعي", "أصيلة علي الحسينية", "عماد عبد الله الهادي",
+            "أمير محمود ال طالب", "ماريا عبد الله البوسعيدية", "عائشة سيف الرحبية",
+            "مرشد خلفان الذخري"
+        ];
+
+        // بيانات تجريبية شاملة
+        const sampleTransactions = [
+            { date: '2024-01-15', engineer: 'سالم عيسى العامري', type: 'صيانة', requestType: 'طارئ' },
+            { date: '2024-01-20', engineer: 'أسماء سعيد السعدية', type: 'تركيب', requestType: 'مجدول' },
+            { date: '2024-02-01', engineer: 'رحمة سيف الصبحية', type: 'فحص', requestType: 'دوري' },
+            { date: '2024-02-05', engineer: 'عائشة راشد الغيثية', type: 'صيانة', requestType: 'طارئ' },
+            { date: '2024-02-10', engineer: 'منى سعيد الحضرمية', type: 'تركيب', requestType: 'مجدول' },
+            { date: '2024-02-15', engineer: 'أنوار علي الهنائية', type: 'فحص', requestType: 'دوري' },
+            { date: '2024-03-01', engineer: 'أشواق علي التميمية', type: 'صيانة', requestType: 'طارئ' },
+            { date: '2024-03-05', engineer: 'خديجة عبدالله البيمانية', type: 'تركيب', requestType: 'مجدول' },
+            { date: '2024-03-10', engineer: 'فاطمة محمد العدوية', type: 'فحص', requestType: 'دوري' },
+            { date: '2024-03-15', engineer: 'المختار عبدالله الفارسي', type: 'صيانة', requestType: 'طارئ' },
+            { date: '2024-03-20', engineer: 'طلال محمد الحجري', type: 'تركيب', requestType: 'مجدول' },
+            { date: '2024-03-25', engineer: 'محمد خميس السيابي', type: 'فحص', requestType: 'دوري' },
+            { date: '2024-04-01', engineer: 'هاجر عبدالله الجابرية', type: 'صيانة', requestType: 'طارئ' },
+            { date: '2024-04-05', engineer: 'أصيلة حمود البوسعيدية', type: 'تركيب', requestType: 'مجدول' },
+            { date: '2024-04-10', engineer: 'هبة سليمان الفلاحية', type: 'فحص', requestType: 'دوري' }
+        ];
+
+        window.onload = function() {
+            setTimeout(() => {
+                loadData();
+            }, 1000);
+        };
+
+        function loadData() {
+            console.log("بدء تحميل البيانات من:", SCRIPT_URL);
+            
+            // إضافة مهلة زمنية (8 ثواني)
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("انتهت مهلة التحميل")), 8000);
+            });
+
+            Promise.race([
+                fetch(`${SCRIPT_URL}?action=getTransactions`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                }),
+                timeoutPromise
+            ])
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`خطأ في الشبكة: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("البيانات المستلمة:", data);
+                
+                if (data && data.transactions && Array.isArray(data.transactions)) {
+                    allTransactions = data.transactions;
+                    console.log(`تم تحميل ${allTransactions.length} معاملة`);
+                } else {
+                    throw new Error("بيانات غير صالحة أو فارغة");
+                }
+            })
+            .catch(error => {
+                console.error("خطأ في تحميل البيانات:", error);
+                console.log("استخدام البيانات التجريبية...");
+                useSampleData();
+            })
+            .finally(() => {
+                filteredTransactions = [...allTransactions];
+                populateEngineersDropdown();
+                setDefaultDates();
+                filterData();
+                
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                // حفظ البيانات محلياً للطوارئ
+                try {
+                    localStorage.setItem('kg_swift_backup_data', JSON.stringify(allTransactions));
+                } catch (e) {
+                    console.log("لا يمكن حفظ البيانات محلياً");
+                }
+            });
+        }
+
+        function useSampleData() {
+            console.log("تفعيل البيانات التجريبية");
+            allTransactions = sampleTransactions;
+            
+            // عرض رسالة للمستخدم
+            const loadingContent = document.querySelector('.loading-content');
+            if (loadingContent) {
+                const message = document.createElement('p');
+                message.style.color = '#e74c3c';
+                message.style.marginTop = '10px';
+                message.textContent = 'تم تحميل بيانات تجريبية للعرض';
+                loadingContent.appendChild(message);
+            }
+        }
+
+        function reloadWithSampleData() {
+            useSampleData();
+            filteredTransactions = [...allTransactions];
+            populateEngineersDropdown();
+            setDefaultDates();
+            filterData();
+            
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+            alert("تم تحميل البيانات التجريبية بنجاح");
+        }
+
+        function populateEngineersDropdown() {
+            const select = document.getElementById('engineer');
+            select.innerHTML = '<option value="">جميع المهندسين</option>';
+            
+            engineers.forEach(eng => {
+                const option = document.createElement('option');
+                option.value = eng;
+                option.textContent = `المهندس ${eng}`;
+                select.appendChild(option);
+            });
+        }
+
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            
+            if (startDateInput && endDateInput) {
+                startDateInput.value = firstDay.toISOString().split('T')[0];
+                endDateInput.value = today.toISOString().split('T')[0];
+            }
+        }
+
+        function filterData() {
+            const selectedEngineer = document.getElementById('engineer').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            filteredTransactions = allTransactions.filter(t => {
+                const tDate = new Date(t.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                if (end) end.setHours(23, 59, 59);
+
+                const engineerMatch = !selectedEngineer || t.engineer === selectedEngineer;
+                const startMatch = !start || tDate >= start;
+                const endMatch = !end || tDate <= end;
+
+                return engineerMatch && startMatch && endMatch;
+            });
+
+            console.log(`تم تصفية البيانات إلى ${filteredTransactions.length} معاملة`);
+            updateAllStats();
+        }
+
+        function updateAllStats() {
+            updateSummary();
+            updateUsageStats();
+            updateRequestStats();
+            updateEngineerStats();
+            updateMonthlyCharts();
+        }
+
+        function updateSummary() {
+            const total = filteredTransactions.length;
+            const uniqueEngineers = new Set(filteredTransactions.map(t => t.engineer)).size;
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const monthsDiff = calculateMonthsDifference(startDate, endDate);
+            const monthlyAvg = monthsDiff > 0 ? Math.round(total / monthsDiff) : total;
+
+            document.getElementById('totalTransactions').textContent = total;
+            document.getElementById('totalEngineers').textContent = uniqueEngineers;
+            document.getElementById('monthlyAverage').textContent = monthlyAvg;
+            
+            const periodText = startDate && endDate ? 
+                `${new Date(startDate).toLocaleDateString('ar-EG')} - ${new Date(endDate).toLocaleDateString('ar-EG')}` : 
+                'الفترة غير محددة';
+            document.getElementById('timePeriod').textContent = periodText;
+        }
+
+        function calculateMonthsDifference(start, end) {
+            if (!start || !end) return 1;
+            
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                          (endDate.getMonth() - startDate.getMonth()) + 1;
+            return Math.max(months, 1);
+        }
+
+        function updateUsageStats() {
+            const stats = {};
+            filteredTransactions.forEach(t => {
+                const type = t.type || 'غير محدد';
+                stats[type] = (stats[type] || 0) + 1;
+            });
+
+            const total = filteredTransactions.length;
+            const monthsDiff = calculateMonthsDifference(
+                document.getElementById('startDate').value,
+                document.getElementById('endDate').value
+            );
+
+            const tbody = document.getElementById('usageTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            const sortedStats = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+            
+            sortedStats.forEach(([type, count]) => {
+                const row = tbody.insertRow();
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                const monthlyAvg = (count / monthsDiff).toFixed(1);
+                
+                row.innerHTML = `
+                    <td>${type}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${monthlyAvg}</td>
+                `;
+            });
+
+            createChart('usageChart', 'pie', sortedStats, 'إحصائيات نوع الاستعمال');
+        }
+
+        function updateRequestStats() {
+            const stats = {};
+            filteredTransactions.forEach(t => {
+                const reqType = t.requestType || 'غير محدد';
+                stats[reqType] = (stats[reqType] || 0) + 1;
+            });
+
+            const total = filteredTransactions.length;
+            const monthsDiff = calculateMonthsDifference(
+                document.getElementById('startDate').value,
+                document.getElementById('endDate').value
+            );
+
+            const tbody = document.getElementById('requestTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            const sortedStats = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+            
+            sortedStats.forEach(([type, count]) => {
+                const row = tbody.insertRow();
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                const monthlyAvg = (count / monthsDiff).toFixed(1);
+                
+                row.innerHTML = `
+                    <td>${type}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${monthlyAvg}</td>
+                `;
+            });
+
+            createChart('requestChart', 'doughnut', sortedStats, 'إحصائيات نوع الطلب');
+        }
+
+        function updateEngineerStats() {
+            const stats = {};
+            filteredTransactions.forEach(t => {
+                stats[t.engineer] = (stats[t.engineer] || 0) + 1;
+            });
+
+            const total = filteredTransactions.length;
+            const monthsDiff = calculateMonthsDifference(
+                document.getElementById('startDate').value,
+                document.getElementById('endDate').value
+            );
+
+            const tbody = document.getElementById('engineerTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            const sortedStats = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+            
+            sortedStats.forEach(([engineer, count]) => {
+                const row = tbody.insertRow();
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                const monthlyAvg = (count / monthsDiff).toFixed(1);
+                
+                row.innerHTML = `
+                    <td>${engineer}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${monthlyAvg}</td>
+                `;
+            });
+
+            createChart('engineerChart', 'bar', sortedStats.slice(0, 15), 'أكثر 15 مهندساً نشاطاً');
+        }
+
+        function updateMonthlyCharts() {
+            const monthlyUsage = getMonthlyStats('type');
+            const monthlyRequest = getMonthlyStats('requestType');
+
+            createMonthlyChart('monthlyUsageChart', monthlyUsage, 'المعدل الشهري حسب نوع الاستعمال');
+            createMonthlyChart('monthlyRequestChart', monthlyRequest, 'المعدل الشهري حسب نوع الطلب');
+        }
+
+        function getMonthlyStats(field) {
+            const monthlyData = {};
+            
+            filteredTransactions.forEach(t => {
+                const date = new Date(t.date);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const value = field === 'requestType' ? (t[field] || 'غير محدد') : t[field];
+                
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = {};
+                }
+                monthlyData[monthKey][value] = (monthlyData[monthKey][value] || 0) + 1;
+            });
+
+            return monthlyData;
+        }
+
+        function createChart(canvasId, type, data, title) {
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
+            }
+
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const labels = data.map(d => d[0]);
+            const values = data.map(d => d[1]);
+            const colors = generateColors(data.length);
+
+            charts[canvasId] = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'عدد المعاملات',
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: type !== 'bar',
+                            position: 'right'
+                        }
+                    },
+                    scales: type === 'bar' ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    } : {}
+                }
+            });
+        }
+
+        function createMonthlyChart(canvasId, monthlyData, title) {
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
+            }
+
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const months = Object.keys(monthlyData).sort();
+            const types = new Set();
+            Object.values(monthlyData).forEach(month => {
+                Object.keys(month).forEach(type => types.add(type));
+            });
+
+            const datasets = Array.from(types).map((type, i) => ({
+                label: type,
+                data: months.map(month => monthlyData[month][type] || 0),
+                backgroundColor: generateColors(types.size)[i],
+                borderColor: generateColors(types.size)[i],
+                borderWidth: 2,
+                fill: false
+            }));
+
+            const ctx = canvas.getContext('2d');
+            charts[canvasId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months.map(m => {
+                        const [year, month] = m.split('-');
+                        return `${month}/${year}`;
+                    }),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateColors(count) {
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+                '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+            ];
+            
+            // إذا احتجنا ألوان أكثر من المتوفر، نكرر الألوان
+            const result = [];
+            for (let i = 0; i < count; i++) {
+                result.push(colors[i % colors.length]);
+            }
+            return result;
+        }
+
+        function printAll() {
+            window.print();
+        }
+
+        function printSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>طباعة التقرير</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; direction: rtl; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+                        th { background: #4a90e2; color: white; }
+                        h2 { color: #2c3e50; border-bottom: 2px solid #4a90e2; padding-bottom: 10px; }
+                        .chart-container { margin: 20px 0; }
+                        canvas { max-width: 100%; }
+                    </style>
+                </head>
+                <body>
+                    ${section.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function exportAllToExcel() {
+            const csvData = [];
+            
+            // عنوان التقرير
+            csvData.push(['التقارير الشاملة - KG SWIFT SYSTEM']);
+            csvData.push(['تاريخ التصدير', new Date().toLocaleDateString('ar-EG')]);
+            csvData.push([]);
+            
+            // الملخص العام
+            csvData.push(['الملخص العام']);
+            csvData.push(['إجمالي المعاملات', document.getElementById('totalTransactions').textContent]);
+            csvData.push(['عدد المهندسين', document.getElementById('totalEngineers').textContent]);
+            csvData.push(['متوسط المعاملات الشهري', document.getElementById('monthlyAverage').textContent]);
+            csvData.push(['الفترة الزمنية', document.getElementById('timePeriod').textContent]);
+            csvData.push([]);
+            
+            // الجداول
+            const tables = [
+                { id: 'usageTable', title: 'إحصائيات نوع الاستعمال' },
+                { id: 'requestTable', title: 'إحصائيات نوع الطلب' },
+                { id: 'engineerTable', title: 'إحصائيات المهندسين' }
+            ];
+            
+            tables.forEach(({id, title}) => {
+                csvData.push([title]);
+                const table = document.getElementById(id);
+                if (table) {
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('th, td');
+                        const rowData = Array.from(cells).map(cell => cell.textContent);
+                        csvData.push(rowData);
+                    });
+                }
+                csvData.push([]);
+            });
+
+            // تحويل إلى CSV
+            const csvContent = csvData.map(row => 
+                row.map(cell => `"${cell}"`).join(',')
+            ).join('\n');
+            
+            const bom = '\uFEFF';
+            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `KG_SWIFT_تقرير_شامل_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // تحميل البيانات المحفوظة في حالة الطوارئ
+        function loadBackupData() {
+            try {
+                const backup = localStorage.getItem('kg_swift_backup_data');
+                if (backup) {
+                    allTransactions = JSON.parse(backup);
+                    return true;
+                }
+            } catch (e) {
+                console.log("لا توجد بيانات احتياطية");
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
+
+
