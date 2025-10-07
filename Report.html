@@ -6,6 +6,8 @@
     <title>KG SWIFT SYSTEM - التقارير الشاملة</title>
     <link rel="icon" href="KG_SWIFT2.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -266,6 +268,22 @@
                 flex-direction: column;
             }
         }
+
+        .pdf-exporting {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 20px;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
@@ -273,8 +291,12 @@
         <div class="loading-content">
             <div class="spinner"></div>
             <p style="font-size: 20px; color: #2c3e50; font-weight: bold;">جاري تحميل التقارير...</p>
-            <button onclick="useSampleData()" style="margin-top: 20px; background: #e74c3c;">تحميل بيانات تجريبية</button>
         </div>
+    </div>
+
+    <div id="pdfExporting" class="pdf-exporting" style="display: none;">
+        <div class="spinner"></div>
+        <p>جاري إنشاء ملف PDF...</p>
     </div>
 
     <div class="container" id="content" style="display: none;">
@@ -307,8 +329,7 @@
             <button onclick="printSection('usage-stats')">طباعة إحصائيات الاستعمال</button>
             <button onclick="printSection('request-stats')">طباعة إحصائيات الطلبات</button>
             <button onclick="printSection('engineer-stats')">طباعة إحصائيات المهندسين</button>
-            <button onclick="exportAllToExcel()">تصدير الكل إلى Excel</button>
-            <button onclick="reloadWithSampleData()">تحميل بيانات تجريبية</button>
+            <button onclick="exportAllToPDF()">تصدير الكل إلى PDF</button>
             <button onclick="location.reload()">إعادة تحميل</button>
             <button onclick="window.location.href='index.html'">العودة للصفحة الرئيسية</button>
         </div>
@@ -428,25 +449,6 @@
             "مرشد خلفان الذخري"
         ];
 
-        // بيانات تجريبية شاملة
-        const sampleTransactions = [
-            { date: '2024-01-15', engineer: 'سالم عيسى العامري', type: 'صيانة', requestType: 'طارئ' },
-            { date: '2024-01-20', engineer: 'أسماء سعيد السعدية', type: 'تركيب', requestType: 'مجدول' },
-            { date: '2024-02-01', engineer: 'رحمة سيف الصبحية', type: 'فحص', requestType: 'دوري' },
-            { date: '2024-02-05', engineer: 'عائشة راشد الغيثية', type: 'صيانة', requestType: 'طارئ' },
-            { date: '2024-02-10', engineer: 'منى سعيد الحضرمية', type: 'تركيب', requestType: 'مجدول' },
-            { date: '2024-02-15', engineer: 'أنوار علي الهنائية', type: 'فحص', requestType: 'دوري' },
-            { date: '2024-03-01', engineer: 'أشواق علي التميمية', type: 'صيانة', requestType: 'طارئ' },
-            { date: '2024-03-05', engineer: 'خديجة عبدالله البيمانية', type: 'تركيب', requestType: 'مجدول' },
-            { date: '2024-03-10', engineer: 'فاطمة محمد العدوية', type: 'فحص', requestType: 'دوري' },
-            { date: '2024-03-15', engineer: 'المختار عبدالله الفارسي', type: 'صيانة', requestType: 'طارئ' },
-            { date: '2024-03-20', engineer: 'طلال محمد الحجري', type: 'تركيب', requestType: 'مجدول' },
-            { date: '2024-03-25', engineer: 'محمد خميس السيابي', type: 'فحص', requestType: 'دوري' },
-            { date: '2024-04-01', engineer: 'هاجر عبدالله الجابرية', type: 'صيانة', requestType: 'طارئ' },
-            { date: '2024-04-05', engineer: 'أصيلة حمود البوسعيدية', type: 'تركيب', requestType: 'مجدول' },
-            { date: '2024-04-10', engineer: 'هبة سليمان الفلاحية', type: 'فحص', requestType: 'دوري' }
-        ];
-
         window.onload = function() {
             setTimeout(() => {
                 loadData();
@@ -487,53 +489,32 @@
             })
             .catch(error => {
                 console.error("خطأ في تحميل البيانات:", error);
-                console.log("استخدام البيانات التجريبية...");
-                useSampleData();
+                alert("حدث خطأ في تحميل البيانات. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.");
+                // محاولة تحميل البيانات الاحتياطية
+                if (!loadBackupData()) {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    alert("لا توجد بيانات متاحة للعرض. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.");
+                }
             })
             .finally(() => {
-                filteredTransactions = [...allTransactions];
-                populateEngineersDropdown();
-                setDefaultDates();
-                filterData();
-                
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-                // حفظ البيانات محلياً للطوارئ
-                try {
-                    localStorage.setItem('kg_swift_backup_data', JSON.stringify(allTransactions));
-                } catch (e) {
-                    console.log("لا يمكن حفظ البيانات محلياً");
+                if (allTransactions.length > 0) {
+                    filteredTransactions = [...allTransactions];
+                    populateEngineersDropdown();
+                    setDefaultDates();
+                    filterData();
+                    
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    
+                    // حفظ البيانات محلياً للطوارئ
+                    try {
+                        localStorage.setItem('kg_swift_backup_data', JSON.stringify(allTransactions));
+                    } catch (e) {
+                        console.log("لا يمكن حفظ البيانات محلياً");
+                    }
                 }
             });
-        }
-
-        function useSampleData() {
-            console.log("تفعيل البيانات التجريبية");
-            allTransactions = sampleTransactions;
-            
-            // عرض رسالة للمستخدم
-            const loadingContent = document.querySelector('.loading-content');
-            if (loadingContent) {
-                const message = document.createElement('p');
-                message.style.color = '#e74c3c';
-                message.style.marginTop = '10px';
-                message.textContent = 'تم تحميل بيانات تجريبية للعرض';
-                loadingContent.appendChild(message);
-            }
-        }
-
-        function reloadWithSampleData() {
-            useSampleData();
-            filteredTransactions = [...allTransactions];
-            populateEngineersDropdown();
-            setDefaultDates();
-            filterData();
-            
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
-            
-            alert("تم تحميل البيانات التجريبية بنجاح");
         }
 
         function populateEngineersDropdown() {
@@ -899,54 +880,142 @@
             printWindow.print();
         }
 
-        function exportAllToExcel() {
-            const csvData = [];
+        function exportAllToPDF() {
+            // إظهار شاشة التحميل
+            document.getElementById('pdfExporting').style.display = 'flex';
             
-            // عنوان التقرير
-            csvData.push(['التقارير الشاملة - KG SWIFT SYSTEM']);
-            csvData.push(['تاريخ التصدير', new Date().toLocaleDateString('ar-EG')]);
-            csvData.push([]);
-            
-            // الملخص العام
-            csvData.push(['الملخص العام']);
-            csvData.push(['إجمالي المعاملات', document.getElementById('totalTransactions').textContent]);
-            csvData.push(['عدد المهندسين', document.getElementById('totalEngineers').textContent]);
-            csvData.push(['متوسط المعاملات الشهري', document.getElementById('monthlyAverage').textContent]);
-            csvData.push(['الفترة الزمنية', document.getElementById('timePeriod').textContent]);
-            csvData.push([]);
-            
-            // الجداول
-            const tables = [
-                { id: 'usageTable', title: 'إحصائيات نوع الاستعمال' },
-                { id: 'requestTable', title: 'إحصائيات نوع الطلب' },
-                { id: 'engineerTable', title: 'إحصائيات المهندسين' }
-            ];
-            
-            tables.forEach(({id, title}) => {
-                csvData.push([title]);
-                const table = document.getElementById(id);
-                if (table) {
-                    const rows = table.querySelectorAll('tr');
-                    rows.forEach(row => {
-                        const cells = row.querySelectorAll('th, td');
-                        const rowData = Array.from(cells).map(cell => cell.textContent);
-                        csvData.push(rowData);
-                    });
-                }
-                csvData.push([]);
-            });
-
-            // تحويل إلى CSV
-            const csvContent = csvData.map(row => 
-                row.map(cell => `"${cell}"`).join(',')
-            ).join('\n');
-            
-            const bom = '\uFEFF';
-            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `KG_SWIFT_تقرير_شامل_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
+            // استخدام setTimeout لإعطاء الوقت لشاشة التحمين للظهور
+            setTimeout(() => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                let currentY = 10;
+                
+                // إضافة العنوان الرئيسي
+                doc.setFontSize(20);
+                doc.setTextColor(44, 62, 80);
+                doc.text('KG SWIFT SYSTEM - التقارير الشاملة', pageWidth / 2, currentY, { align: 'center' });
+                currentY += 15;
+                
+                // إضافة التاريخ
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`, pageWidth - 10, currentY, { align: 'right' });
+                currentY += 10;
+                
+                // إضافة الفترة الزمنية
+                const periodText = document.getElementById('timePeriod').textContent;
+                doc.text(`الفترة الزمنية: ${periodText}`, pageWidth - 10, currentY, { align: 'right' });
+                currentY += 15;
+                
+                // إضافة الملخص العام
+                doc.setFontSize(16);
+                doc.setTextColor(44, 62, 80);
+                doc.text('📊 الملخص العام', 10, currentY);
+                currentY += 10;
+                
+                // إضافة إحصائيات الملخص
+                doc.setFontSize(12);
+                const totalTransactions = document.getElementById('totalTransactions').textContent;
+                const totalEngineers = document.getElementById('totalEngineers').textContent;
+                const monthlyAverage = document.getElementById('monthlyAverage').textContent;
+                
+                doc.text(`إجمالي المعاملات: ${totalTransactions}`, pageWidth - 10, currentY, { align: 'right' });
+                currentY += 6;
+                doc.text(`عدد المهندسين: ${totalEngineers}`, pageWidth - 10, currentY, { align: 'right' });
+                currentY += 6;
+                doc.text(`متوسط المعاملات الشهري: ${monthlyAverage}`, pageWidth - 10, currentY, { align: 'right' });
+                currentY += 15;
+                
+                // إضافة الجداول
+                const tables = [
+                    { id: 'usageTable', title: '📈 إحصائيات حسب نوع الاستعمال' },
+                    { id: 'requestTable', title: '📋 إحصائيات حسب نوع الطلب' },
+                    { id: 'engineerTable', title: '👷 إحصائيات المهندسين' }
+                ];
+                
+                tables.forEach(({id, title}) => {
+                    // التحقق مما إذا كانت هناك مساحة كافية في الصفحة
+                    if (currentY > pageHeight - 50) {
+                        doc.addPage();
+                        currentY = 10;
+                    }
+                    
+                    doc.setFontSize(16);
+                    doc.setTextColor(44, 62, 80);
+                    doc.text(title, 10, currentY);
+                    currentY += 10;
+                    
+                    const table = document.getElementById(id);
+                    if (table) {
+                        const rows = table.querySelectorAll('tr');
+                        
+                        // إضافة رأس الجدول
+                        doc.setFillColor(74, 144, 226);
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(10);
+                        
+                        const headerCells = rows[0].querySelectorAll('th');
+                        const colWidths = [40, 40, 40, 40]; // عرض الأعمدة
+                        let xPos = pageWidth - 10;
+                        
+                        headerCells.forEach((cell, index) => {
+                            xPos -= colWidths[index];
+                            doc.rect(xPos, currentY, colWidths[index], 8, 'F');
+                            doc.text(cell.textContent, xPos + colWidths[index]/2, currentY + 5, { align: 'center' });
+                        });
+                        
+                        currentY += 8;
+                        
+                        // إضافة بيانات الجدول
+                        doc.setTextColor(0, 0, 0);
+                        for (let i = 1; i < rows.length; i++) {
+                            // التحقق مما إذا كانت هناك مساحة كافية في الصفحة
+                            if (currentY > pageHeight - 20) {
+                                doc.addPage();
+                                currentY = 10;
+                                
+                                // إعادة إضافة رأس الجدول في الصفحة الجديدة
+                                doc.setFillColor(74, 144, 226);
+                                doc.setTextColor(255, 255, 255);
+                                xPos = pageWidth - 10;
+                                
+                                headerCells.forEach((cell, index) => {
+                                    xPos -= colWidths[index];
+                                    doc.rect(xPos, currentY, colWidths[index], 8, 'F');
+                                    doc.text(cell.textContent, xPos + colWidths[index]/2, currentY + 5, { align: 'center' });
+                                });
+                                
+                                currentY += 8;
+                            }
+                            
+                            const cells = rows[i].querySelectorAll('td');
+                            xPos = pageWidth - 10;
+                            
+                            cells.forEach((cell, index) => {
+                                xPos -= colWidths[index];
+                                // تناوب ألوان الصفوف
+                                if (i % 2 === 0) {
+                                    doc.setFillColor(248, 249, 250);
+                                    doc.rect(xPos, currentY, colWidths[index], 8, 'F');
+                                }
+                                doc.text(cell.textContent, xPos + colWidths[index]/2, currentY + 5, { align: 'center' });
+                            });
+                            
+                            currentY += 8;
+                        }
+                        
+                        currentY += 10;
+                    }
+                });
+                
+                // حفظ الملف
+                doc.save(`KG_SWIFT_تقرير_شامل_${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                // إخفاء شاشة التحميل
+                document.getElementById('pdfExporting').style.display = 'none';
+            }, 500);
         }
 
         // تحميل البيانات المحفوظة في حالة الطوارئ
@@ -955,6 +1024,15 @@
                 const backup = localStorage.getItem('kg_swift_backup_data');
                 if (backup) {
                     allTransactions = JSON.parse(backup);
+                    filteredTransactions = [...allTransactions];
+                    populateEngineersDropdown();
+                    setDefaultDates();
+                    filterData();
+                    
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    
+                    console.log("تم تحميل البيانات الاحتياطية بنجاح");
                     return true;
                 }
             } catch (e) {
@@ -965,5 +1043,3 @@
     </script>
 </body>
 </html>
-
-
