@@ -811,35 +811,45 @@
             }
         }
 
-        function addTransaction() {
-            let engineer, transactionId, transactionType, requestType;
-            try {
-                engineer = document.getElementById('engineer').value;
-                transactionId = sanitizeInput(document.getElementById('transactionId').value);
-                transactionType = document.getElementById('transactionType').value;
-                requestType = document.getElementById('requestType').value;
-            } catch (error) {
-                alert(error.message);
-                return;
-            }
+   function addTransaction() {
+    let engineer, transactionId, transactionType, requestType;
+    try {
+        engineer = document.getElementById('engineer').value;
+        transactionId = sanitizeInput(document.getElementById('transactionId').value);
+        transactionType = document.getElementById('transactionType').value;
+        requestType = document.getElementById('requestType').value;
+    } catch (error) {
+        alert(error.message);
+        return;
+    }
 
-            if (!engineer || !transactionId || !transactionType || !requestType) {
-                alert("⚠️ الرجاء ملء جميع الحقول.");
-                return;
-            }
+    if (!engineer || !transactionId || !transactionType || !requestType) {
+        alert("⚠️ الرجاء ملء جميع الحقول.");
+        return;
+    }
 
-            const today = new Date();
-            const activeStop = stopTransfers.find(stop => 
-                stop.engineer === engineer && 
-                new Date(stop.startDate) <= today && 
-                new Date(stop.endDate) >= today
-            );
+    const today = new Date();
+    const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-            if (activeStop) {
-                const message = `لا يمكن تحويل المعاملة للمهندس ${engineer}، تم إيقاف التحويل عنه من تاريخ ${new Date(activeStop.startDate).toLocaleDateString('ar-EG')} إلى تاريخ ${new Date(activeStop.endDate).toLocaleDateString('ar-EG')}`;
-                showStopTransferWarningModal(message);
-                return;
-            }
+    // التحقق من وجود إيقاف تحويل للمهندس في هذا اليوم
+    const activeStop = stopTransfers.find(stop => {
+        const start = new Date(stop.startDate);
+        const end = new Date(stop.endDate);
+
+        // إزالة الوقت من التواريخ لمقارنة دقيقة
+        const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+        return stop.engineer === engineer && todayDateOnly >= startDateOnly && todayDateOnly <= endDateOnly;
+    });
+
+    if (activeStop) {
+        const message = `لا يمكن تحويل المعاملة للمهندس ${engineer}، تم إيقاف التحويل عنه من تاريخ ${new Date(activeStop.startDate).toLocaleDateString('ar-EG')} إلى تاريخ ${new Date(activeStop.endDate).toLocaleDateString('ar-EG')}`;
+        showStopTransferWarningModal(message);
+        return; // يمنع التحويل تمامًا
+    }
+
+ 
 
             const params = new URLSearchParams();
             params.append('action', 'addTransaction');
