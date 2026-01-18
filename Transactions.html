@@ -497,7 +497,6 @@
                 <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
                 <option value="موافقة فنية">موافقة فنية</option>
                 <option value="إضافة وتعديل">إضافة وتعديل</option>
-                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
             </select>
 
             <input type="text" id="search" placeholder="🔍 بحث عن المعاملات" oninput="searchTransactions()">
@@ -512,10 +511,10 @@
                 <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير</button>
             </div>
 
-            <h3 id="todayTitle" style="display: none;">📋 معاملات اليوم (آخر 10 ساعات)</h3>
+            <h3 id="todayTitle" style="display: none;">📋 معاملات اليوم </h3>
             <div id="todayTransactionsTable" style="display: none;"></div>
             
-            <h3>📋 معاملات آخر 10 ساعات</h3>
+            <h3>📋 معاملات اليوم</h3>
             <div id="transactionsList"></div> 
             <div class="pagination">
                 <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
@@ -592,7 +591,6 @@
                 <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
                 <option value="موافقة فنية">موافقة فنية</option>
                 <option value="إضافة وتعديل">إضافة وتعديل</option>
-                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
             </select>
             <div class="modal-buttons">
                 <button class="edit-btn" onclick="editTransaction()">تحديث</button>
@@ -954,7 +952,7 @@
 
             const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
 
-            document.getElementById("todayTransactionsInfo").innerHTML = `📅 معاملات آخر 10 ساعات: ${todayTxs.length}`;
+            document.getElementById("todayTransactionsInfo").innerHTML = `📅 معاملات اليوم: ${todayTxs.length}`;
 
             if (todayTxs.length === 0) {
                 document.getElementById("todayTitle").style.display = 'none';
@@ -998,7 +996,7 @@
             const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
 
             if (todayTxs.length === 0) {
-                alert('❌ لا توجد معاملات في آخر 10 ساعات');
+                alert('❌ لا توجد معاملات اليوم');
                 return;
             }
 
@@ -1039,7 +1037,7 @@
             statsModal.innerHTML = `
                 <div class="modal-content" style="max-width: 700px;">
                     <span class="close" onclick="document.getElementById('statsModal').style.display='none'">&times;</span>
-                    <h3>📊 إحصائيات المعاملات (آخر 10 ساعات)</h3>
+                    <h3>📊 إحصائيات المعاملات (آاليوم)</h3>
                     <div style="color: #333; text-align: right; margin-bottom: 20px;">
                         <p style="font-size: 18px; font-weight: 600;">إجمالي المعاملات: <span style="color: #2ecc71; font-size: 24px;">${todayTxs.length}</span></p>
                     </div>
@@ -1099,4 +1097,5 @@
     </script>
 </body>
 </html>
+
 
