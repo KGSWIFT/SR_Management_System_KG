@@ -597,79 +597,80 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBgucGjIDbgxLF9FnmZL14XuabUqu0AMV1PK6G64fEggnCB__WrGjrinAiqtmmvAp1/exec";
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBgucGjIDbgxLF9FnmZL14XuabUqu0AMV1PK6G64fEggnCB__WrGjrinAiqtmmvAp1/exec";
 
-        const VALID_PINS = {
-            '12345': { name: 'خالد يعقوب الغزالي', isAdmin: true },
-            '54321': { name: 'خالد يعقوب الغزالي', isAdmin: true },
-            '12123': { name: 'امل سعيد الحسنية 1', isAdmin: false },
-            '22222': { name: 'محمد على المجرفي 2', isAdmin: false },
-            '33333': { name: 'بدر سويدان الشرجي 3', isAdmin: false },
-            '44444': { name: '4 احمد ناصر الشبلي', isAdmin: false }
-        };
+let transactions = [];
+let stopTransfers = [];
+let currentPageMain = 1;
+const rowsPerPage = 10;
+let currentUser = null;
 
-        let transactions = [];
-        let stopTransfers = [];
-        let currentPageMain = 1;
-        const rowsPerPage = 10;
-        let currentUser = null;
+async function checkPin() {
+    const pin = document.getElementById("pin").value.trim();
+    
+    if (!pin || pin.length !== 5 || !/^\d+$/.test(pin)) {
+        alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
+        document.getElementById("pin").value = '';
+        document.getElementById("pin").focus();
+        return;
+    }
 
-        function checkPin() {
-            const pin = document.getElementById("pin").value;
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'login');
+        params.append('pin', pin);
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+
+        if (data.success) {
+            currentUser = {
+                pin: pin,
+                name: data.name,
+                isAdmin: data.isAdmin
+            };
+
+            document.getElementById("login-container").classList.add("hidden");
+            document.getElementById("welcome").classList.remove("hidden");
+            document.getElementById("userGreeting").innerHTML = 
+                `مرحباً بك <strong>${currentUser.name}</strong>`;
             
-            if (!pin || pin.length !== 5 || !/^\d+$/.test(pin)) {
-                alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
-                document.getElementById("pin").value = '';
-                document.getElementById("pin").focus();
-                return;
-            }
-
-            if (VALID_PINS[pin]) {
-                currentUser = {
-                    pin: pin,
-                    name: VALID_PINS[pin].name,
-                    isAdmin: VALID_PINS[pin].isAdmin
-                };
-
-                document.getElementById("login-container").classList.add("hidden");
-                document.getElementById("welcome").classList.remove("hidden");
-                document.getElementById("userGreeting").innerHTML = 
-                    `مرحباً بك <strong>${currentUser.name}</strong>`;
+            setTimeout(() => {
+                document.getElementById("welcome").classList.add("hidden");
+                document.getElementById("main-container").classList.remove("hidden");
+                document.getElementById("currentUserDisplay").innerHTML = 
+                    `👤 ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
                 
-                setTimeout(() => {
-                    document.getElementById("welcome").classList.add("hidden");
-                    document.getElementById("main-container").classList.remove("hidden");
-                    document.getElementById("currentUserDisplay").innerHTML = 
-                        `👤 ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
-                    
-                    loadTransactionsFromDB();
-                    loadStopTransfersData();
-                }, 2000);
-                
-                document.getElementById("pin").value = '';
-            } else {
-                alert("❌ PIN غير صحيح");
-                document.getElementById("pin").value = '';
-                document.getElementById("pin").focus();
-            }
-        }
+                loadTransactionsFromDB();
+                loadStopTransfersData();
+            }, 2000);
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                checkPin();
-            }
+            document.getElementById("pin").value = '';
+        } else {
+            alert(data.message || "❌ PIN غير صحيح");
+            document.getElementById("pin").value = '';
+            document.getElementById("pin").focus();
         }
+    } catch (err) {
+        alert("❌ حدث خطأ أثناء التحقق من PIN: " + err.message);
+    }
+}
 
-        function logout() {
-            if (confirm("هل أنت متأكد من الخروج؟")) {
-                currentUser = null;
-                transactions = [];
-                document.getElementById("main-container").classList.add("hidden");
-                document.getElementById("login-container").classList.remove("hidden");
-                document.getElementById("pin").value = "";
-                document.getElementById("pin").focus();
-            }
-        }
+function handleKeyPress(event) {
+    if (event.key === "Enter") checkPin();
+}
+
+function logout() {
+    if (confirm("هل أنت متأكد من الخروج؟")) {
+        currentUser = null;
+        transactions = [];
+        document.getElementById("main-container").classList.add("hidden");
+        document.getElementById("login-container").classList.remove("hidden");
+        document.getElementById("pin").value = "";
+        document.getElementById("pin").focus();
+    }
+}
+
 
         function goToHomePage() {
             window.location.href = "index.html";
@@ -1094,6 +1095,7 @@
     </script>
 </body>
 </html>
+
 
 
 
