@@ -3,293 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KG SWIFT SYSTEM-Transactions</title>
-     <link rel="icon" href="KG_SWIFT2.ico">
+    <title>KG SWIFT SYSTEM - Transactions</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             direction: rtl;
-            text-align: center;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        #welcome {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #2a5298;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            animation: fadeIn 0.5s ease-out;
+        .login-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: popIn 0.6s ease-out;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 20px auto;
             background: rgba(255, 255, 255, 0.98);
             padding: 40px;
             border-radius: 25px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
             color: #333;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            animation: slideUp 0.5s ease-out;
-        }
-
-        .logo {
-            width: 200px;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
-        }
-
-        h2, h3, h4 {
-            color: #1e3c72;
-            font-size: 34px;
-            font-weight: 800;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(45deg, #1e3c72, #4a90e2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #4a90e2;
-        }
-
-        .total-transactions {
-            font-size: 24px;
-            margin: 25px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            border-radius: 15px;
-            color: white;
-            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
-            font-weight: 600;
-        }
-
-        select, button, input {
-            padding: 15px 25px;
-            margin: 15px auto;
-            border: 2px solid #4a90e2;
-            border-radius: 12px;
-            background: white;
-            color: #333;
-            width: 80%;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.25);
-            transform: translateY(-2px);
-        }
-
-        button {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 15px 30px;
-            width: auto;
-            border: none;
-            font-weight: 700;
-            letter-spacing: 1px;
-            min-width: 200px;
-        }
-
-        button:hover {
-            background: linear-gradient(135deg, #357abd, #2a5298);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .report-btn {
-            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
-        }
-
-        .report-btn:hover {
-            background: linear-gradient(135deg, #27ae60, #219653) !important;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .login-container {
-            max-width: 500px;
-            width: 90%;
-            margin: auto;
-            padding: 60px 40px;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            border: 3px solid rgba(255, 255, 255, 0.4);
-            animation: popIn 0.6s ease-out;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .login-form button {
-            width: 85%;
-            padding: 18px;
-            font-size: 20px;
-            font-weight: 700;
-            margin-top: 20px;
-        }
-
-        .pin-container {
-            position: relative;
-            width: 85%;
-            margin: 20px auto;
-        }
-
-        #pin {
-            font-size: 28px !important;
-            letter-spacing: 12px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            padding: 20px;
-            border: 3px solid #4a90e2;
-            background: #f8fafc;
-        }
-
-        .pin-label {
-            font-size: 20px;
+        h2 {
             color: #1e3c72;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h3 {
+            color: #4a90e2;
+            margin: 20px 0 15px 0;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
             margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e3c72;
             font-weight: 600;
         }
 
-        table {
+        input, select {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 30px;
-            border: 3px solid #4a90e2;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        th, td {
-            padding: 18px;
-            border: 1px solid #e0e0e0;
-            text-align: center;
-            transition: all 0.2s ease;
+            padding: 12px;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
             font-size: 16px;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
         }
 
-        th {
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.2);
+            transform: translateY(-2px);
+        }
+
+        button {
+            padding: 12px 25px;
+            margin: 8px;
             background: linear-gradient(135deg, #4a90e2, #357abd);
             color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: 700;
-            position: sticky;
-            top: 0;
-            font-size: 18px;
-        }
-
-        tr:hover {
-            background-color: rgba(74, 144, 226, 0.15);
-            transform: scale(1.01);
-        }
-
-        #stopTransferTable td {
-            color: #333;
-            font-weight: 500;
-        }
-
-        #statistics-container, #stop-transfer-container {
-            margin-top: 40px;
-        }
-
-        .date-range-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .date-input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 250px;
-        }
-
-        .date-input-group label {
-            margin-bottom: 12px;
-            color: #1e3c72;
-            font-weight: 700;
+            transition: all 0.3s ease;
             font-size: 16px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #357abd, #2a5298);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .button-container {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
             flex-wrap: wrap;
-        }
-
-        .pagination {
-            display: flex;
             justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-            gap: 15px;
+            gap: 10px;
+            margin: 20px 0;
         }
 
-        .pagination button {
-            background: #4a90e2;
-            padding: 15px 30px;
-            border-radius: 10px;
-            border: none;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
             color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: auto;
-            min-width: 120px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
             font-weight: 600;
         }
 
-        .pagination button:disabled {
-            background: #b0b0b0;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        .pagination button:not(:disabled):hover {
-            background: #357abd;
-            transform: translateY(-3px) scale(1.05);
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        #pageInfo, #pageInfoStats {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e3c72;
-            margin: 0 20px;
-            padding: 12px 24px;
-            background: rgba(74, 144, 226, 0.15);
-            border-radius: 10px;
-            border: 2px solid #4a90e2;
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
 
         .modal {
@@ -300,133 +193,98 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease-in;
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #ffffff, #f8fafc);
-            margin: 8% auto;
-            padding: 40px;
-            border: none;
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
             width: 90%;
-            max-width: 600px;
-            border-radius: 25px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-            text-align: right;
-            animation: slideDown 0.4s ease-out;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            color: #333;
         }
 
-        .modal-content h3 {
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
             color: #1e3c72;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
             font-size: 28px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .close {
-            color: #777;
-            float: left;
-            font-size: 36px;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 5px 10px;
-            border-radius: 50%;
+            color: #666;
+            padding: 0;
+            margin: 0;
         }
 
-        .close:hover {
+        .close-btn:hover {
             color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
             transform: rotate(90deg);
         }
 
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            margin-top: 30px;
-            padding: 0 20px;
+        .user-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #1e3c72;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .modal-buttons button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            font-weight: 700;
-            min-width: 140px;
-        }
-
-        .modal-buttons button.edit-btn {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-        }
-
-        .modal-buttons button.edit-btn:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        .modal-buttons button.delete-btn {
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .modal-buttons button.delete-btn:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-3px) scale(1.05);
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
         }
 
-        .modal-buttons button.cancel-btn {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
         }
 
-        .modal-buttons button.cancel-btn:hover {
-            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-            transform: translateY(-3px) scale(1.05);
+        .pagination button {
+            padding: 8px 15px;
+            min-width: 100px;
         }
 
-        .modal-message {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            line-height: 1.7;
-            text-align: center;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: 2px solid #e0e0e0;
-        }
-
-        #stopTransferWarningModal .modal-content {
-            background: linear-gradient(135deg, #fff5e6, #ffe8cc);
-            border: 3px solid #f39c12;
-        }
-
-        #stopTransferWarningModal .modal-buttons button {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-        }
-
-        #stopTransferWarningModal .modal-buttons button:hover {
-            background: linear-gradient(135deg, #e67e22, #d35400);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        #editDeleteModal select#modalEngineer {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 85%;
-            text-align: center;
+        .page-info {
+            padding: 8px 15px;
+            background: rgba(74, 144, 226, 0.2);
+            border-radius: 5px;
+            font-weight: 600;
+            color: #1e3c72;
         }
 
         @keyframes fadeIn {
@@ -434,351 +292,198 @@
             to { opacity: 1; }
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            70% { transform: scale(1.05); }
+            0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         @media (max-width: 768px) {
             .container, .login-container {
-                width: 95%;
-                padding: 25px;
                 margin: 15px auto;
+                padding: 20px;
             }
-            
+
             .button-container {
                 flex-direction: column;
-                align-items: center;
-                gap: 15px;
             }
-            
-            .button-container button {
-                width: 95%;
-            }
-            
-            .date-range-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-            
-            .pagination {
-                flex-wrap: wrap;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 15% auto;
-                padding: 25px;
-            }
-            
-            select, input, button {
-                width: 95%;
-            }
-            
-            h2, h3, h4 {
-                font-size: 28px;
-            }
-        }
 
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableContent * {
-                visibility: visible;
-            }
-            #printableContent {
-                position: absolute;
-                left: 0;
-                top: 0;
+            button {
                 width: 100%;
             }
-            .pagination, button {
-                display: none !important;
+
+            table {
+                font-size: 14px;
             }
-        }
 
-        .transactions-list table {
-            width: 100%;
-            margin: 30px 0;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .transactions-list th {
-            padding: 20px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .transactions-list td {
-            padding: 18px;
-            border: 1px solid #e0e0e0;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            margin-right: 10px;
-            box-shadow: 0 0 10px currentColor;
-        }
-
-        .status-active {
-            background-color: #2ecc71;
-        }
-
-        .status-inactive {
-            background-color: #e74c3c;
-        }
-
-        .highlight {
-            background-color: rgba(74, 144, 226, 0.2) !important;
-            font-weight: bold;
-            border-left: 4px solid #4a90e2;
-        }
-
-        .pin-instructions {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .current-user {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px 20px;
-            border-radius: 25px;
-            color: #1e3c72;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #4a90e2;
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            th, td {
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container" id="login-container">
-        <img src="KG_SWIFT.png" alt="الشعار" class="logo">
+    <!-- شاشة الدخول -->
+    <div id="loginScreen" class="login-container">
+        <div class="logo">🔐</div>
         <h2>KG SWIFT SYSTEM</h2>
         <h3>نظام إدارة المعاملات</h3>
         
-        <div class="login-form">
-            <div class="pin-label">أدخل رقم PIN الخاص بك</div>
-            <div class="pin-container">
-                <input type="password" id="pin" placeholder="أدخل PIN (5 أرقام)" required 
-                       onkeypress="handleKeyPress(event)" class="pin-input"
-                       maxlength="5" pattern="\d*" inputmode="numeric"
-                       autocomplete="off">
-            </div>
-            <div class="pin-instructions">
-                أدخل PIN مكون من 5 أرقام للدخول إلى النظام
-            </div>
-            <button class="login-btn" onclick="checkPin()">🔓 دخول إلى النظام</button>
-            <button class="login-btn" onclick="goToHomePage()">🏠 العودة للصفحة الرئيسية</button>
+        <div class="form-group">
+            <label>أدخل رقم PIN (5 أرقام)</label>
+            <input type="password" id="pinInput" maxlength="5" inputmode="numeric" placeholder="12345" 
+                   onkeypress="if(event.key==='Enter') login()">
         </div>
-    </div>
-
-    <div class="hidden" id="welcome">
-        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
-        <h2>KG SWIFT SYSTEM</h2>
-        <h2>مرحباً بك في نظام إدارة المعاملات</h2>
-        <div id="userGreeting" style="margin-top: 20px; font-size: 20px;"></div>
-    </div>
-
-    <div class="hidden" id="main-container">
-        <div id="currentUserDisplay" class="current-user"></div>
-        <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
         
+        <div class="button-container">
+            <button onclick="login()">🔓 دخول</button>
+            <button onclick="location.href='index.html'">🏠 الرئيسية</button>
+        </div>
+        
+        <div id="loginMessage"></div>
+    </div>
+
+    <!-- الشاشة الرئيسية -->
+    <div id="mainScreen" class="hidden">
+        <div class="user-info" id="userInfo"></div>
+        <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+
         <div class="container">
-            <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
+            <div class="logo">📊</div>
             <h2>KG SWIFT SYSTEM</h2>
-            <p style="margin-bottom: 30px; font-size: 26px; color: #1e3c72; font-weight: 700;">
-                نظام تحويل المعاملات
-            </p>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">نظام تحويل المعاملات</p>
 
-            <input type="text" id="transactionId" placeholder="📝 رقم المعاملة" required>
-            
-            <select id="engineer">
-                <option value="">👨‍💼 اختيار المهندس</option>
-                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
-                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
-                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
-                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
-                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
-                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
-                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
-                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
-                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
-                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
-                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
-                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
-                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
-                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
-                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
-                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
-                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
-                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
-                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
-                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
-                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
-                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
-                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
-                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
-                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
-            </select>
-            
-            <select id="transactionType">
-                <option value="">🏢 نوع الاستعمال</option>
-                <option value="حديقة عامة">حديقة عامة</option>
-                <option value="أبراج اتصالات">أبراج اتصالات</option>
-                <option value="حكومي">حكومي</option>
-                <option value="تجاري">تجاري</option>
-                <option value="ملعب">ملعب</option>
-                <option value="سياحي">سياحي</option>
-                <option value="سكني">سكني</option> 
-                <option value="صناعي">صناعي</option>
-                <option value="مسجد">مسجد</option>
-                <option value="سكني تجاري">سكني تجاري</option>
-                <option value="كنيسة">كنيسة</option>
-            </select>
-            
-            <select id="requestType">
-                <option value="">📄 نوع الطلب</option>
-                <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
-                <option value="موافقة فنية">موافقة فنية</option>
-                <option value="إضافة وتعديل">إضافة وتعديل</option>
-                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
-            </select>
+            <h3>إضافة معاملة جديدة</h3>
+            <div class="form-group">
+                <label>رقم المعاملة</label>
+                <input type="number" id="transactionId" placeholder="مثال: 12345">
+            </div>
 
-            <input type="text" id="search" placeholder="🔍 بحث عن المعاملات" oninput="searchTransactions()">
-            
+            <div class="form-group">
+                <label>المهندس</label>
+                <select id="engineer">
+                    <option value="">اختيار المهندس</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>نوع الاستعمال</label>
+                <select id="type">
+                    <option value="">اختيار النوع</option>
+                    <option value="حديقة عامة">حديقة عامة</option>
+                    <option value="أبراج اتصالات">أبراج اتصالات</option>
+                    <option value="حكومي">حكومي</option>
+                    <option value="تجاري">تجاري</option>
+                    <option value="سكني">سكني</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>نوع الطلب</label>
+                <select id="requestType">
+                    <option value="">اختيار نوع الطلب</option>
+                    <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
+                    <option value="موافقة فنية">موافقة فنية</option>
+                    <option value="إضافة وتعديل">إضافة وتعديل</option>
+                </select>
+            </div>
+
             <div class="button-container">
-                <button onclick="addTransaction()">➕ إضافة المعاملة</button>
-                <button onclick="clearFields()">🗑️ تفريغ الحقول</button>
-                <button onclick="deleteTransaction()">🗑️ حذف الطلب</button>
-                <button onclick="openEditModal()">✏️ تحديث الطلب</button>
-                <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
-                <button onclick="toggleStopTransfer()">⏸️ إيقاف التحويل</button>
-                <!-- زر جديد لإرسال تقرير اليوم -->
-                <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير اليوم للإدارة</button>
+                <button onclick="addTransaction()">➕ إضافة</button>
+                <button onclick="clearForm()">🗑️ مسح</button>
             </div>
 
-            <div class="transactions-list" id="transactionsList"></div>
-            <div class="pagination" id="mainPagination">
-                <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
-                <span id="pageInfo"></span>
-                <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
+            <div id="statusMessage"></div>
+
+            <h3>المعاملات</h3>
+            <div class="form-group">
+                <input type="text" id="searchInput" placeholder="🔍 بحث..." oninput="searchTransactions()">
             </div>
+
+            <div id="transactionsContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم المعاملة</th>
+                            <th>المهندس</th>
+                            <th>النوع</th>
+                            <th>نوع الطلب</th>
+                            <th>التاريخ</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
         </div>
     </div>
 
-    <!-- Modal لتحديث الطلب -->
+    <!-- Modal للتحديث -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">×</span>
-            <h3>✏️ تحديث الطلب</h3>
-            <input type="text" id="editTransactionId" placeholder="🔢 رقم المعاملة المراد تحديثها" required>
-            <select id="editEngineer">
-                <option value="">👨‍💼 اختيار المهندس الجديد</option>
-                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
-                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
-                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
-                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
-                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
-                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
-                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
-                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
-                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
-                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
-                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
-                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
-                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
-                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
-                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
-                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
-                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
-                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
-                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
-                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
-                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
-                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
-                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
-                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
-                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
-            </select>
-            <select id="editTransactionType">
-                <option value="">🏢 نوع الاستعمال الجديد</option>
-                <option value="حديقة عامة">حديقة عامة</option>
-                <option value="أبراج اتصالات">أبراج اتصالات</option>
-                <option value="حكومي">حكومي</option>
-                <option value="تجاري">تجاري</option>
-                <option value="ملعب">ملعب</option>
-                <option value="سياحي">سياحي</option>
-                <option value="سكني">سكني</option> 
-                <option value="صناعي">صناعي</option>
-                <option value="مسجد">مسجد</option>
-                <option value="سكني تجاري">سكني تجاري</option>
-                <option value="كنيسة">كنيسة</option>
-            </select>
-            <select id="editRequestType">
-                <option value="">📄 نوع الطلب الجديد</option>
-                <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
-                <option value="موافقة فنية">موافقة فنية</option>
-                <option value="إضافة وتعديل">إضافة وتعديل</option>
-                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
-            </select>
-            <div class="modal-buttons">
-                <button class="edit-btn" onclick="editTransaction()">تحديث</button>
-                <button class="cancel-btn" onclick="closeEditModal()">إلغاء</button>
+            <div class="modal-header">
+                <h3>تحديث المعاملة</h3>
+                <button class="close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label>رقم المعاملة الحالي</label>
+                <input type="number" id="editOldId" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>رقم المعاملة الجديد</label>
+                <input type="number" id="editNewId">
+            </div>
+
+            <div class="form-group">
+                <label>المهندس</label>
+                <select id="editEngineer"></select>
+            </div>
+
+            <div class="form-group">
+                <label>النوع</label>
+                <select id="editType">
+                    <option value="حديقة عامة">حديقة عامة</option>
+                    <option value="أبراج اتصالات">أبراج اتصالات</option>
+                    <option value="حكومي">حكومي</option>
+                    <option value="تجاري">تجاري</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>نوع الطلب</label>
+                <select id="editRequestType">
+                    <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
+                    <option value="موافقة فنية">موافقة فنية</option>
+                </select>
+            </div>
+
+            <div class="button-container">
+                <button onclick="saveEdit()">💾 حفظ</button>
+                <button onclick="closeEditModal()">❌ إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- باقي الـ modals والأقسام تبقى كما هي مع تعديل التنسيقات فقط -->
-
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzT-iVTBlJuL-MjdDWF8ok3rnPrdb8eGSkWfrmCtT0v3EOoFYSq0UXkCOpU2IqkTCDdVg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbz1OKc2ywpnBHiKtA8qU9GlYM8UpUp7OwnLTDYEZ72fXR_YpjJs0QpF5hKbEmZZoeXsTA/exec";
 
-        // تعريف PINs لخمسة أشخاص (يمكن تعديلها حسب الحاجة)
+        // البيانات
+        let transactions = [];
+        let allTransactions = [];
+        let currentUser = null;
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // PINs الافتراضية
         const VALID_PINS = {
             '12345': { name: 'المسؤول الرئيسي', isAdmin: true },
             '54321': { name: 'مشرف النظام', isAdmin: true },
@@ -787,27 +492,27 @@
             '33333': { name: 'موظف الإدخال 3', isAdmin: false }
         };
 
-        let transactions = [];
-        let stopTransfers = [];
-        let currentPageMain = 1;
-        let currentPageStats = 1;
-        const rowsPerPage = 10;
-        let filteredTransactions = [];
-        let currentUser = null;
+        // قائمة المهندسين
+        const engineers = [
+            "المهندسة أسماء سعيد السعدية",
+            "المهندسة رحمة سيف الصبحية",
+            "المهندس المختار عبدالله الفارسي",
+            "المهندس طلال محمد الحجري"
+        ];
 
-        // التحقق من PIN
-        function checkPin() {
-            const pin = document.getElementById("pin").value;
-            
+        // دالة الدخول
+        function login() {
+            const pin = document.getElementById('pinInput').value;
+            const messageDiv = document.getElementById('loginMessage');
+
             if (!pin) {
-                alert("⚠️ الرجاء إدخال PIN");
+                showMessage(messageDiv, 'الرجاء إدخال PIN', 'error');
                 return;
             }
 
             if (pin.length !== 5 || !/^\d+$/.test(pin)) {
-                alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
-                document.getElementById("pin").value = '';
-                document.getElementById("pin").focus();
+                showMessage(messageDiv, 'PIN يجب أن يكون 5 أرقام فقط', 'error');
+                document.getElementById('pinInput').value = '';
                 return;
             }
 
@@ -818,434 +523,296 @@
                     isAdmin: VALID_PINS[pin].isAdmin
                 };
 
-                document.getElementById("login-container").classList.add("hidden");
-                document.getElementById("welcome").classList.remove("hidden");
-                
-                // عرض رسالة ترحيب بالمستخدم
-                document.getElementById("userGreeting").innerHTML = 
-                    `مرحباً بك <strong>${currentUser.name}</strong> في نظام إدارة المعاملات`;
-                
-                setTimeout(() => {
-                    document.getElementById("welcome").classList.add("hidden");
-                    document.getElementById("main-container").classList.remove("hidden");
-                    
-                    // عرض اسم المستخدم الحالي
-                    document.getElementById("currentUserDisplay").innerHTML = 
-                        `👤 المستخدم: ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
-                    
-                    // تحميل البيانات
-                    loadTransactionsFromDB();
-                    loadStopTransfers();
-                }, 2000);
-                
-                // تفريغ حقل PIN
-                document.getElementById("pin").value = '';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainScreen').classList.remove('hidden');
+                document.getElementById('userInfo').textContent = 
+                    `👤 ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
+
+                initializeApp();
             } else {
-                alert("❌ PIN غير صحيح. الرجاء المحاولة مرة أخرى.");
-                document.getElementById("pin").value = '';
-                document.getElementById("pin").focus();
+                showMessage(messageDiv, 'PIN غير صحيح', 'error');
+                document.getElementById('pinInput').value = '';
             }
         }
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                checkPin();
-            }
+        // تهيئة التطبيق
+        function initializeApp() {
+            loadEngineers();
+            loadTransactions();
         }
 
-        function logout() {
-            const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
-            if (confirmation) {
-                currentUser = null;
-                transactions = [];
-                stopTransfers = [];
-                
-                document.getElementById("main-container").classList.add("hidden");
-                document.getElementById("login-container").classList.remove("hidden");
-                document.getElementById("pin").value = "";
-                document.getElementById("pin").focus();
-            }
-        }
-
-        function goToHomePage() {
-            window.location.href = "index.html";
-        }
-
-        // دالة تفريغ الحقول
-        function clearFields() {
-            document.getElementById('engineer').value = '';
-            document.getElementById('transactionId').value = '';
-            document.getElementById('transactionType').value = '';
-            document.getElementById('requestType').value = '';
-        }
-
-        // دالة البحث عن المعاملات
-        function searchTransactions() {
-            const searchValue = document.getElementById('search').value.toLowerCase();
-            const filteredTransactions = transactions.filter(tx => 
-                String(tx.id).toLowerCase().includes(searchValue) || 
-                tx.engineer.toLowerCase().includes(searchValue) ||
-                tx.type.toLowerCase().includes(searchValue) ||
-                tx.requestType.toLowerCase().includes(searchValue)
-            );
-            currentPageMain = 1;
-            displayTransactions(filteredTransactions);
-        }
-
-        // دالة عرض قائمة إيقاف التحويل
-        function displayStopTransfers() {
-            const stopTransferTable = document.getElementById('stopTransferTable').getElementsByTagName('tbody')[0];
-            stopTransferTable.innerHTML = '';
-
-            if (stopTransfers.length === 0) {
-                stopTransferTable.innerHTML = '<tr><td colspan="3">لا توجد بيانات إيقاف التحويل.</td></tr>';
-                return;
-            }
-
-            stopTransfers.forEach(stop => {
-                const row = stopTransferTable.insertRow();
-                row.insertCell(0).innerText = stop.engineer;
-                row.insertCell(1).innerText = new Date(stop.startDate).toLocaleDateString('ar-EG');
-                row.insertCell(2).innerText = new Date(stop.endDate).toLocaleDateString('ar-EG');
+        // تحميل المهندسين
+        function loadEngineers() {
+            const selects = ['engineer', 'editEngineer'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">اختيار المهندس</option>';
+                engineers.forEach(eng => {
+                    const option = document.createElement('option');
+                    option.value = eng;
+                    option.textContent = eng;
+                    select.appendChild(option);
+                });
             });
         }
 
-        // دالة عرض التحذير عند إيقاف التحويل
-        function showStopTransferWarningModal(message) {
-            document.getElementById('stopTransferWarningMessage').textContent = message;
-            document.getElementById('stopTransferWarningModal').style.display = 'block';
-        }
-
-        // فتح مودال التحديث
-        function openEditModal() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
-                return;
+        // تحميل المعاملات
+        async function loadTransactions() {
+            try {
+                const response = await fetch(`${API_URL}?action=getTransactions`);
+                const data = await response.json();
+                allTransactions = data.transactions || [];
+                transactions = [...allTransactions];
+                currentPage = 1;
+                displayTransactions();
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                showStatus('خطأ في تحميل البيانات', 'error');
             }
-            document.getElementById('editModal').style.display = 'block';
         }
 
-        // إغلاق مودال التحديث
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            clearEditFields();
-        }
+        // إضافة معاملة
+        async function addTransaction() {
+            const id = document.getElementById('transactionId').value;
+            const engineer = document.getElementById('engineer').value;
+            const type = document.getElementById('type').value;
+            const requestType = document.getElementById('requestType').value;
 
-        // تفريغ حقول التعديل
-        function clearEditFields() {
-            document.getElementById('editTransactionId').value = '';
-            document.getElementById('editEngineer').value = '';
-            document.getElementById('editTransactionType').value = '';
-            document.getElementById('editRequestType').value = '';
-        }
-
-        // دالة إرسال تقرير اليوم إلى الإدارة
-        async function sendDailyReport() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
-                return;
-            }
-
-            const confirmation = confirm("هل أنت متأكد أنك تريد إرسال تقرير معاملات اليوم إلى الإدارة؟");
-            if (!confirmation) {
+            if (!id || !engineer || !type || !requestType) {
+                showStatus('الرجاء ملء جميع الحقول', 'error');
                 return;
             }
 
             try {
-                const params = new URLSearchParams();
-                params.append('action', 'sendDailyReport');
-                
-                const response = await fetch(SCRIPT_URL, {
+                const params = new URLSearchParams({
+                    action: 'addTransaction',
+                    id: id,
+                    engineer: engineer,
+                    type: type,
+                    requestType: requestType
+                });
+
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     body: params
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
 
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert(`✅ ${data.message}`);
+                    showStatus('✅ تمت إضافة المعاملة بنجاح', 'success');
+                    clearForm();
+                    loadTransactions();
                 } else {
-                    alert(`❌ ${data.message}`);
+                    showStatus('❌ ' + (data.message || 'خطأ في الإضافة'), 'error');
                 }
             } catch (error) {
-                console.error('Error sending daily report:', error);
-                alert('❌ حدث خطأ في إرسال التقرير: ' + error.message);
+                showStatus('❌ خطأ: ' + error.message, 'error');
             }
         }
 
-        // دالة تعديل المعاملة مع القوائم المنسدلة
-        async function editTransaction() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
+        // البحث
+        function searchTransactions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            transactions = allTransactions.filter(t => 
+                t.id.toString().includes(searchTerm) ||
+                t.engineer.toLowerCase().includes(searchTerm) ||
+                t.type.toLowerCase().includes(searchTerm)
+            );
+            currentPage = 1;
+            displayTransactions();
+        }
+
+        // عرض المعاملات
+        function displayTransactions() {
+            const tbody = document.getElementById('transactionsTable');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageTransactions = transactions.slice(start, end);
+
+            if (pageTransactions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا توجد معاملات</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
                 return;
             }
 
-            let transactionIdToEdit;
-            try {
-                transactionIdToEdit = sanitizeInput(document.getElementById('editTransactionId').value);
-                if (!transactionIdToEdit) {
-                    alert("⚠️ الرجاء إدخال رقم المعاملة");
-                    return;
-                }
-            } catch (error) {
-                alert(error.message);
+            tbody.innerHTML = pageTransactions.map((t, idx) => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td>${t.engineer}</td>
+                    <td>${t.type}</td>
+                    <td>${t.requestType}</td>
+                    <td>${new Date(t.date).toLocaleDateString('ar-EG')}</td>
+                    <td>
+                        <button onclick="openEditModal(${t.id})" style="padding: 5px 10px; font-size: 14px;">✏️</button>
+                        <button onclick="deleteTransaction(${t.id})" style="padding: 5px 10px; font-size: 14px; background: #e74c3c;">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            displayPagination();
+        }
+
+        // عرض التصفح
+        function displayPagination() {
+            const totalPages = Math.ceil(transactions.length / itemsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
                 return;
             }
 
-            const newTransactionId = sanitizeInput(document.getElementById('editTransactionId').value);
-            const newEngineer = document.getElementById('editEngineer').value;
-            const newTransactionType = document.getElementById('editTransactionType').value;
-            const newRequestType = document.getElementById('editRequestType').value;
+            paginationDiv.innerHTML = `
+                <button onclick="previousPage()" ${currentPage === 1 ? 'disabled' : ''}>⬅️ السابق</button>
+                <span class="page-info">الصفحة ${currentPage} من ${totalPages}</span>
+                <button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>التالي ➡️</button>
+            `;
+        }
 
-            if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
-                alert("⚠️ الرجاء ملء جميع الحقول");
-                return;
-            }
-
-            const transaction = transactions.find(t => Number(t.id) === transactionIdToEdit);
-            if (!transaction) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
-            try {
-                const params = new URLSearchParams();
-                params.append('action', 'editTransaction');
-                params.append('oldId', transactionIdToEdit);
-                params.append('id', newTransactionId);
-                params.append('engineer', newEngineer);
-                params.append('type', newTransactionType);
-                params.append('requestType', newRequestType);
-                params.append('date', new Date().toISOString());
-                params.append('createdAt', transaction.createdAt);
-
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    transactions = transactions.map(t => 
-                        Number(t.id) === transactionIdToEdit ? {
-                            id: newTransactionId,
-                            engineer: newEngineer,
-                            type: newTransactionType,
-                            requestType: newRequestType,
-                            date: new Date().toISOString(),
-                            createdAt: transaction.createdAt
-                        } : t
-                    );
-                    currentPageMain = 1;
-                    updateTransactionList();
-                    updateTotalTransactions();
-                    alert("✅ تم تحديث المعاملة بنجاح!");
-                    closeEditModal();
-                }
-            } catch (error) {
-                console.error('Error updating transaction:', error);
-                alert(`حدث خطأ أثناء تحديث المعاملة: ${error.message}`);
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayTransactions();
+                window.scrollTo(0, 0);
             }
         }
 
-        // دالة إضافة معاملة (مع تحقق من PIN)
-        async function addTransaction() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
-                return;
-            }
-
-            let engineer, transactionId, transactionType, requestType;
-            try {
-                engineer = document.getElementById('engineer').value;
-                transactionId = sanitizeInput(document.getElementById('transactionId').value);
-                transactionType = document.getElementById('transactionType').value;
-                requestType = document.getElementById('requestType').value;
-            } catch (error) {
-                alert(error.message);
-                return;
-            }
-
-            if (!engineer || !transactionId || !transactionType || !requestType) {
-                alert("⚠️ الرجاء ملء جميع الحقول.");
-                return;
-            }
-
-            const today = new Date();
-            const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-            // التحقق من وجود إيقاف تحويل للمهندس في هذا اليوم
-            const activeStop = stopTransfers.find(stop => {
-                const start = new Date(stop.startDate);
-                const end = new Date(stop.endDate);
-                const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-                const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-
-                return stop.engineer === engineer && todayDateOnly >= startDateOnly && todayDateOnly <= endDateOnly;
-            });
-
-            if (activeStop) {
-                const message = `لا يمكن تحويل المعاملة للمهندس ${engineer}، تم إيقاف التحويل عنه من تاريخ ${new Date(activeStop.startDate).toLocaleDateString('ar-EG')} إلى تاريخ ${new Date(activeStop.endDate).toLocaleDateString('ar-EG')}`;
-                showStopTransferWarningModal(message);
-                return;
-            }
-
-            const params = new URLSearchParams();
-            params.append('action', 'addTransaction');
-            params.append('id', transactionId);
-            params.append('engineer', engineer);
-            params.append('type', transactionType);
-            params.append('requestType', requestType);
-            params.append('date', new Date().toISOString());
-            params.append('createdAt', new Date().getTime());
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    const transaction = {
-                        id: transactionId,
-                        engineer,
-                        type: transactionType,
-                        requestType,
-                        date: new Date().toISOString(),
-                        createdAt: new Date().getTime()
-                    };
-                    transactions.push(transaction);
-                    currentPageMain = 1;
-                    updateTransactionList();
-                    updateTotalTransactions();
-                    alert("✅ تمت إضافة المعاملة بنجاح!");
-                    clearFields();
-                }
-            } catch (error) {
-                console.error('Error adding transaction:', error);
-                alert(`حدث خطأ أثناء إضافة المعاملة: ${error.message}`);
+        function nextPage() {
+            const totalPages = Math.ceil(transactions.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayTransactions();
+                window.scrollTo(0, 0);
             }
         }
 
-        // باقي الدوال تبقى كما هي مع تعديلات بسيطة
-        function sanitizeInput(input) {
-            const trimmed = input.trim();
-            const number = Number(trimmed);
-            if (isNaN(number)) {
-                throw new Error("رقم المعاملة يجب أن يكون رقمًا صحيحًا");
-            }
-            return number;
-        }
-
-        async function loadTransactionsFromDB() {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=getTransactions`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                transactions = data.transactions || [];
-                currentPageMain = 1;
-                updateTransactionList();
-                updateTotalTransactions();
-                populateEngineerSelect();
-            } catch (error) {
-                console.error('Error loading transactions:', error);
-                alert(`حدث خطأ أثناء جلب البيانات: ${error.message}`);
+        // فتح modal التحديث
+        function openEditModal(id) {
+            const transaction = allTransactions.find(t => t.id == id);
+            if (transaction) {
+                document.getElementById('editOldId').value = id;
+                document.getElementById('editNewId').value = id;
+                document.getElementById('editEngineer').value = transaction.engineer;
+                document.getElementById('editType').value = transaction.type;
+                document.getElementById('editRequestType').value = transaction.requestType;
+                document.getElementById('editModal').style.display = 'block';
             }
         }
 
-        async function loadStopTransfers() {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=getStopTransfers`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                stopTransfers = data.stopTransfers || [];
-                displayStopTransfers();
-            } catch (error) {
-                console.error('Error loading stop transfers:', error);
-                alert(`حدث خطأ أثناء جلب بيانات إيقاف التحويل: ${error.message}`);
-            }
-        }
-
-        // الدوال الأخرى تبقى كما هي مع إضافة تحقق من currentUser عند الحاجة
-        
-        // عند تحميل الصفحة
-        window.addEventListener('load', () => {
-            // تعيين التواريخ الافتراضية
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
-            
-            // إظهار شاشة الدخول فقط
-            document.getElementById('login-container').classList.remove('hidden');
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('main-container').classList.add('hidden');
-            
-            // إخفاء جميع الـ modals
+        function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
-            document.getElementById('editDeleteModal').style.display = 'none';
-            document.getElementById('stopTransferWarningModal').style.display = 'none';
-            
-            // التركيز على حقل PIN
-            document.getElementById('pin').focus();
-        });
+        }
 
-        // تحسين تجربة المستخدم مع حقل PIN
-        document.getElementById('pin').addEventListener('input', function(e) {
-            // السماح بالأرقام فقط
-            this.value = this.value.replace(/[^0-9]/g, '');
-            
-            // إذا وصل إلى 5 أرقام، التركيز على زر الدخول
-            if (this.value.length === 5) {
-                document.querySelector('.login-btn').focus();
+        async function saveEdit() {
+            const oldId = document.getElementById('editOldId').value;
+            const newId = document.getElementById('editNewId').value;
+            const engineer = document.getElementById('editEngineer').value;
+            const type = document.getElementById('editType').value;
+            const requestType = document.getElementById('editRequestType').value;
+
+            try {
+                const params = new URLSearchParams({
+                    action: 'editTransaction',
+                    oldId: oldId,
+                    id: newId,
+                    engineer: engineer,
+                    type: type,
+                    requestType: requestType,
+                    createdAt: new Date().getTime()
+                });
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('✅ تم التحديث بنجاح', 'success');
+                    closeEditModal();
+                    loadTransactions();
+                } else {
+                    showStatus('❌ ' + (data.message || 'خطأ'), 'error');
+                }
+            } catch (error) {
+                showStatus('❌ خطأ: ' + error.message, 'error');
             }
-        });
+        }
 
-        // إضافة تأثيرات للتركيز على العناصر
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('input, select, button');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.transform = 'scale(1.02)';
-                    this.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.3)';
-                });
-                input.addEventListener('blur', function() {
-                    this.style.transform = '';
-                    this.style.boxShadow = '';
-                });
-            });
-        });
+        async function deleteTransaction(id) {
+            if (!confirm('هل أنت متأكد من الحذف؟')) return;
 
-        // إضافة رسالة ترحيب عند فتح الصفحة
-        console.log('🌟 KG SWIFT SYSTEM - نظام إدارة المعاملات');
-        console.log('🔐 النظام يستخدم PIN فقط للدخول');
-        console.log('📌 PINs المتاحة: 12345, 54321, 11111, 22222, 33333');
+            try {
+                const params = new URLSearchParams({
+                    action: 'deleteTransaction',
+                    id: id
+                });
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('✅ تم الحذف بنجاح', 'success');
+                    loadTransactions();
+                } else {
+                    showStatus('❌ ' + (data.message || 'خطأ'), 'error');
+                }
+            } catch (error) {
+                showStatus('❌ خطأ: ' + error.message, 'error');
+            }
+        }
+
+        // دوال مساعدة
+        function clearForm() {
+            document.getElementById('transactionId').value = '';
+            document.getElementById('engineer').value = '';
+            document.getElementById('type').value = '';
+            document.getElementById('requestType').value = '';
+        }
+
+        function showStatus(message, type) {
+            const div = document.getElementById('statusMessage');
+            div.innerHTML = message;
+            div.className = 'status-message ' + type;
+            setTimeout(() => {
+                div.innerHTML = '';
+                div.className = '';
+            }, 4000);
+        }
+
+        function showMessage(div, message, type) {
+            div.innerHTML = message;
+            div.className = 'status-message ' + type;
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                currentUser = null;
+                document.getElementById('mainScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('pinInput').value = '';
+                document.getElementById('pinInput').focus();
+            }
+        }
+
+        // تهيئة عند التحميل
+        window.addEventListener('load', () => {
+            document.getElementById('pinInput').focus();
+            
+            // إغلاق modal عند الضغط خارجه
+            window.onclick = (event) => {
+                const modal = document.getElementById('editModal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            };
+        });
     </script>
 </body>
 </html>
-
-
