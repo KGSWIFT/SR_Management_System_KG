@@ -883,12 +883,57 @@
         // دالة البحث عن المعاملات
         function searchTransactions() {
             const searchValue = document.getElementById('search').value.toLowerCase();
-            const filteredTransactions = transactions.filter(tx => 
-                String(tx.id).toLowerCase().includes(searchValue) || 
-                tx.engineer.toLowerCase().includes(searchValue) ||
-                tx.type.toLowerCase().includes(searchValue) ||
-                tx.requestType.toLowerCase().includes(searchValue)
-            );
+            function searchTransactions() {
+    const searchValue = document.getElementById('search').value.toLowerCase();
+
+    filteredTransactions = transactions.filter(tx =>
+        String(tx.id).includes(searchValue) ||
+        tx.engineer.toLowerCase().includes(searchValue) ||
+        tx.type.toLowerCase().includes(searchValue) ||
+        tx.requestType.toLowerCase().includes(searchValue)
+    );
+
+    currentPageMain = 1;
+    renderFilteredTransactions();
+}
+
+function renderFilteredTransactions() {
+    const container = document.getElementById("transactionsList");
+    container.innerHTML = "";
+
+    if (filteredTransactions.length === 0) {
+        container.innerHTML = "<p>لا توجد نتائج</p>";
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم المعاملة</th>
+                    <th>المهندس</th>
+                    <th>نوع الاستعمال</th>
+                    <th>نوع الطلب</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filteredTransactions.forEach(tx => {
+        html += `
+            <tr>
+                <td>${tx.id}</td>
+                <td>${tx.engineer}</td>
+                <td>${tx.type}</td>
+                <td>${tx.requestType}</td>
+            </tr>
+        `;
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+}
+
             currentPageMain = 1;
             displayTransactions(filteredTransactions);
         }
@@ -1245,9 +1290,56 @@
         console.log('🌟 KG SWIFT SYSTEM - نظام إدارة المعاملات');
         console.log('🔐 النظام يستخدم PIN فقط للدخول');
         console.log('📌 PINs المتاحة: 12345, 54321, 11111, 22222, 33333');
+        function updateTransactionList() {
+    const container = document.getElementById("transactionsList");
+    container.innerHTML = "";
+
+    if (transactions.length === 0) {
+        container.innerHTML = "<p>لا توجد معاملات</p>";
+        return;
+    }
+
+    const start = (currentPageMain - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = transactions.slice(start, end);
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم المعاملة</th>
+                    <th>المهندس</th>
+                    <th>نوع الاستعمال</th>
+                    <th>نوع الطلب</th>
+                    <th>التاريخ</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    pageData.forEach(tx => {
+        html += `
+            <tr>
+                <td>${tx.id}</td>
+                <td>${tx.engineer}</td>
+                <td>${tx.type}</td>
+                <td>${tx.requestType}</td>
+                <td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td>
+            </tr>
+        `;
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+
+    document.getElementById("pageInfo").innerText =
+        `صفحة ${currentPageMain} من ${Math.ceil(transactions.length / rowsPerPage)}`;
+}
+
     </script>
 </body>
 </html
+
 
 
 
