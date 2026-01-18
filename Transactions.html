@@ -445,7 +445,6 @@
             <h2>KG SWIFT SYSTEM</h2>
             <p style="margin-bottom: 30px; font-size: 26px; color: #1e3c72; font-weight: 700;">نظام تحويل المعاملات</p>
 
-            <div class="info-box total-box" id="totalTransactionsDisplay">📊 جاري التحميل...</div>
             <div class="info-box today-box" id="todayTransactionsInfo">📅 جاري التحميل...</div>
 
             <input type="text" id="transactionId" placeholder="📝 رقم المعاملة">
@@ -915,14 +914,21 @@
             const container = document.getElementById("transactionsList");
             container.innerHTML = "";
 
-            if (transactions.length === 0) {
-                container.innerHTML = "<p>لا توجد معاملات</p>";
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            if (todayTxs.length === 0) {
+                container.innerHTML = "<p>لا توجد معاملات في آخر 10 ساعات</p>";
                 return;
             }
 
             const start = (currentPageMain - 1) * rowsPerPage;
             const end = start + rowsPerPage;
-            const pageData = transactions.slice(start, end);
+            const pageData = todayTxs.slice(start, end);
 
             let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
             pageData.forEach(tx => {
@@ -931,14 +937,13 @@
             html += '</tbody></table>';
             container.innerHTML = html;
 
-            const totalPages = Math.ceil(transactions.length / rowsPerPage);
+            const totalPages = Math.ceil(todayTxs.length / rowsPerPage);
             document.getElementById("pageInfo").textContent = `صفحة ${currentPageMain} من ${totalPages}`;
             document.getElementById("prevPageMain").disabled = currentPageMain <= 1;
             document.getElementById("nextPageMain").disabled = currentPageMain >= totalPages;
         }
 
         function updateTotalTransactions() {
-            document.getElementById("totalTransactionsDisplay").innerHTML = `📊 إجمالي المعاملات: ${transactions.length}`;
             displayTodayTransactions();
         }
 
@@ -986,7 +991,75 @@
         }
 
         function toggleStatistics() {
-            alert('📊 قيد التطوير');
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            if (todayTxs.length === 0) {
+                alert('❌ لا توجد معاملات في آخر 10 ساعات');
+                return;
+            }
+
+            // إحصائيات المهندسين
+            const engineerStats = {};
+            todayTxs.forEach(tx => {
+                if (!engineerStats[tx.engineer]) {
+                    engineerStats[tx.engineer] = 0;
+                }
+                engineerStats[tx.engineer]++;
+            });
+
+            // إنشاء جدول الإحصائيات
+            let html = '<table style="width: 100%; margin-top: 20px; border: 3px solid #4a90e2; border-radius: 15px; overflow: hidden;">';
+            html += '<thead><tr style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">';
+            html += '<th style="padding: 18px; font-weight: 700; font-size: 18px;">اسم المهندس</th>';
+            html += '<th style="padding: 18px; font-weight: 700; font-size: 18px;">عدد المعاملات</th>';
+            html += '</tr></thead><tbody>';
+
+            // ترتيب المهندسين حسب عدد المعاملات
+            const sortedEngineers = Object.entries(engineerStats)
+                .sort((a, b) => b[1] - a[1]);
+
+            sortedEngineers.forEach(([engineer, count]) => {
+                html += `<tr style="border: 1px solid #e0e0e0; text-align: center;">`;
+                html += `<td style="padding: 18px; color: #333; font-weight: 600;">${engineer}</td>`;
+                html += `<td style="padding: 18px; color: #2ecc71; font-weight: 700; font-size: 20px;">${count}</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table>';
+
+            // إنشاء modal للإحصائيات
+            const statsModal = document.createElement('div');
+            statsModal.className = 'modal';
+            statsModal.style.display = 'block';
+            statsModal.id = 'statsModal';
+            statsModal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="close" onclick="document.getElementById('statsModal').style.display='none'">&times;</span>
+                    <h3>📊 إحصائيات المعاملات (آخر 10 ساعات)</h3>
+                    <div style="color: #333; text-align: right; margin-bottom: 20px;">
+                        <p style="font-size: 18px; font-weight: 600;">إجمالي المعاملات: <span style="color: #2ecc71; font-size: 24px;">${todayTxs.length}</span></p>
+                    </div>
+                    ${html}
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="document.getElementById('statsModal').style.display='none'" style="width: 200px;">إغلاق</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(statsModal);
+
+            // إغلاق modal عند الضغط خارجه
+            statsModal.onclick = function(event) {
+                if (event.target === statsModal) {
+                    statsModal.style.display = 'none';
+                    statsModal.remove();
+                }
+            };
         }
 
         function toggleStopTransfer() {
