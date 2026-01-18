@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -6,15 +7,10 @@
     <title>KG SWIFT SYSTEM-Transactions</title>
      <link rel="icon" href="KG_SWIFT2.ico">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             direction: rtl;
+            text-align: center;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
@@ -24,166 +20,20 @@
             align-items: center;
         }
 
-        /* شاشة الدخول */
-        #login-container {
-            max-width: 500px;
-            width: 90%;
-            margin: auto;
-            padding: 60px 40px;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            text-align: center;
-            animation: popIn 0.6s ease-out;
-            border: 3px solid rgba(255, 255, 255, 0.4);
+        #welcome {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #2a5298;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            animation: fadeIn 0.5s ease-out;
         }
 
-        /* الشعار */
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 60px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-        }
-
-        h2, h3 {
-            color: #1e3c72;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(45deg, #1e3c72, #4a90e2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        h3 {
-            color: #4a90e2;
-            margin: 10px 0 30px 0;
-            font-size: 24px;
-            border-bottom: 2px solid #4a90e2;
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-            width: 100%;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #1e3c72;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #4a90e2;
-            border-radius: 12px;
-            font-size: 20px;
-            background: white;
-            color: #333;
-            transition: all 0.3s ease;
-            text-align: center;
-            letter-spacing: 12px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.2);
-            transform: translateY(-2px);
-        }
-
-        button {
-            padding: 15px 30px;
-            margin: 10px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            min-width: 200px;
-        }
-
-        button:hover {
-            background: linear-gradient(135deg, #357abd, #2a5298);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            width: 100%;
-        }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-            align-items: center;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* رسائل الحالة */
-        .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            font-weight: 600;
-            width: 100%;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .pin-instructions {
-            color: #666;
-            font-size: 16px;
-            margin-top: 5px;
-            font-style: italic;
-        }
-
-        /* الصفحة الرئيسية */
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 20px auto;
             background: rgba(255, 255, 255, 0.98);
             padding: 40px;
@@ -191,6 +41,525 @@
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
             color: #333;
             border: 3px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .logo {
+            width: 200px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+        }
+
+        h2, h3, h4 {
+            color: #1e3c72;
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, #1e3c72, #4a90e2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #4a90e2;
+        }
+
+        .total-transactions {
+            font-size: 24px;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+            font-weight: 600;
+        }
+
+        select, button, input {
+            padding: 15px 25px;
+            margin: 15px auto;
+            border: 2px solid #4a90e2;
+            border-radius: 12px;
+            background: white;
+            color: #333;
+            width: 80%;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.25);
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 15px 30px;
+            width: auto;
+            border: none;
+            font-weight: 700;
+            letter-spacing: 1px;
+            min-width: 200px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #357abd, #2a5298);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .report-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+        }
+
+        .report-btn:hover {
+            background: linear-gradient(135deg, #27ae60, #219653) !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 90%;
+            margin: auto;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            animation: popIn 0.6s ease-out;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .login-form button {
+            width: 85%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .pin-container {
+            position: relative;
+            width: 85%;
+            margin: 20px auto;
+        }
+
+        #pin {
+            font-size: 28px !important;
+            letter-spacing: 12px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            padding: 20px;
+            border: 3px solid #4a90e2;
+            background: #f8fafc;
+        }
+
+        .pin-label {
+            font-size: 20px;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 30px;
+            border: 3px solid #4a90e2;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        th, td {
+            padding: 18px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            font-size: 18px;
+        }
+
+        tr:hover {
+            background-color: rgba(74, 144, 226, 0.15);
+            transform: scale(1.01);
+        }
+
+        #stopTransferTable td {
+            color: #333;
+            font-weight: 500;
+        }
+
+        #statistics-container, #stop-transfer-container {
+            margin-top: 40px;
+        }
+
+        .date-range-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 250px;
+        }
+
+        .date-input-group label {
+            margin-bottom: 12px;
+            color: #1e3c72;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .pagination button {
+            background: #4a90e2;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: auto;
+            min-width: 120px;
+            font-weight: 600;
+        }
+
+        .pagination button:disabled {
+            background: #b0b0b0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pagination button:not(:disabled):hover {
+            background: #357abd;
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        #pageInfo, #pageInfoStats {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin: 0 20px;
+            padding: 12px 24px;
+            background: rgba(74, 144, 226, 0.15);
+            border-radius: 10px;
+            border: 2px solid #4a90e2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            margin: 8% auto;
+            padding: 40px;
+            border: none;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 25px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            text-align: right;
+            animation: slideDown 0.4s ease-out;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-content h3 {
+            color: #1e3c72;
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .close {
+            color: #777;
+            float: left;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+
+        .modal-buttons button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            font-weight: 700;
+            min-width: 140px;
+        }
+
+        .modal-buttons button.edit-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .modal-buttons button.edit-btn:hover {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .modal-buttons button.delete-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .modal-buttons button.delete-btn:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .modal-buttons button.cancel-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .modal-buttons button.cancel-btn:hover {
+            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .modal-message {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid #e0e0e0;
+        }
+
+        #stopTransferWarningModal .modal-content {
+            background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+            border: 3px solid #f39c12;
+        }
+
+        #stopTransferWarningModal .modal-buttons button {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        #stopTransferWarningModal .modal-buttons button:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        #editDeleteModal select#modalEngineer {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 85%;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container, .login-container {
+                width: 95%;
+                padding: 25px;
+                margin: 15px auto;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .button-container button {
+                width: 95%;
+            }
+            
+            .date-range-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 15% auto;
+                padding: 25px;
+            }
+            
+            select, input, button {
+                width: 95%;
+            }
+            
+            h2, h3, h4 {
+                font-size: 28px;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableContent * {
+                visibility: visible;
+            }
+            #printableContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .pagination, button {
+                display: none !important;
+            }
+        }
+
+        .transactions-list table {
+            width: 100%;
+            margin: 30px 0;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .transactions-list th {
+            padding: 20px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .transactions-list td {
+            padding: 18px;
+            border: 1px solid #e0e0e0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .status-active {
+            background-color: #2ecc71;
+        }
+
+        .status-inactive {
+            background-color: #e74c3c;
+        }
+
+        .highlight {
+            background-color: rgba(74, 144, 226, 0.2) !important;
+            font-weight: bold;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .pin-instructions {
+            color: #666;
+            font-size: 16px;
+            margin-top: 10px;
+            font-style: italic;
         }
 
         .current-user {
@@ -225,248 +594,104 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
         }
-
-        /* العناصر المشتركة */
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #4a90e2;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-            color: #333;
-            transition: all 0.3s ease;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.2);
-            transform: translateY(-2px);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        thead {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        tr:hover {
-            background: rgba(74, 144, 226, 0.1);
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .pagination button {
-            padding: 8px 15px;
-            min-width: 100px;
-            font-size: 14px;
-        }
-
-        .page-info {
-            padding: 8px 15px;
-            background: rgba(74, 144, 226, 0.2);
-            border-radius: 5px;
-            font-weight: 600;
-            color: #1e3c72;
-        }
-
-        /* التعديلات */
-        #welcome {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #2a5298;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            animation: fadeIn 0.5s ease-out;
-            text-align: center;
-        }
-
-        #userGreeting {
-            margin-top: 20px;
-            font-size: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .container, #login-container {
-                width: 95%;
-                padding: 25px;
-                margin: 15px auto;
-            }
-
-            .button-container {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-
-            input {
-                font-size: 18px;
-                padding: 12px;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- شاشة الدخول -->
-    <div id="login-container">
-        <div class="logo">🔐</div>
+    <div class="login-container" id="login-container">
+        <img src="KG_SWIFT.png" alt="الشعار" class="logo">
         <h2>KG SWIFT SYSTEM</h2>
         <h3>نظام إدارة المعاملات</h3>
         
         <div class="login-form">
-            <div class="form-group">
-                <label>أدخل رقم PIN الخاص بك</label>
+            <div class="pin-label">أدخل رقم PIN الخاص بك</div>
+            <div class="pin-container">
                 <input type="password" id="pin" placeholder="أدخل PIN (5 أرقام)" required 
-                       onkeypress="handleKeyPress(event)" maxlength="5" pattern="\d*" 
-                       inputmode="numeric" autocomplete="off">
+                       onkeypress="handleKeyPress(event)" class="pin-input"
+                       maxlength="5" pattern="\d*" inputmode="numeric"
+                       autocomplete="off">
             </div>
             <div class="pin-instructions">
                 أدخل PIN مكون من 5 أرقام للدخول إلى النظام
             </div>
-            
-            <div class="button-container">
-                <button onclick="checkPin()">🔓 دخول إلى النظام</button>
-                <button onclick="goToHomePage()">🏠 العودة للصفحة الرئيسية</button>
-            </div>
-            
-            <div id="loginMessage" class="status-message"></div>
+            <button class="login-btn" onclick="checkPin()">🔓 دخول إلى النظام</button>
+            <button class="login-btn" onclick="goToHomePage()">🏠 العودة للصفحة الرئيسية</button>
         </div>
     </div>
 
-    <!-- شاشة الترحيب -->
     <div class="hidden" id="welcome">
-        <div class="logo">👋</div>
+        <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
         <h2>KG SWIFT SYSTEM</h2>
-        <h3>مرحباً بك في نظام إدارة المعاملات</h3>
-        <div id="userGreeting"></div>
+        <h2>مرحباً بك في نظام إدارة المعاملات</h2>
+        <div id="userGreeting" style="margin-top: 20px; font-size: 20px;"></div>
     </div>
 
-    <!-- الشاشة الرئيسية -->
     <div class="hidden" id="main-container">
         <div id="currentUserDisplay" class="current-user"></div>
         <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
         
         <div class="container">
-            <div class="logo">📊</div>
+            <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
             <h2>KG SWIFT SYSTEM</h2>
-            <h3>نظام تحويل المعاملات</h3>
+            <p style="margin-bottom: 30px; font-size: 26px; color: #1e3c72; font-weight: 700;">
+                نظام تحويل المعاملات
+            </p>
 
-            <div class="form-group">
-                <label>📝 رقم المعاملة</label>
-                <input type="text" id="transactionId" placeholder="أدخل رقم المعاملة" required>
-            </div>
+            <input type="text" id="transactionId" placeholder="📝 رقم المعاملة" required>
+            
+            <select id="engineer">
+                <option value="">👨‍💼 اختيار المهندس</option>
+                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+            </select>
+            
+            <select id="transactionType">
+                <option value="">🏢 نوع الاستعمال</option>
+                <option value="حديقة عامة">حديقة عامة</option>
+                <option value="أبراج اتصالات">أبراج اتصالات</option>
+                <option value="حكومي">حكومي</option>
+                <option value="تجاري">تجاري</option>
+                <option value="ملعب">ملعب</option>
+                <option value="سياحي">سياحي</option>
+                <option value="سكني">سكني</option> 
+                <option value="صناعي">صناعي</option>
+                <option value="مسجد">مسجد</option>
+                <option value="سكني تجاري">سكني تجاري</option>
+                <option value="كنيسة">كنيسة</option>
+            </select>
+            
+            <select id="requestType">
+                <option value="">📄 نوع الطلب</option>
+                <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
+                <option value="موافقة فنية">موافقة فنية</option>
+                <option value="إضافة وتعديل">إضافة وتعديل</option>
+                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
+            </select>
 
-            <div class="form-group">
-                <label>👨‍💼 المهندس</label>
-                <select id="engineer">
-                    <option value="">اختيار المهندس</option>
-                    <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
-                    <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
-                    <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
-                    <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
-                    <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
-                    <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
-                    <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
-                    <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
-                    <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
-                    <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
-                    <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
-                    <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
-                    <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
-                    <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
-                    <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
-                    <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
-                    <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
-                    <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
-                    <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
-                    <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
-                    <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
-                    <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
-                    <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
-                    <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
-                    <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🏢 نوع الاستعمال</label>
-                <select id="transactionType">
-                    <option value="">اختيار نوع الاستعمال</option>
-                    <option value="حديقة عامة">حديقة عامة</option>
-                    <option value="أبراج اتصالات">أبراج اتصالات</option>
-                    <option value="حكومي">حكومي</option>
-                    <option value="تجاري">تجاري</option>
-                    <option value="ملعب">ملعب</option>
-                    <option value="سياحي">سياحي</option>
-                    <option value="سكني">سكني</option> 
-                    <option value="صناعي">صناعي</option>
-                    <option value="مسجد">مسجد</option>
-                    <option value="سكني تجاري">سكني تجاري</option>
-                    <option value="كنيسة">كنيسة</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>📄 نوع الطلب</label>
-                <select id="requestType">
-                    <option value="">اختيار نوع الطلب</option>
-                    <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
-                    <option value="موافقة فنية">موافقة فنية</option>
-                    <option value="إضافة وتعديل">إضافة وتعديل</option>
-                    <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🔍 بحث عن المعاملات</label>
-                <input type="text" id="search" placeholder="ابحث برقم المعاملة أو اسم المهندس" oninput="searchTransactions()">
-            </div>
-
+            <input type="text" id="search" placeholder="🔍 بحث عن المعاملات" oninput="searchTransactions()">
+            
             <div class="button-container">
                 <button onclick="addTransaction()">➕ إضافة المعاملة</button>
                 <button onclick="clearFields()">🗑️ تفريغ الحقول</button>
@@ -474,29 +699,87 @@
                 <button onclick="openEditModal()">✏️ تحديث الطلب</button>
                 <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
                 <button onclick="toggleStopTransfer()">⏸️ إيقاف التحويل</button>
+                <!-- زر جديد لإرسال تقرير اليوم -->
                 <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير اليوم للإدارة</button>
             </div>
 
-            <div id="statusMessage" class="status-message"></div>
-
-            <div class="form-group">
-                <h3>المعاملات</h3>
-                <div class="transactions-list" id="transactionsList"></div>
-                <div class="pagination" id="mainPagination">
-                    <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
-                    <span id="pageInfo" class="page-info"></span>
-                    <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
-                </div>
+            <div class="transactions-list" id="transactionsList"></div>
+            <div class="pagination" id="mainPagination">
+                <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
+                <span id="pageInfo"></span>
+                <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
             </div>
         </div>
     </div>
 
-    <!-- باقي الـ modals والأقسام تبقى كما هي -->
+    <!-- Modal لتحديث الطلب -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">×</span>
+            <h3>✏️ تحديث الطلب</h3>
+            <input type="text" id="editTransactionId" placeholder="🔢 رقم المعاملة المراد تحديثها" required>
+            <select id="editEngineer">
+                <option value="">👨‍💼 اختيار المهندس الجديد</option>
+                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+            </select>
+            <select id="editTransactionType">
+                <option value="">🏢 نوع الاستعمال الجديد</option>
+                <option value="حديقة عامة">حديقة عامة</option>
+                <option value="أبراج اتصالات">أبراج اتصالات</option>
+                <option value="حكومي">حكومي</option>
+                <option value="تجاري">تجاري</option>
+                <option value="ملعب">ملعب</option>
+                <option value="سياحي">سياحي</option>
+                <option value="سكني">سكني</option> 
+                <option value="صناعي">صناعي</option>
+                <option value="مسجد">مسجد</option>
+                <option value="سكني تجاري">سكني تجاري</option>
+                <option value="كنيسة">كنيسة</option>
+            </select>
+            <select id="editRequestType">
+                <option value="">📄 نوع الطلب الجديد</option>
+                <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
+                <option value="موافقة فنية">موافقة فنية</option>
+                <option value="إضافة وتعديل">إضافة وتعديل</option>
+                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="edit-btn" onclick="editTransaction()">تحديث</button>
+                <button class="cancel-btn" onclick="closeEditModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- باقي الـ modals والأقسام تبقى كما هي مع تعديل التنسيقات فقط -->
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1OKc2ywpnBHiKtA8qU9GlYM8UpUp7OwnLTDYEZ72fXR_YpjJs0QpF5hKbEmZZoeXsTA/exec";
 
-        // تعريف PINs لخمسة أشخاص
+        // تعريف PINs لخمسة أشخاص (يمكن تعديلها حسب الحاجة)
         const VALID_PINS = {
             '12345': { name: 'المسؤول الرئيسي', isAdmin: true },
             '54321': { name: 'مشرف النظام', isAdmin: true },
@@ -516,15 +799,14 @@
         // التحقق من PIN
         function checkPin() {
             const pin = document.getElementById("pin").value;
-            const messageDiv = document.getElementById("loginMessage");
             
             if (!pin) {
-                showMessage(messageDiv, "⚠️ الرجاء إدخال PIN", "error");
+                alert("⚠️ الرجاء إدخال PIN");
                 return;
             }
 
             if (pin.length !== 5 || !/^\d+$/.test(pin)) {
-                showMessage(messageDiv, "⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط", "error");
+                alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
                 document.getElementById("pin").value = '';
                 document.getElementById("pin").focus();
                 return;
@@ -540,6 +822,7 @@
                 document.getElementById("login-container").classList.add("hidden");
                 document.getElementById("welcome").classList.remove("hidden");
                 
+                // عرض رسالة ترحيب بالمستخدم
                 document.getElementById("userGreeting").innerHTML = 
                     `مرحباً بك <strong>${currentUser.name}</strong> في نظام إدارة المعاملات`;
                 
@@ -547,43 +830,22 @@
                     document.getElementById("welcome").classList.add("hidden");
                     document.getElementById("main-container").classList.remove("hidden");
                     
+                    // عرض اسم المستخدم الحالي
                     document.getElementById("currentUserDisplay").innerHTML = 
                         `👤 المستخدم: ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
                     
+                    // تحميل البيانات
                     loadTransactionsFromDB();
                     loadStopTransfers();
                 }, 2000);
                 
+                // تفريغ حقل PIN
                 document.getElementById("pin").value = '';
-                messageDiv.innerHTML = '';
             } else {
-                showMessage(messageDiv, "❌ PIN غير صحيح. الرجاء المحاولة مرة أخرى.", "error");
+                alert("❌ PIN غير صحيح. الرجاء المحاولة مرة أخرى.");
                 document.getElementById("pin").value = '';
                 document.getElementById("pin").focus();
             }
-        }
-
-        // دالة لعرض الرسائل
-        function showMessage(element, message, type) {
-            element.innerHTML = message;
-            element.className = 'status-message ' + type;
-            if (type === 'error') {
-                setTimeout(() => {
-                    element.innerHTML = '';
-                    element.className = 'status-message';
-                }, 4000);
-            }
-        }
-
-        // دالة لعرض رسائل الحالة
-        function showStatus(message, type) {
-            const div = document.getElementById('statusMessage');
-            div.innerHTML = message;
-            div.className = 'status-message ' + type;
-            setTimeout(() => {
-                div.innerHTML = '';
-                div.className = 'status-message';
-            }, 4000);
         }
 
         function handleKeyPress(event) {
@@ -610,32 +872,372 @@
             window.location.href = "index.html";
         }
 
-        // باقي الدوال تبقى كما هي...
-        // [يتم الحفاظ على جميع الدوال الأخرى كما هي]
+        // دالة تفريغ الحقول
+        function clearFields() {
+            document.getElementById('engineer').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('transactionType').value = '';
+            document.getElementById('requestType').value = '';
+        }
 
+        // دالة البحث عن المعاملات
+        function searchTransactions() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const filteredTransactions = transactions.filter(tx => 
+                String(tx.id).toLowerCase().includes(searchValue) || 
+                tx.engineer.toLowerCase().includes(searchValue) ||
+                tx.type.toLowerCase().includes(searchValue) ||
+                tx.requestType.toLowerCase().includes(searchValue)
+            );
+            currentPageMain = 1;
+            displayTransactions(filteredTransactions);
+        }
+
+        // دالة عرض قائمة إيقاف التحويل
+        function displayStopTransfers() {
+            const stopTransferTable = document.getElementById('stopTransferTable').getElementsByTagName('tbody')[0];
+            stopTransferTable.innerHTML = '';
+
+            if (stopTransfers.length === 0) {
+                stopTransferTable.innerHTML = '<tr><td colspan="3">لا توجد بيانات إيقاف التحويل.</td></tr>';
+                return;
+            }
+
+            stopTransfers.forEach(stop => {
+                const row = stopTransferTable.insertRow();
+                row.insertCell(0).innerText = stop.engineer;
+                row.insertCell(1).innerText = new Date(stop.startDate).toLocaleDateString('ar-EG');
+                row.insertCell(2).innerText = new Date(stop.endDate).toLocaleDateString('ar-EG');
+            });
+        }
+
+        // دالة عرض التحذير عند إيقاف التحويل
+        function showStopTransferWarningModal(message) {
+            document.getElementById('stopTransferWarningMessage').textContent = message;
+            document.getElementById('stopTransferWarningModal').style.display = 'block';
+        }
+
+        // فتح مودال التحديث
+        function openEditModal() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول أولاً");
+                return;
+            }
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        // إغلاق مودال التحديث
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            clearEditFields();
+        }
+
+        // تفريغ حقول التعديل
+        function clearEditFields() {
+            document.getElementById('editTransactionId').value = '';
+            document.getElementById('editEngineer').value = '';
+            document.getElementById('editTransactionType').value = '';
+            document.getElementById('editRequestType').value = '';
+        }
+
+        // دالة إرسال تقرير اليوم إلى الإدارة
+        async function sendDailyReport() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول أولاً");
+                return;
+            }
+
+            const confirmation = confirm("هل أنت متأكد أنك تريد إرسال تقرير معاملات اليوم إلى الإدارة؟");
+            if (!confirmation) {
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'sendDailyReport');
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                } else {
+                    alert(`❌ ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error sending daily report:', error);
+                alert('❌ حدث خطأ في إرسال التقرير: ' + error.message);
+            }
+        }
+
+        // دالة تعديل المعاملة مع القوائم المنسدلة
+        async function editTransaction() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول أولاً");
+                return;
+            }
+
+            let transactionIdToEdit;
+            try {
+                transactionIdToEdit = sanitizeInput(document.getElementById('editTransactionId').value);
+                if (!transactionIdToEdit) {
+                    alert("⚠️ الرجاء إدخال رقم المعاملة");
+                    return;
+                }
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+
+            const newTransactionId = sanitizeInput(document.getElementById('editTransactionId').value);
+            const newEngineer = document.getElementById('editEngineer').value;
+            const newTransactionType = document.getElementById('editTransactionType').value;
+            const newRequestType = document.getElementById('editRequestType').value;
+
+            if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
+                alert("⚠️ الرجاء ملء جميع الحقول");
+                return;
+            }
+
+            const transaction = transactions.find(t => Number(t.id) === transactionIdToEdit);
+            if (!transaction) {
+                alert("⚠️ لا توجد معاملة بهذا الرقم!");
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'editTransaction');
+                params.append('oldId', transactionIdToEdit);
+                params.append('id', newTransactionId);
+                params.append('engineer', newEngineer);
+                params.append('type', newTransactionType);
+                params.append('requestType', newRequestType);
+                params.append('date', new Date().toISOString());
+                params.append('createdAt', transaction.createdAt);
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    transactions = transactions.map(t => 
+                        Number(t.id) === transactionIdToEdit ? {
+                            id: newTransactionId,
+                            engineer: newEngineer,
+                            type: newTransactionType,
+                            requestType: newRequestType,
+                            date: new Date().toISOString(),
+                            createdAt: transaction.createdAt
+                        } : t
+                    );
+                    currentPageMain = 1;
+                    updateTransactionList();
+                    updateTotalTransactions();
+                    alert("✅ تم تحديث المعاملة بنجاح!");
+                    closeEditModal();
+                }
+            } catch (error) {
+                console.error('Error updating transaction:', error);
+                alert(`حدث خطأ أثناء تحديث المعاملة: ${error.message}`);
+            }
+        }
+
+        // دالة إضافة معاملة (مع تحقق من PIN)
+        async function addTransaction() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول أولاً");
+                return;
+            }
+
+            let engineer, transactionId, transactionType, requestType;
+            try {
+                engineer = document.getElementById('engineer').value;
+                transactionId = sanitizeInput(document.getElementById('transactionId').value);
+                transactionType = document.getElementById('transactionType').value;
+                requestType = document.getElementById('requestType').value;
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+
+            if (!engineer || !transactionId || !transactionType || !requestType) {
+                alert("⚠️ الرجاء ملء جميع الحقول.");
+                return;
+            }
+
+            const today = new Date();
+            const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            // التحقق من وجود إيقاف تحويل للمهندس في هذا اليوم
+            const activeStop = stopTransfers.find(stop => {
+                const start = new Date(stop.startDate);
+                const end = new Date(stop.endDate);
+                const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+                const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+                return stop.engineer === engineer && todayDateOnly >= startDateOnly && todayDateOnly <= endDateOnly;
+            });
+
+            if (activeStop) {
+                const message = `لا يمكن تحويل المعاملة للمهندس ${engineer}، تم إيقاف التحويل عنه من تاريخ ${new Date(activeStop.startDate).toLocaleDateString('ar-EG')} إلى تاريخ ${new Date(activeStop.endDate).toLocaleDateString('ar-EG')}`;
+                showStopTransferWarningModal(message);
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('action', 'addTransaction');
+            params.append('id', transactionId);
+            params.append('engineer', engineer);
+            params.append('type', transactionType);
+            params.append('requestType', requestType);
+            params.append('date', new Date().toISOString());
+            params.append('createdAt', new Date().getTime());
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const transaction = {
+                        id: transactionId,
+                        engineer,
+                        type: transactionType,
+                        requestType,
+                        date: new Date().toISOString(),
+                        createdAt: new Date().getTime()
+                    };
+                    transactions.push(transaction);
+                    currentPageMain = 1;
+                    updateTransactionList();
+                    updateTotalTransactions();
+                    alert("✅ تمت إضافة المعاملة بنجاح!");
+                    clearFields();
+                }
+            } catch (error) {
+                console.error('Error adding transaction:', error);
+                alert(`حدث خطأ أثناء إضافة المعاملة: ${error.message}`);
+            }
+        }
+
+        // باقي الدوال تبقى كما هي مع تعديلات بسيطة
+        function sanitizeInput(input) {
+            const trimmed = input.trim();
+            const number = Number(trimmed);
+            if (isNaN(number)) {
+                throw new Error("رقم المعاملة يجب أن يكون رقمًا صحيحًا");
+            }
+            return number;
+        }
+
+        async function loadTransactionsFromDB() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getTransactions`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                transactions = data.transactions || [];
+                currentPageMain = 1;
+                updateTransactionList();
+                updateTotalTransactions();
+                populateEngineerSelect();
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                alert(`حدث خطأ أثناء جلب البيانات: ${error.message}`);
+            }
+        }
+
+        async function loadStopTransfers() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getStopTransfers`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                stopTransfers = data.stopTransfers || [];
+                displayStopTransfers();
+            } catch (error) {
+                console.error('Error loading stop transfers:', error);
+                alert(`حدث خطأ أثناء جلب بيانات إيقاف التحويل: ${error.message}`);
+            }
+        }
+
+        // الدوال الأخرى تبقى كما هي مع إضافة تحقق من currentUser عند الحاجة
+        
         // عند تحميل الصفحة
         window.addEventListener('load', () => {
-            document.getElementById('pin').focus();
+            // تعيين التواريخ الافتراضية
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
             
-            // إضافة تأثيرات للتركيز على العناصر
-            const inputs = document.querySelectorAll('input, select');
+            // إظهار شاشة الدخول فقط
+            document.getElementById('login-container').classList.remove('hidden');
+            document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('main-container').classList.add('hidden');
+            
+            // إخفاء جميع الـ modals
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editDeleteModal').style.display = 'none';
+            document.getElementById('stopTransferWarningModal').style.display = 'none';
+            
+            // التركيز على حقل PIN
+            document.getElementById('pin').focus();
+        });
+
+        // تحسين تجربة المستخدم مع حقل PIN
+        document.getElementById('pin').addEventListener('input', function(e) {
+            // السماح بالأرقام فقط
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // إذا وصل إلى 5 أرقام، التركيز على زر الدخول
+            if (this.value.length === 5) {
+                document.querySelector('.login-btn').focus();
+            }
+        });
+
+        // إضافة تأثيرات للتركيز على العناصر
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, select, button');
             inputs.forEach(input => {
                 input.addEventListener('focus', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.2)';
+                    this.style.transform = 'scale(1.02)';
+                    this.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.3)';
                 });
                 input.addEventListener('blur', function() {
                     this.style.transform = '';
                     this.style.boxShadow = '';
                 });
-            });
-            
-            // تحسين تجربة المستخدم مع حقل PIN
-            document.getElementById('pin').addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-                if (this.value.length === 5) {
-                    document.querySelector('.button-container button:first-child').focus();
-                }
             });
         });
 
@@ -645,4 +1247,4 @@
         console.log('📌 PINs المتاحة: 12345, 54321, 11111, 22222, 33333');
     </script>
 </body>
-</html>
+</html
