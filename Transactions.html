@@ -1336,9 +1336,16 @@ function renderFilteredTransactions() {
         `صفحة ${currentPageMain} من ${Math.ceil(transactions.length / rowsPerPage)}`;
 }
 
+        function updateTotalTransactions() {
+    const el = document.querySelector('.total-transactions');
+    if (!el) return;
+
+    el.innerHTML = `📊 إجمالي المعاملات: ${transactions.length}`;
+}
     </script>
 </body>
 </html
+
 
 
 
