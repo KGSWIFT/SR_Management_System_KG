@@ -72,6 +72,11 @@
             font-weight: 600;
         }
 
+        .total-box {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+
         .today-box {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
@@ -448,6 +453,28 @@
                 <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
                 <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
                 <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
             </select>
             
             <select id="transactionType">
@@ -456,6 +483,13 @@
                 <option value="أبراج اتصالات">أبراج اتصالات</option>
                 <option value="حكومي">حكومي</option>
                 <option value="تجاري">تجاري</option>
+                <option value="ملعب">ملعب</option>
+                <option value="سياحي">سياحي</option>
+                <option value="سكني">سكني</option>
+                <option value="صناعي">صناعي</option>
+                <option value="مسجد">مسجد</option>
+                <option value="سكني تجاري">سكني تجاري</option>
+                <option value="كنيسة">كنيسة</option>
             </select>
             
             <select id="requestType">
@@ -472,15 +506,34 @@
                 <button onclick="clearFields()">🗑️ تفريغ الحقول</button>
                 <button onclick="deleteTransaction()">🗑️ حذف الطلب</button>
                 <button onclick="openEditModal()">✏️ تحديث الطلب</button>
+                <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
+                <button onclick="toggleStopTransfer()">⏸️ إيقاف التحويل</button>
                 <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير</button>
             </div>
 
+            <h3 id="todayTitle" style="display: none;">📋 معاملات اليوم </h3>
+            <div id="todayTransactionsTable" style="display: none;"></div>
+            
             <h3>📋 معاملات اليوم</h3>
             <div id="transactionsList"></div> 
             <div class="pagination">
                 <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
                 <span id="pageInfo"></span>
                 <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
+            </div>
+
+            <div id="stop-transfer-container" class="hidden" style="margin-top: 40px;">
+                <h3>⏸️ إيقاف التحويل</h3>
+                <table id="stopTransferTable">
+                    <thead>
+                        <tr>
+                            <th>المهندس</th>
+                            <th>من تاريخ</th>
+                            <th>إلى تاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -495,19 +548,52 @@
                 <option value="">اختيار المهندس</option>
                 <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
                 <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
             </select>
             <select id="editTransactionType">
                 <option value="">نوع الاستعمال</option>
                 <option value="حديقة عامة">حديقة عامة</option>
                 <option value="أبراج اتصالات">أبراج اتصالات</option>
+                <option value="حكومي">حكومي</option>
+                <option value="تجاري">تجاري</option>
+                <option value="ملعب">ملعب</option>
+                <option value="سياحي">سياحي</option>
+                <option value="سكني">سكني</option>
+                <option value="صناعي">صناعي</option>
+                <option value="مسجد">مسجد</option>
+                <option value="سكني تجاري">سكني تجاري</option>
+                <option value="كنيسة">كنيسة</option>
             </select>
             <select id="editRequestType">
                 <option value="">نوع الطلب</option>
                 <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
                 <option value="موافقة فنية">موافقة فنية</option>
+                <option value="إضافة وتعديل">إضافة وتعديل</option>
             </select>
             <div class="modal-buttons">
-                <button class="edit-btn" onclick="submitEditTransaction()">تحديث</button>
+                <button class="edit-btn" onclick="editTransaction()">تحديث</button>
                 <button class="cancel-btn" onclick="closeEditModal()">إلغاء</button>
             </div>
         </div>
@@ -519,21 +605,20 @@
         const VALID_PINS = {
             '12345': { name: 'خالد يعقوب الغزالي', isAdmin: true },
             '54321': { name: 'خالد يعقوب الغزالي', isAdmin: true },
-            '11111': { name: 'امل سعيد الحسنية', isAdmin: false },
-            '22222': { name: 'محمد على المجرفي', isAdmin: false },
-            '33333': { name: 'بدر سويدان الشرجي', isAdmin: false }
+            '11111': { name: 'امل سعيد الحسنية 1', isAdmin: false },
+            '22222': { name: 'محمد على المجرفي 2', isAdmin: false },
+            '33333': { name: 'بدر سويدان الشرجي 3', isAdmin: false },
+            '44444': { name: '4 احمد ناصر الشبلي', isAdmin: false }
         };
 
         let transactions = [];
+        let stopTransfers = [];
         let currentPageMain = 1;
         const rowsPerPage = 10;
         let currentUser = null;
 
         function checkPin() {
-            const pin = document.getElementById("pin").value.trim();
-            
-            console.log("PIN المدخل:", pin);
-            console.log("PINs المتاحة:", Object.keys(VALID_PINS));
+            const pin = document.getElementById("pin").value;
             
             if (!pin || pin.length !== 5 || !/^\d+$/.test(pin)) {
                 alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
@@ -549,8 +634,6 @@
                     isAdmin: VALID_PINS[pin].isAdmin
                 };
 
-                console.log("تسجيل دخول ناجح:", currentUser);
-
                 document.getElementById("login-container").classList.add("hidden");
                 document.getElementById("welcome").classList.remove("hidden");
                 document.getElementById("userGreeting").innerHTML = 
@@ -563,6 +646,7 @@
                         `👤 ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
                     
                     loadTransactionsFromDB();
+                    loadStopTransfersData();
                 }, 2000);
                 
                 document.getElementById("pin").value = '';
@@ -583,7 +667,6 @@
             if (confirm("هل أنت متأكد من الخروج؟")) {
                 currentUser = null;
                 transactions = [];
-                currentPageMain = 1;
                 document.getElementById("main-container").classList.add("hidden");
                 document.getElementById("login-container").classList.remove("hidden");
                 document.getElementById("pin").value = "";
@@ -624,21 +707,18 @@
                 return;
             }
 
-            const start = (currentPageMain - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-            const pageData = list.slice(start, end);
-
             let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
-            pageData.forEach(tx => {
+            list.forEach(tx => {
                 html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
             });
             html += '</tbody></table>';
             container.innerHTML = html;
+        }
 
-            const totalPages = Math.ceil(list.length / rowsPerPage);
-            document.getElementById("pageInfo").textContent = `صفحة ${currentPageMain} من ${totalPages}`;
-            document.getElementById("prevPageMain").disabled = currentPageMain <= 1;
-            document.getElementById("nextPageMain").disabled = currentPageMain >= totalPages;
+        function sanitizeInput(input) {
+            const number = Number(input.trim());
+            if (isNaN(number)) throw new Error("رقم المعاملة يجب أن يكون رقمًا");
+            return number;
         }
 
         function openEditModal() {
@@ -664,7 +744,7 @@
             }
 
             const engineer = document.getElementById('engineer').value;
-            const transactionId = document.getElementById('transactionId').value.trim();
+            const transactionId = sanitizeInput(document.getElementById('transactionId').value);
             const transactionType = document.getElementById('transactionType').value;
             const requestType = document.getElementById('requestType').value;
 
@@ -680,6 +760,8 @@
                 params.append('engineer', engineer);
                 params.append('type', transactionType);
                 params.append('requestType', requestType);
+                params.append('date', new Date().toISOString());
+                params.append('createdAt', new Date().getTime());
 
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
                 const data = await response.json();
@@ -695,8 +777,8 @@
                         date: new Date().toISOString(),
                         createdAt: new Date().getTime()
                     });
-                    currentPageMain = 1;
                     updateTransactionList();
+                    updateTotalTransactions();
                     alert("✅ تمت الإضافة بنجاح!");
                     clearFields();
                 }
@@ -705,8 +787,8 @@
             }
         }
 
-        async function submitEditTransaction() {
-            const id = document.getElementById('editTransactionId').value.trim();
+        async function editTransaction() {
+            const id = sanitizeInput(document.getElementById('editTransactionId').value);
             const engineer = document.getElementById('editEngineer').value;
             const type = document.getElementById('editTransactionType').value;
             const requestType = document.getElementById('editRequestType').value;
@@ -716,7 +798,7 @@
                 return;
             }
 
-            const tx = transactions.find(t => String(t.id) === id);
+            const tx = transactions.find(t => Number(t.id) === id);
             if (!tx) {
                 alert("⚠️ المعاملة غير موجودة");
                 return;
@@ -730,6 +812,8 @@
                 params.append('engineer', engineer);
                 params.append('type', type);
                 params.append('requestType', requestType);
+                params.append('date', new Date().toISOString());
+                params.append('createdAt', tx.createdAt);
 
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
                 const data = await response.json();
@@ -750,13 +834,8 @@
         }
 
         async function deleteTransaction() {
-            const id = document.getElementById('transactionId').value.trim();
-            if (!id) {
-                alert("⚠️ أدخل رقم المعاملة");
-                return;
-            }
-
-            if (!transactions.find(t => String(t.id) === id)) {
+            const id = sanitizeInput(document.getElementById('transactionId').value);
+            if (!transactions.find(t => Number(t.id) === id)) {
                 alert("⚠️ المعاملة غير موجودة");
                 return;
             }
@@ -769,4 +848,252 @@
                 params.append('id', id);
 
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
-                const data
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    transactions = transactions.filter(t => Number(t.id) !== id);
+                    updateTransactionList();
+                    alert("✅ تم الحذف بنجاح!");
+                    clearFields();
+                }
+            } catch (error) {
+                alert(`❌ خطأ: ${error.message}`);
+            }
+        }
+
+        async function loadTransactionsFromDB() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getTransactions`);
+                const data = await response.json();
+                transactions = data.transactions || [];
+                updateTransactionList();
+                updateTotalTransactions();
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+            }
+        }
+
+        async function loadStopTransfersData() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getStopTransfers`);
+                const data = await response.json();
+                stopTransfers = data.stopTransfers || [];
+                displayStopTransfers();
+            } catch (error) {
+                console.error('خطأ في تحميل إيقاف التحويل:', error);
+            }
+        }
+
+        function displayStopTransfers() {
+            const table = document.getElementById('stopTransferTable');
+            if (!table) return;
+            
+            const tbody = table.getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            if (stopTransfers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            stopTransfers.forEach(stop => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = stop.engineer;
+                row.insertCell(1).textContent = new Date(stop.startDate).toLocaleDateString('ar-EG');
+                row.insertCell(2).textContent = new Date(stop.endDate).toLocaleDateString('ar-EG');
+            });
+        }
+
+        function updateTransactionList() {
+            const container = document.getElementById("transactionsList");
+            container.innerHTML = "";
+
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            if (todayTxs.length === 0) {
+                container.innerHTML = "<p>لا توجد معاملات في آخر 10 ساعات</p>";
+                return;
+            }
+
+            const start = (currentPageMain - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = todayTxs.slice(start, end);
+
+            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
+            pageData.forEach(tx => {
+                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            const totalPages = Math.ceil(todayTxs.length / rowsPerPage);
+            document.getElementById("pageInfo").textContent = `صفحة ${currentPageMain} من ${totalPages}`;
+            document.getElementById("prevPageMain").disabled = currentPageMain <= 1;
+            document.getElementById("nextPageMain").disabled = currentPageMain >= totalPages;
+        }
+
+        function updateTotalTransactions() {
+            displayTodayTransactions();
+        }
+
+        function displayTodayTransactions() {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            document.getElementById("todayTransactionsInfo").innerHTML = `📅 معاملات اليوم: ${todayTxs.length}`;
+
+            if (todayTxs.length === 0) {
+                document.getElementById("todayTitle").style.display = 'none';
+                document.getElementById("todayTransactionsTable").style.display = 'none';
+                return;
+            }
+
+            document.getElementById("todayTitle").style.display = 'block';
+            
+            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>الوقت</th></tr></thead><tbody>';
+            todayTxs.forEach(tx => {
+                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            
+            document.getElementById("todayTransactionsTable").innerHTML = html;
+            document.getElementById("todayTransactionsTable").style.display = 'block';
+        }
+
+        function previousPageMain() {
+            if (currentPageMain > 1) {
+                currentPageMain--;
+                updateTransactionList();
+            }
+        }
+
+        function nextPageMain() {
+            const maxPage = Math.ceil(transactions.length / rowsPerPage);
+            if (currentPageMain < maxPage) {
+                currentPageMain++;
+                updateTransactionList();
+            }
+        }
+
+        function toggleStatistics() {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            if (todayTxs.length === 0) {
+                alert('❌ لا توجد معاملات اليوم');
+                return;
+            }
+
+            // إحصائيات المهندسين
+            const engineerStats = {};
+            todayTxs.forEach(tx => {
+                if (!engineerStats[tx.engineer]) {
+                    engineerStats[tx.engineer] = 0;
+                }
+                engineerStats[tx.engineer]++;
+            });
+
+            // إنشاء جدول الإحصائيات
+            let html = '<table style="width: 100%; margin-top: 20px; border: 3px solid #4a90e2; border-radius: 15px; overflow: hidden;">';
+            html += '<thead><tr style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">';
+            html += '<th style="padding: 18px; font-weight: 700; font-size: 18px;">اسم المهندس</th>';
+            html += '<th style="padding: 18px; font-weight: 700; font-size: 18px;">عدد المعاملات</th>';
+            html += '</tr></thead><tbody>';
+
+            // ترتيب المهندسين حسب عدد المعاملات
+            const sortedEngineers = Object.entries(engineerStats)
+                .sort((a, b) => b[1] - a[1]);
+
+            sortedEngineers.forEach(([engineer, count]) => {
+                html += `<tr style="border: 1px solid #e0e0e0; text-align: center;">`;
+                html += `<td style="padding: 18px; color: #333; font-weight: 600;">${engineer}</td>`;
+                html += `<td style="padding: 18px; color: #2ecc71; font-weight: 700; font-size: 20px;">${count}</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table>';
+
+            // إنشاء modal للإحصائيات
+            const statsModal = document.createElement('div');
+            statsModal.className = 'modal';
+            statsModal.style.display = 'block';
+            statsModal.id = 'statsModal';
+            statsModal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="close" onclick="document.getElementById('statsModal').style.display='none'">&times;</span>
+                    <h3>📊 إحصائيات المعاملات (آاليوم)</h3>
+                    <div style="color: #333; text-align: right; margin-bottom: 20px;">
+                        <p style="font-size: 18px; font-weight: 600;">إجمالي المعاملات: <span style="color: #2ecc71; font-size: 24px;">${todayTxs.length}</span></p>
+                    </div>
+                    ${html}
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="document.getElementById('statsModal').style.display='none'" style="width: 200px;">إغلاق</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(statsModal);
+
+            // إغلاق modal عند الضغط خارجه
+            statsModal.onclick = function(event) {
+                if (event.target === statsModal) {
+                    statsModal.style.display = 'none';
+                    statsModal.remove();
+                }
+            };
+        }
+
+        function toggleStopTransfer() {
+            const container = document.getElementById('stop-transfer-container');
+            container.classList.toggle('hidden');
+        }
+
+        async function sendDailyReport() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول");
+                return;
+            }
+
+            if (!confirm("إرسال التقرير؟")) return;
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'sendDailyReport');
+
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+                const data = await response.json();
+                
+                alert(data.success ? `✅ ${data.message}` : `❌ ${data.message}`);
+            } catch (error) {
+                alert(`❌ خطأ: ${error.message}`);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('login-container').classList.remove('hidden');
+            document.getElementById('main-container').classList.add('hidden');
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('pin').focus();
+        });
+
+        console.log('🌟 KG SWIFT SYSTEM');
+        console.log('🔐 PINs: 12345, 54321, 11111, 22222, 33333, 44444');
+    </script>
+</body>
+</html>
