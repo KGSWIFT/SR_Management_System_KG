@@ -1,12 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG SWIFT SYSTEM-Transactions</title>
-     <link rel="icon" href="KG_SWIFT2.ico">
+    <link rel="icon" href="KG_SWIFT2.ico">
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             direction: rtl;
@@ -33,7 +33,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 20px auto;
             background: rgba(255, 255, 255, 0.98);
             padding: 40px;
@@ -50,7 +50,7 @@
             filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
         }
 
-        h2, h3, h4 {
+        h2, h3 {
             color: #1e3c72;
             font-size: 34px;
             font-weight: 800;
@@ -63,18 +63,26 @@
             border-bottom: 3px solid #4a90e2;
         }
 
-        .total-transactions {
-            font-size: 24px;
-            margin: 25px 0;
+        .info-box {
+            font-size: 20px;
+            margin: 15px 0;
             padding: 20px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            border-radius: 15px;
+            border-radius: 12px;
             color: white;
-            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
             font-weight: 600;
         }
 
-        select, button, input {
+        .total-box {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        .today-box {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        select, input {
             padding: 15px 25px;
             margin: 15px auto;
             border: 2px solid #4a90e2;
@@ -95,16 +103,19 @@
         }
 
         button {
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 12px;
             background: linear-gradient(135deg, #4a90e2, #357abd);
             color: white;
             cursor: pointer;
             font-size: 18px;
-            padding: 15px 30px;
-            width: auto;
-            border: none;
             font-weight: 700;
             letter-spacing: 1px;
             min-width: 200px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         button:hover {
@@ -168,6 +179,8 @@
             padding: 20px;
             border: 3px solid #4a90e2;
             background: #f8fafc;
+            width: 100% !important;
+            margin: 0 !important;
         }
 
         .pin-label {
@@ -179,8 +192,7 @@
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
             margin-bottom: 30px;
             border: 3px solid #4a90e2;
             border-radius: 15px;
@@ -192,7 +204,6 @@
             padding: 18px;
             border: 1px solid #e0e0e0;
             text-align: center;
-            transition: all 0.2s ease;
             font-size: 16px;
         }
 
@@ -200,51 +211,17 @@
             background: linear-gradient(135deg, #4a90e2, #357abd);
             color: white;
             font-weight: 700;
-            position: sticky;
-            top: 0;
             font-size: 18px;
         }
 
         tr:hover {
             background-color: rgba(74, 144, 226, 0.15);
-            transform: scale(1.01);
-        }
-
-        #stopTransferTable td {
-            color: #333;
-            font-weight: 500;
-        }
-
-        #statistics-container, #stop-transfer-container {
-            margin-top: 40px;
-        }
-
-        .date-range-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .date-input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 250px;
-        }
-
-        .date-input-group label {
-            margin-bottom: 12px;
-            color: #1e3c72;
-            font-weight: 700;
-            font-size: 16px;
         }
 
         .button-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 10px;
             margin: 30px 0;
             flex-wrap: wrap;
         }
@@ -268,21 +245,16 @@
             width: auto;
             min-width: 120px;
             font-weight: 600;
+            margin: 0;
         }
 
         .pagination button:disabled {
             background: #b0b0b0;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
-        .pagination button:not(:disabled):hover {
-            background: #357abd;
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        #pageInfo, #pageInfoStats {
+        #pageInfo {
             font-size: 18px;
             font-weight: 700;
             color: #1e3c72;
@@ -303,20 +275,17 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s ease-in-out;
         }
 
         .modal-content {
             background: linear-gradient(135deg, #ffffff, #f8fafc);
             margin: 8% auto;
             padding: 40px;
-            border: none;
             width: 90%;
             max-width: 600px;
             border-radius: 25px;
             box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
             text-align: right;
-            animation: slideDown 0.4s ease-out;
             border: 3px solid rgba(255, 255, 255, 0.3);
         }
 
@@ -334,14 +303,10 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 5px 10px;
-            border-radius: 50%;
         }
 
         .close:hover {
             color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
-            transform: rotate(90deg);
         }
 
         .modal-buttons {
@@ -349,7 +314,6 @@
             justify-content: space-between;
             gap: 20px;
             margin-top: 30px;
-            padding: 0 20px;
         }
 
         .modal-buttons button {
@@ -361,205 +325,17 @@
             transition: all 0.3s ease;
             flex: 1;
             font-weight: 700;
-            min-width: 140px;
+            margin: 0;
         }
 
-        .modal-buttons button.edit-btn {
+        .edit-btn {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             color: white;
         }
 
-        .modal-buttons button.edit-btn:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        .modal-buttons button.delete-btn {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .modal-buttons button.delete-btn:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        .modal-buttons button.cancel-btn {
+        .cancel-btn {
             background: linear-gradient(135deg, #95a5a6, #7f8c8d);
             color: white;
-        }
-
-        .modal-buttons button.cancel-btn:hover {
-            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        .modal-message {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            line-height: 1.7;
-            text-align: center;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: 2px solid #e0e0e0;
-        }
-
-        #stopTransferWarningModal .modal-content {
-            background: linear-gradient(135deg, #fff5e6, #ffe8cc);
-            border: 3px solid #f39c12;
-        }
-
-        #stopTransferWarningModal .modal-buttons button {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-        }
-
-        #stopTransferWarningModal .modal-buttons button:hover {
-            background: linear-gradient(135deg, #e67e22, #d35400);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        #editDeleteModal select#modalEngineer {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 85%;
-            text-align: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            70% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .container, .login-container {
-                width: 95%;
-                padding: 25px;
-                margin: 15px auto;
-            }
-            
-            .button-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            .button-container button {
-                width: 95%;
-            }
-            
-            .date-range-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-            
-            .pagination {
-                flex-wrap: wrap;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 15% auto;
-                padding: 25px;
-            }
-            
-            select, input, button {
-                width: 95%;
-            }
-            
-            h2, h3, h4 {
-                font-size: 28px;
-            }
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableContent * {
-                visibility: visible;
-            }
-            #printableContent {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            .pagination, button {
-                display: none !important;
-            }
-        }
-
-        .transactions-list table {
-            width: 100%;
-            margin: 30px 0;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .transactions-list th {
-            padding: 20px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .transactions-list td {
-            padding: 18px;
-            border: 1px solid #e0e0e0;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            margin-right: 10px;
-            box-shadow: 0 0 10px currentColor;
-        }
-
-        .status-active {
-            background-color: #2ecc71;
-        }
-
-        .status-inactive {
-            background-color: #e74c3c;
-        }
-
-        .highlight {
-            background-color: rgba(74, 144, 226, 0.2) !important;
-            font-weight: bold;
-            border-left: 4px solid #4a90e2;
-        }
-
-        .pin-instructions {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-            font-style: italic;
         }
 
         .current-user {
@@ -583,48 +359,83 @@
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
             border-radius: 25px;
-            text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            margin: 0;
         }
 
         .logout-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 25px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .button-container button {
+                width: 100%;
+            }
+            
+            select, input {
+                width: 95% !important;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- شاشة الدخول -->
     <div class="login-container" id="login-container">
         <img src="KG_SWIFT.png" alt="الشعار" class="logo">
         <h2>KG SWIFT SYSTEM</h2>
         <h3>نظام إدارة المعاملات</h3>
-        
         <div class="login-form">
             <div class="pin-label">أدخل رقم PIN الخاص بك</div>
             <div class="pin-container">
-                <input type="password" id="pin" placeholder="0 0 0 0 0" required 
-                       onkeypress="handleKeyPress(event)" class="pin-input"
-                       maxlength="5" pattern="\d*" inputmode="numeric"
-                       autocomplete="off">
+                <input type="password" id="pin" placeholder="0 0 0 0 0" maxlength="5" inputmode="numeric" onkeypress="handleKeyPress(event)">
             </div>
-            <div class="pin-instructions">
-                أدخل PIN مكون من 5 أرقام للدخول إلى النظام
-            </div>
-            <button class="login-btn" onclick="checkPin()">🔓 دخول إلى النظام</button>
-            <button class="login-btn" onclick="goToHomePage()">🏠 العودة للصفحة الرئيسية</button>
+            <button onclick="checkPin()">🔓 دخول إلى النظام</button>
+            <button onclick="goToHomePage()">🏠 العودة للصفحة الرئيسية</button>
         </div>
     </div>
 
+    <!-- شاشة الترحيب -->
     <div class="hidden" id="welcome">
         <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
-        <h2>KG SWIFT SYSTEM</h2>
         <h2>مرحباً بك في نظام إدارة المعاملات</h2>
         <div id="userGreeting" style="margin-top: 20px; font-size: 20px;"></div>
     </div>
 
+    <!-- الصفحة الرئيسية -->
     <div class="hidden" id="main-container">
         <div id="currentUserDisplay" class="current-user"></div>
         <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
@@ -632,12 +443,12 @@
         <div class="container">
             <img src="KG_SWIFT.png" alt="شعار الشركة" class="logo">
             <h2>KG SWIFT SYSTEM</h2>
-            <p style="margin-bottom: 30px; font-size: 26px; color: #1e3c72; font-weight: 700;">
-                نظام تحويل المعاملات
-            </p>
+            <p style="margin-bottom: 30px; font-size: 26px; color: #1e3c72; font-weight: 700;">نظام تحويل المعاملات</p>
 
-            <input type="text" id="transactionId" placeholder="📝 رقم المعاملة" required>
-            
+            <div class="info-box total-box" id="totalTransactionsDisplay">📊 جاري التحميل...</div>
+            <div class="info-box today-box" id="todayTransactionsInfo">📅 جاري التحميل...</div>
+
+            <input type="text" id="transactionId" placeholder="📝 رقم المعاملة">
             <select id="engineer">
                 <option value="">👨‍💼 اختيار المهندس</option>
                 <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
@@ -675,7 +486,7 @@
                 <option value="تجاري">تجاري</option>
                 <option value="ملعب">ملعب</option>
                 <option value="سياحي">سياحي</option>
-                <option value="سكني">سكني</option> 
+                <option value="سكني">سكني</option>
                 <option value="صناعي">صناعي</option>
                 <option value="مسجد">مسجد</option>
                 <option value="سكني تجاري">سكني تجاري</option>
@@ -699,27 +510,45 @@
                 <button onclick="openEditModal()">✏️ تحديث الطلب</button>
                 <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
                 <button onclick="toggleStopTransfer()">⏸️ إيقاف التحويل</button>
-                <!-- زر جديد لإرسال تقرير اليوم -->
-                <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير اليوم للإدارة</button>
+                <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير</button>
             </div>
 
-            <div class="transactions-list" id="transactionsList"></div>
-            <div class="pagination" id="mainPagination">
+            <h3 id="todayTitle" style="display: none;">📋 معاملات اليوم (آخر 10 ساعات)</h3>
+            <div id="todayTransactionsTable" style="display: none;"></div>
+            
+            <h3>📊 جميع المعاملات</h3>
+            <div id="transactionsList"></div>
+            
+            <div class="pagination">
                 <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
                 <span id="pageInfo"></span>
                 <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
             </div>
+
+            <div id="stop-transfer-container" class="hidden" style="margin-top: 40px;">
+                <h3>⏸️ إيقاف التحويل</h3>
+                <table id="stopTransferTable">
+                    <thead>
+                        <tr>
+                            <th>المهندس</th>
+                            <th>من تاريخ</th>
+                            <th>إلى تاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Modal لتحديث الطلب -->
+    <!-- Modal للتحديث -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">×</span>
+            <span class="close" onclick="closeEditModal()">&times;</span>
             <h3>✏️ تحديث الطلب</h3>
-            <input type="text" id="editTransactionId" placeholder="🔢 رقم المعاملة المراد تحديثها" required>
+            <input type="text" id="editTransactionId" placeholder="رقم المعاملة">
             <select id="editEngineer">
-                <option value="">👨‍💼 اختيار المهندس الجديد</option>
+                <option value="">اختيار المهندس</option>
                 <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
                 <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
                 <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
@@ -747,25 +576,26 @@
                 <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
             </select>
             <select id="editTransactionType">
-                <option value="">🏢 نوع الاستعمال الجديد</option>
+                <option value="">نوع الاستعمال</option>
                 <option value="حديقة عامة">حديقة عامة</option>
                 <option value="أبراج اتصالات">أبراج اتصالات</option>
                 <option value="حكومي">حكومي</option>
                 <option value="تجاري">تجاري</option>
                 <option value="ملعب">ملعب</option>
                 <option value="سياحي">سياحي</option>
-                <option value="سكني">سكني</option> 
+                <option value="سكني">سكني</option>
                 <option value="صناعي">صناعي</option>
                 <option value="مسجد">مسجد</option>
                 <option value="سكني تجاري">سكني تجاري</option>
                 <option value="كنيسة">كنيسة</option>
             </select>
             <select id="editRequestType">
-                <option value="">📄 نوع الطلب الجديد</option>
+                <option value="">نوع الطلب</option>
                 <option value="إباحة بناء جديدة">إباحة بناء جديدة</option>
                 <option value="موافقة فنية">موافقة فنية</option>
                 <option value="إضافة وتعديل">إضافة وتعديل</option>
-          </select>
+                <option value="سكني متعدد الطوابق">سكني متعدد الطوابق</option>
+            </select>
             <div class="modal-buttons">
                 <button class="edit-btn" onclick="editTransaction()">تحديث</button>
                 <button class="cancel-btn" onclick="closeEditModal()">إلغاء</button>
@@ -773,12 +603,9 @@
         </div>
     </div>
 
-    <!-- باقي الـ modals والأقسام تبقى كما هي مع تعديل التنسيقات فقط -->
-
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSKWYfmklJuFeMUTJsL8ifCJccQqAgjITNKGzLSnw-6onHHyk6nQhM0PO6n8RlULiYRA/exec";
 
-        // تعريف PINs لخمسة أشخاص (يمكن تعديلها حسب الحاجة)
         const VALID_PINS = {
             '12345': { name: 'خالد يعقوب الغزالي', isAdmin: true },
             '54321': { name: 'خالد يعقوب الغزالي', isAdmin: true },
@@ -791,21 +618,13 @@
         let transactions = [];
         let stopTransfers = [];
         let currentPageMain = 1;
-        let currentPageStats = 1;
         const rowsPerPage = 10;
-        let filteredTransactions = [];
         let currentUser = null;
 
-        // التحقق من PIN
         function checkPin() {
             const pin = document.getElementById("pin").value;
             
-            if (!pin) {
-                alert("⚠️ الرجاء إدخال PIN");
-                return;
-            }
-
-            if (pin.length !== 5 || !/^\d+$/.test(pin)) {
+            if (!pin || pin.length !== 5 || !/^\d+$/.test(pin)) {
                 alert("⚠️ يجب أن يكون PIN مكون من 5 أرقام فقط");
                 document.getElementById("pin").value = '';
                 document.getElementById("pin").focus();
@@ -821,28 +640,22 @@
 
                 document.getElementById("login-container").classList.add("hidden");
                 document.getElementById("welcome").classList.remove("hidden");
-                
-                // عرض رسالة ترحيب بالمستخدم
                 document.getElementById("userGreeting").innerHTML = 
-                    `مرحباً بك <strong>${currentUser.name}</strong> في نظام إدارة المعاملات`;
+                    `مرحباً بك <strong>${currentUser.name}</strong>`;
                 
                 setTimeout(() => {
                     document.getElementById("welcome").classList.add("hidden");
                     document.getElementById("main-container").classList.remove("hidden");
-                    
-                    // عرض اسم المستخدم الحالي
                     document.getElementById("currentUserDisplay").innerHTML = 
-                        `👤 المستخدم: ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
+                        `👤 ${currentUser.name} ${currentUser.isAdmin ? '(مدير)' : ''}`;
                     
-                    // تحميل البيانات
                     loadTransactionsFromDB();
-                    loadStopTransfers();
+                    loadStopTransfersData();
                 }, 2000);
                 
-                // تفريغ حقل PIN
                 document.getElementById("pin").value = '';
             } else {
-                alert("❌ PIN غير صحيح. الرجاء المحاولة مرة أخرى.");
+                alert("❌ PIN غير صحيح");
                 document.getElementById("pin").value = '';
                 document.getElementById("pin").focus();
             }
@@ -855,12 +668,9 @@
         }
 
         function logout() {
-            const confirmation = confirm("هل أنت متأكد أنك ترغب في الخروج من النظام؟");
-            if (confirmation) {
+            if (confirm("هل أنت متأكد من الخروج؟")) {
                 currentUser = null;
                 transactions = [];
-                stopTransfers = [];
-                
                 document.getElementById("main-container").classList.add("hidden");
                 document.getElementById("login-container").classList.remove("hidden");
                 document.getElementById("pin").value = "";
@@ -872,7 +682,6 @@
             window.location.href = "index.html";
         }
 
-        // دالة تفريغ الحقول
         function clearFields() {
             document.getElementById('engineer').value = '';
             document.getElementById('transactionId').value = '';
@@ -880,474 +689,341 @@
             document.getElementById('requestType').value = '';
         }
 
-        // دالة البحث عن المعاملات
         function searchTransactions() {
             const searchValue = document.getElementById('search').value.toLowerCase();
-            function searchTransactions() {
-    const searchValue = document.getElementById('search').value.toLowerCase();
-
-    filteredTransactions = transactions.filter(tx =>
-        String(tx.id).includes(searchValue) ||
-        tx.engineer.toLowerCase().includes(searchValue) ||
-        tx.type.toLowerCase().includes(searchValue) ||
-        tx.requestType.toLowerCase().includes(searchValue)
-    );
-
-    currentPageMain = 1;
-    renderFilteredTransactions();
-}
-
-function renderFilteredTransactions() {
-    const container = document.getElementById("transactionsList");
-    container.innerHTML = "";
-
-    if (filteredTransactions.length === 0) {
-        container.innerHTML = "<p>لا توجد نتائج</p>";
-        return;
-    }
-
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>رقم المعاملة</th>
-                    <th>المهندس</th>
-                    <th>نوع الاستعمال</th>
-                    <th>نوع الطلب</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    filteredTransactions.forEach(tx => {
-        html += `
-            <tr>
-                <td>${tx.id}</td>
-                <td>${tx.engineer}</td>
-                <td>${tx.type}</td>
-                <td>${tx.requestType}</td>
-            </tr>
-        `;
-    });
-
-    html += "</tbody></table>";
-    container.innerHTML = html;
-}
+            const filtered = transactions.filter(tx =>
+                String(tx.id).includes(searchValue) ||
+                tx.engineer.toLowerCase().includes(searchValue) ||
+                tx.type.toLowerCase().includes(searchValue) ||
+                tx.requestType.toLowerCase().includes(searchValue)
+            );
 
             currentPageMain = 1;
-            displayTransactions(filteredTransactions);
+            displaySearchResults(filtered);
         }
 
-        // دالة عرض قائمة إيقاف التحويل
-        function displayStopTransfers() {
-            const stopTransferTable = document.getElementById('stopTransferTable').getElementsByTagName('tbody')[0];
-            stopTransferTable.innerHTML = '';
+        function displaySearchResults(list) {
+            const container = document.getElementById("transactionsList");
+            container.innerHTML = "";
 
-            if (stopTransfers.length === 0) {
-                stopTransferTable.innerHTML = '<tr><td colspan="3">لا توجد بيانات إيقاف التحويل.</td></tr>';
+            if (list.length === 0) {
+                container.innerHTML = "<p>لا توجد نتائج</p>";
                 return;
             }
 
-            stopTransfers.forEach(stop => {
-                const row = stopTransferTable.insertRow();
-                row.insertCell(0).innerText = stop.engineer;
-                row.insertCell(1).innerText = new Date(stop.startDate).toLocaleDateString('ar-EG');
-                row.insertCell(2).innerText = new Date(stop.endDate).toLocaleDateString('ar-EG');
+            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
+            list.forEach(tx => {
+                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
             });
+            html += '</tbody></table>';
+            container.innerHTML = html;
         }
 
-        // دالة عرض التحذير عند إيقاف التحويل
-        function showStopTransferWarningModal(message) {
-            document.getElementById('stopTransferWarningMessage').textContent = message;
-            document.getElementById('stopTransferWarningModal').style.display = 'block';
+        function sanitizeInput(input) {
+            const number = Number(input.trim());
+            if (isNaN(number)) throw new Error("رقم المعاملة يجب أن يكون رقمًا");
+            return number;
         }
 
-        // فتح مودال التحديث
         function openEditModal() {
             if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
+                alert("⚠️ يجب تسجيل الدخول");
                 return;
             }
             document.getElementById('editModal').style.display = 'block';
         }
 
-        // إغلاق مودال التحديث
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
-            clearEditFields();
-        }
-
-        // تفريغ حقول التعديل
-        function clearEditFields() {
             document.getElementById('editTransactionId').value = '';
             document.getElementById('editEngineer').value = '';
             document.getElementById('editTransactionType').value = '';
             document.getElementById('editRequestType').value = '';
         }
 
-        // دالة إرسال تقرير اليوم إلى الإدارة
-        async function sendDailyReport() {
+        async function addTransaction() {
             if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
+                alert("⚠️ يجب تسجيل الدخول");
                 return;
             }
 
-            const confirmation = confirm("هل أنت متأكد أنك تريد إرسال تقرير معاملات اليوم إلى الإدارة؟");
-            if (!confirmation) {
-                return;
-            }
+            const engineer = document.getElementById('engineer').value;
+            const transactionId = sanitizeInput(document.getElementById('transactionId').value);
+            const transactionType = document.getElementById('transactionType').value;
+            const requestType = document.getElementById('requestType').value;
 
-            try {
-                const params = new URLSearchParams();
-                params.append('action', 'sendDailyReport');
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`✅ ${data.message}`);
-                } else {
-                    alert(`❌ ${data.message}`);
-                }
-            } catch (error) {
-                console.error('Error sending daily report:', error);
-                alert('❌ حدث خطأ في إرسال التقرير: ' + error.message);
-            }
-        }
-
-        // دالة تعديل المعاملة مع القوائم المنسدلة
-        async function editTransaction() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
-                return;
-            }
-
-            let transactionIdToEdit;
-            try {
-                transactionIdToEdit = sanitizeInput(document.getElementById('editTransactionId').value);
-                if (!transactionIdToEdit) {
-                    alert("⚠️ الرجاء إدخال رقم المعاملة");
-                    return;
-                }
-            } catch (error) {
-                alert(error.message);
-                return;
-            }
-
-            const newTransactionId = sanitizeInput(document.getElementById('editTransactionId').value);
-            const newEngineer = document.getElementById('editEngineer').value;
-            const newTransactionType = document.getElementById('editTransactionType').value;
-            const newRequestType = document.getElementById('editRequestType').value;
-
-            if (!newTransactionId || !newEngineer || !newTransactionType || !newRequestType) {
+            if (!engineer || !transactionId || !transactionType || !requestType) {
                 alert("⚠️ الرجاء ملء جميع الحقول");
                 return;
             }
 
-            const transaction = transactions.find(t => Number(t.id) === transactionIdToEdit);
-            if (!transaction) {
-                alert("⚠️ لا توجد معاملة بهذا الرقم!");
-                return;
-            }
-
             try {
                 const params = new URLSearchParams();
-                params.append('action', 'editTransaction');
-                params.append('oldId', transactionIdToEdit);
-                params.append('id', newTransactionId);
-                params.append('engineer', newEngineer);
-                params.append('type', newTransactionType);
-                params.append('requestType', newRequestType);
+                params.append('action', 'addTransaction');
+                params.append('id', transactionId);
+                params.append('engineer', engineer);
+                params.append('type', transactionType);
+                params.append('requestType', requestType);
                 params.append('date', new Date().toISOString());
-                params.append('createdAt', transaction.createdAt);
+                params.append('createdAt', new Date().getTime());
 
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
                 const data = await response.json();
                 
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    transactions = transactions.map(t => 
-                        Number(t.id) === transactionIdToEdit ? {
-                            id: newTransactionId,
-                            engineer: newEngineer,
-                            type: newTransactionType,
-                            requestType: newRequestType,
-                            date: new Date().toISOString(),
-                            createdAt: transaction.createdAt
-                        } : t
-                    );
-                    currentPageMain = 1;
-                    updateTransactionList();
-                    updateTotalTransactions();
-                    alert("✅ تم تحديث المعاملة بنجاح!");
-                    closeEditModal();
-                }
-            } catch (error) {
-                console.error('Error updating transaction:', error);
-                alert(`حدث خطأ أثناء تحديث المعاملة: ${error.message}`);
-            }
-        }
-
-        // دالة إضافة معاملة (مع تحقق من PIN)
-        async function addTransaction() {
-            if (!currentUser) {
-                alert("⚠️ يجب تسجيل الدخول أولاً");
-                return;
-            }
-
-            let engineer, transactionId, transactionType, requestType;
-            try {
-                engineer = document.getElementById('engineer').value;
-                transactionId = sanitizeInput(document.getElementById('transactionId').value);
-                transactionType = document.getElementById('transactionType').value;
-                requestType = document.getElementById('requestType').value;
-            } catch (error) {
-                alert(error.message);
-                return;
-            }
-
-            if (!engineer || !transactionId || !transactionType || !requestType) {
-                alert("⚠️ الرجاء ملء جميع الحقول.");
-                return;
-            }
-
-            const today = new Date();
-            const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-            // التحقق من وجود إيقاف تحويل للمهندس في هذا اليوم
-            const activeStop = stopTransfers.find(stop => {
-                const start = new Date(stop.startDate);
-                const end = new Date(stop.endDate);
-                const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-                const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-
-                return stop.engineer === engineer && todayDateOnly >= startDateOnly && todayDateOnly <= endDateOnly;
-            });
-
-            if (activeStop) {
-                const message = `لا يمكن تحويل المعاملة للمهندس ${engineer}، تم إيقاف التحويل عنه من تاريخ ${new Date(activeStop.startDate).toLocaleDateString('ar-EG')} إلى تاريخ ${new Date(activeStop.endDate).toLocaleDateString('ar-EG')}`;
-                showStopTransferWarningModal(message);
-                return;
-            }
-
-            const params = new URLSearchParams();
-            params.append('action', 'addTransaction');
-            params.append('id', transactionId);
-            params.append('engineer', engineer);
-            params.append('type', transactionType);
-            params.append('requestType', requestType);
-            params.append('date', new Date().toISOString());
-            params.append('createdAt', new Date().getTime());
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    const transaction = {
+                    transactions.push({
                         id: transactionId,
                         engineer,
                         type: transactionType,
                         requestType,
                         date: new Date().toISOString(),
                         createdAt: new Date().getTime()
-                    };
-                    transactions.push(transaction);
-                    currentPageMain = 1;
+                    });
                     updateTransactionList();
                     updateTotalTransactions();
-                    alert("✅ تمت إضافة المعاملة بنجاح!");
+                    alert("✅ تمت الإضافة بنجاح!");
                     clearFields();
                 }
             } catch (error) {
-                console.error('Error adding transaction:', error);
-                alert(`حدث خطأ أثناء إضافة المعاملة: ${error.message}`);
+                alert(`❌ خطأ: ${error.message}`);
             }
         }
 
-        // باقي الدوال تبقى كما هي مع تعديلات بسيطة
-        function sanitizeInput(input) {
-            const trimmed = input.trim();
-            const number = Number(trimmed);
-            if (isNaN(number)) {
-                throw new Error("رقم المعاملة يجب أن يكون رقمًا صحيحًا");
+        async function editTransaction() {
+            const id = sanitizeInput(document.getElementById('editTransactionId').value);
+            const engineer = document.getElementById('editEngineer').value;
+            const type = document.getElementById('editTransactionType').value;
+            const requestType = document.getElementById('editRequestType').value;
+
+            if (!engineer || !type || !requestType) {
+                alert("⚠️ الرجاء ملء جميع الحقول");
+                return;
             }
-            return number;
+
+            const tx = transactions.find(t => Number(t.id) === id);
+            if (!tx) {
+                alert("⚠️ المعاملة غير موجودة");
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'editTransaction');
+                params.append('oldId', id);
+                params.append('id', id);
+                params.append('engineer', engineer);
+                params.append('type', type);
+                params.append('requestType', requestType);
+                params.append('date', new Date().toISOString());
+                params.append('createdAt', tx.createdAt);
+
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    tx.engineer = engineer;
+                    tx.type = type;
+                    tx.requestType = requestType;
+                    updateTransactionList();
+                    alert("✅ تم التحديث بنجاح!");
+                    closeEditModal();
+                }
+            } catch (error) {
+                alert(`❌ خطأ: ${error.message}`);
+            }
+        }
+
+        async function deleteTransaction() {
+            const id = sanitizeInput(document.getElementById('transactionId').value);
+            if (!transactions.find(t => Number(t.id) === id)) {
+                alert("⚠️ المعاملة غير موجودة");
+                return;
+            }
+
+            if (!confirm("هل تريد حذف المعاملة؟")) return;
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'deleteTransaction');
+                params.append('id', id);
+
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    transactions = transactions.filter(t => Number(t.id) !== id);
+                    updateTransactionList();
+                    alert("✅ تم الحذف بنجاح!");
+                    clearFields();
+                }
+            } catch (error) {
+                alert(`❌ خطأ: ${error.message}`);
+            }
         }
 
         async function loadTransactionsFromDB() {
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getTransactions`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 transactions = data.transactions || [];
-                currentPageMain = 1;
                 updateTransactionList();
                 updateTotalTransactions();
-                populateEngineerSelect();
             } catch (error) {
-                console.error('Error loading transactions:', error);
-                alert(`حدث خطأ أثناء جلب البيانات: ${error.message}`);
+                console.error('خطأ في تحميل البيانات:', error);
             }
         }
 
-        async function loadStopTransfers() {
+        async function loadStopTransfersData() {
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getStopTransfers`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 stopTransfers = data.stopTransfers || [];
                 displayStopTransfers();
             } catch (error) {
-                console.error('Error loading stop transfers:', error);
-                alert(`حدث خطأ أثناء جلب بيانات إيقاف التحويل: ${error.message}`);
+                console.error('خطأ في تحميل إيقاف التحويل:', error);
             }
         }
 
-        // الدوال الأخرى تبقى كما هي مع إضافة تحقق من currentUser عند الحاجة
-        
-        // عند تحميل الصفحة
+        function displayStopTransfers() {
+            const table = document.getElementById('stopTransferTable');
+            if (!table) return;
+            
+            const tbody = table.getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            if (stopTransfers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            stopTransfers.forEach(stop => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = stop.engineer;
+                row.insertCell(1).textContent = new Date(stop.startDate).toLocaleDateString('ar-EG');
+                row.insertCell(2).textContent = new Date(stop.endDate).toLocaleDateString('ar-EG');
+            });
+        }
+
+        function updateTransactionList() {
+            const container = document.getElementById("transactionsList");
+            container.innerHTML = "";
+
+            if (transactions.length === 0) {
+                container.innerHTML = "<p>لا توجد معاملات</p>";
+                return;
+            }
+
+            const start = (currentPageMain - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = transactions.slice(start, end);
+
+            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
+            pageData.forEach(tx => {
+                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            const totalPages = Math.ceil(transactions.length / rowsPerPage);
+            document.getElementById("pageInfo").textContent = `صفحة ${currentPageMain} من ${totalPages}`;
+            document.getElementById("prevPageMain").disabled = currentPageMain <= 1;
+            document.getElementById("nextPageMain").disabled = currentPageMain >= totalPages;
+        }
+
+        function updateTotalTransactions() {
+            document.getElementById("totalTransactionsDisplay").innerHTML = `📊 إجمالي المعاملات: ${transactions.length}`;
+            displayTodayTransactions();
+        }
+
+        function displayTodayTransactions() {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+            const cutoff = Math.max(todayStart, tenHoursAgo);
+
+            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+
+            document.getElementById("todayTransactionsInfo").innerHTML = `📅 معاملات آخر 10 ساعات: ${todayTxs.length}`;
+
+            if (todayTxs.length === 0) {
+                document.getElementById("todayTitle").style.display = 'none';
+                document.getElementById("todayTransactionsTable").style.display = 'none';
+                return;
+            }
+
+            document.getElementById("todayTitle").style.display = 'block';
+            
+            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>الوقت</th></tr></thead><tbody>';
+            todayTxs.forEach(tx => {
+                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            
+            document.getElementById("todayTransactionsTable").innerHTML = html;
+            document.getElementById("todayTransactionsTable").style.display = 'block';
+        }
+
+        function previousPageMain() {
+            if (currentPageMain > 1) {
+                currentPageMain--;
+                updateTransactionList();
+            }
+        }
+
+        function nextPageMain() {
+            const maxPage = Math.ceil(transactions.length / rowsPerPage);
+            if (currentPageMain < maxPage) {
+                currentPageMain++;
+                updateTransactionList();
+            }
+        }
+
+        function toggleStatistics() {
+            alert('📊 قيد التطوير');
+        }
+
+        function toggleStopTransfer() {
+            const container = document.getElementById('stop-transfer-container');
+            container.classList.toggle('hidden');
+        }
+
+        async function sendDailyReport() {
+            if (!currentUser) {
+                alert("⚠️ يجب تسجيل الدخول");
+                return;
+            }
+
+            if (!confirm("إرسال التقرير؟")) return;
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'sendDailyReport');
+
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+                const data = await response.json();
+                
+                alert(data.success ? `✅ ${data.message}` : `❌ ${data.message}`);
+            } catch (error) {
+                alert(`❌ خطأ: ${error.message}`);
+            }
+        }
+
         window.addEventListener('load', () => {
-            // تعيين التواريخ الافتراضية
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
-            
-            // إظهار شاشة الدخول فقط
             document.getElementById('login-container').classList.remove('hidden');
-            document.getElementById('welcome').classList.add('hidden');
             document.getElementById('main-container').classList.add('hidden');
-            
-            // إخفاء جميع الـ modals
             document.getElementById('editModal').style.display = 'none';
-            document.getElementById('editDeleteModal').style.display = 'none';
-            document.getElementById('stopTransferWarningModal').style.display = 'none';
-            
-            // التركيز على حقل PIN
             document.getElementById('pin').focus();
         });
 
-        // تحسين تجربة المستخدم مع حقل PIN
-        document.getElementById('pin').addEventListener('input', function(e) {
-            // السماح بالأرقام فقط
-            this.value = this.value.replace(/[^0-9]/g, '');
-            
-            // إذا وصل إلى 5 أرقام، التركيز على زر الدخول
-            if (this.value.length === 5) {
-                document.querySelector('.login-btn').focus();
-            }
-        });
-
-        // إضافة تأثيرات للتركيز على العناصر
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('input, select, button');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.transform = 'scale(1.02)';
-                    this.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.3)';
-                });
-                input.addEventListener('blur', function() {
-                    this.style.transform = '';
-                    this.style.boxShadow = '';
-                });
-            });
-        });
-
-        // إضافة رسالة ترحيب عند فتح الصفحة
-        console.log('🌟 KG SWIFT SYSTEM - نظام إدارة المعاملات');
-        console.log('🔐 النظام يستخدم PIN فقط للدخول');
-        console.log('📌 PINs المتاحة: 12345, 54321, 11111, 22222, 33333');
-        function updateTransactionList() {
-    const container = document.getElementById("transactionsList");
-    container.innerHTML = "";
-
-    if (transactions.length === 0) {
-        container.innerHTML = "<p>لا توجد معاملات</p>";
-        return;
-    }
-
-    const start = (currentPageMain - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const pageData = transactions.slice(start, end);
-
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>رقم المعاملة</th>
-                    <th>المهندس</th>
-                    <th>نوع الاستعمال</th>
-                    <th>نوع الطلب</th>
-                    <th>التاريخ</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    pageData.forEach(tx => {
-        html += `
-            <tr>
-                <td>${tx.id}</td>
-                <td>${tx.engineer}</td>
-                <td>${tx.type}</td>
-                <td>${tx.requestType}</td>
-                <td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td>
-            </tr>
-        `;
-    });
-
-    html += "</tbody></table>";
-    container.innerHTML = html;
-
-    document.getElementById("pageInfo").innerText =
-        `صفحة ${currentPageMain} من ${Math.ceil(transactions.length / rowsPerPage)}`;
-}
-
-        function updateTotalTransactions() {
-    const el = document.querySelector('.total-transactions');
-    if (!el) return;
-
-    el.innerHTML = `📊 إجمالي المعاملات: ${transactions.length}`;
-}
+        console.log('🌟 KG SWIFT SYSTEM');
+        console.log('🔐 PINs: 12345, 54321, 11111, 22222, 33333, 44444');
     </script>
 </body>
-</html
-
-
-
-
-
-
+</html>
