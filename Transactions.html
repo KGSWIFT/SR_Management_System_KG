@@ -871,6 +871,51 @@
             window.location.href = "index.html";
         }
 
+        // دالة تفريغ الحقول
+        function clearFields() {
+            document.getElementById('engineer').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('transactionType').value = '';
+            document.getElementById('requestType').value = '';
+        }
+
+        // دالة البحث عن المعاملات
+        function searchTransactions() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const filteredTransactions = transactions.filter(tx => 
+                String(tx.id).toLowerCase().includes(searchValue) || 
+                tx.engineer.toLowerCase().includes(searchValue) ||
+                tx.type.toLowerCase().includes(searchValue) ||
+                tx.requestType.toLowerCase().includes(searchValue)
+            );
+            currentPageMain = 1;
+            displayTransactions(filteredTransactions);
+        }
+
+        // دالة عرض قائمة إيقاف التحويل
+        function displayStopTransfers() {
+            const stopTransferTable = document.getElementById('stopTransferTable').getElementsByTagName('tbody')[0];
+            stopTransferTable.innerHTML = '';
+
+            if (stopTransfers.length === 0) {
+                stopTransferTable.innerHTML = '<tr><td colspan="3">لا توجد بيانات إيقاف التحويل.</td></tr>';
+                return;
+            }
+
+            stopTransfers.forEach(stop => {
+                const row = stopTransferTable.insertRow();
+                row.insertCell(0).innerText = stop.engineer;
+                row.insertCell(1).innerText = new Date(stop.startDate).toLocaleDateString('ar-EG');
+                row.insertCell(2).innerText = new Date(stop.endDate).toLocaleDateString('ar-EG');
+            });
+        }
+
+        // دالة عرض التحذير عند إيقاف التحويل
+        function showStopTransferWarningModal(message) {
+            document.getElementById('stopTransferWarningMessage').textContent = message;
+            document.getElementById('stopTransferWarningModal').style.display = 'block';
+        }
+
         // فتح مودال التحديث
         function openEditModal() {
             if (!currentUser) {
@@ -1202,4 +1247,3 @@
     </script>
 </body>
 </html>
-
