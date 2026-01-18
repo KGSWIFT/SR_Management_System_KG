@@ -944,7 +944,7 @@
             displayTodayTransactions();
         }
 
-        function displayTodayTransactions() {
+        function updateTotalTransactions() {}
             const today = new Date();
             const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
             const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
@@ -979,13 +979,24 @@
             }
         }
 
-        function nextPageMain() {
-            const maxPage = Math.ceil(transactions.length / rowsPerPage);
-            if (currentPageMain < maxPage) {
-                currentPageMain++;
-                updateTransactionList();
-            }
-        }
+       function nextPageMain() {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const tenHoursAgo = Date.now() - (10 * 60 * 60 * 1000);
+    const cutoff = Math.max(todayStart, tenHoursAgo);
+
+    const todayTxs = transactions.filter(
+        tx => new Date(tx.date).getTime() >= cutoff
+    );
+
+    const maxPage = Math.ceil(todayTxs.length / rowsPerPage);
+
+    if (currentPageMain < maxPage) {
+        currentPageMain++;
+        updateTransactionList();
+    }
+}
+
 
         function toggleStatistics() {
             const today = new Date();
@@ -1097,5 +1108,6 @@
     </script>
 </body>
 </html>
+
 
 
