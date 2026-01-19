@@ -499,7 +499,7 @@
                 <option value="إضافة وتعديل">إضافة وتعديل</option>
             </select>
 
-            <input type="text" id="search" placeholder="🔍 بحث عن المعاملات" oninput="searchTransactions()">
+            <input type="text" id="search" placeholder="🔍 بحث في معاملات اليوم" oninput="searchTodayTransactions()">
             
             <div class="button-container">
                 <button onclick="addTransaction()">➕ إضافة المعاملة</button>
@@ -512,12 +512,11 @@
             </div>
             
             <h3>📋 معاملات اليوم</h3>
-            <div id="transactionsList"></div> 
             <div id="todayTransactionsTable"></div>
-            <div class="pagination">
-                <button onclick="previousPageMain()" id="prevPageMain">⬅️ السابق</button>
-                <span id="pageInfo"></span>
-                <button onclick="nextPageMain()" id="nextPageMain">التالي ➡️</button>
+            <div class="pagination" id="todayPagination">
+                <button onclick="previousPageToday()" id="prevPageToday">⬅️ السابق</button>
+                <span id="todayPageInfo"></span>
+                <button onclick="nextPageToday()" id="nextPageToday">التالي ➡️</button>
             </div>
 
             <div id="stop-transfer-container" class="hidden" style="margin-top: 40px;">
@@ -602,7 +601,7 @@
 
 let transactions = [];
 let stopTransfers = [];
-let currentPageMain = 1;
+let currentPageToday = 1;
 const rowsPerPage = 10;
 let currentUser = null;
 
@@ -683,34 +682,31 @@ function clearFields() {
     document.getElementById('requestType').value = '';
 }
 
-function searchTransactions() {
+function searchTodayTransactions() {
     const searchValue = document.getElementById('search').value.toLowerCase();
-    const filtered = transactions.filter(tx =>
+    
+    // الحصول على معاملات اليوم
+    const todayTransactions = getTodayTransactions();
+    
+    // البحث ضمن معاملات اليوم فقط
+    const filtered = todayTransactions.filter(tx =>
         String(tx.id).includes(searchValue) ||
         tx.engineer.toLowerCase().includes(searchValue) ||
         tx.type.toLowerCase().includes(searchValue) ||
         tx.requestType.toLowerCase().includes(searchValue)
     );
 
-    currentPageMain = 1;
-    displaySearchResults(filtered);
+    currentPageToday = 1;
+    displayTodayTransactionsTable(filtered);
 }
 
-function displaySearchResults(list) {
-    const container = document.getElementById("transactionsList");
-    container.innerHTML = "";
+function getTodayTransactions() {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+    const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+    const cutoff = Math.max(todayStart, tenHoursAgo);
 
-    if (list.length === 0) {
-        container.innerHTML = "<p>لا توجد نتائج</p>";
-        return;
-    }
-
-    let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
-    list.forEach(tx => {
-        html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
+    return transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
 }
 
 function sanitizeInput(input) {
@@ -775,7 +771,6 @@ async function addTransaction() {
                 date: new Date().toISOString(),
                 createdAt: new Date().getTime()
             });
-            updateTransactionList();
             displayTodayTransactions();
             alert("✅ تمت الإضافة بنجاح!");
             clearFields();
@@ -822,7 +817,6 @@ async function editTransaction() {
             tx.engineer = engineer;
             tx.type = type;
             tx.requestType = requestType;
-            updateTransactionList();
             displayTodayTransactions();
             alert("✅ تم التحديث بنجاح!");
             closeEditModal();
@@ -853,7 +847,6 @@ async function deleteTransaction() {
             alert(data.error);
         } else {
             transactions = transactions.filter(t => Number(t.id) !== id);
-            updateTransactionList();
             displayTodayTransactions();
             alert("✅ تم الحذف بنجاح!");
             clearFields();
@@ -868,7 +861,6 @@ async function loadTransactionsFromDB() {
         const response = await fetch(`${SCRIPT_URL}?action=getTransactions`);
         const data = await response.json();
         transactions = data.transactions || [];
-        updateTransactionList();
         displayTodayTransactions();
     } catch (error) {
         console.error('خطأ في تحميل البيانات:', error);
@@ -911,53 +903,10 @@ function displayStopTransfers() {
     });
 }
 
-function updateTransactionList() {
-    const start = (currentPageMain - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const paginatedTransactions = transactions.slice(start, end);
-
-    const tableDiv = document.getElementById("transactionsList");
-    if (!tableDiv) return;
-
-    if (paginatedTransactions.length === 0) {
-        tableDiv.innerHTML = "<p>لا توجد معاملات</p>";
-        return;
+function displayTodayTransactionsTable(todayTxs = null) {
+    if (!todayTxs) {
+        todayTxs = getTodayTransactions();
     }
-
-    let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع الاستعمال</th><th>نوع الطلب</th><th>التاريخ</th></tr></thead><tbody>';
-    
-    paginatedTransactions.forEach(tx => {
-        html += `<tr>
-            <td>${tx.id}</td>
-            <td>${tx.engineer}</td>
-            <td>${tx.type}</td>
-            <td>${tx.requestType}</td>
-            <td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td>
-        </tr>`;
-    });
-    
-    html += '</tbody></table>';
-    tableDiv.innerHTML = html;
-
-    const pageInfo = document.getElementById("pageInfo");
-    const maxPage = Math.ceil(transactions.length / rowsPerPage);
-    if (pageInfo) {
-        pageInfo.textContent = `الصفحة ${currentPageMain} من ${maxPage}`;
-    }
-
-    const prevButton = document.getElementById("prevPageMain");
-    const nextButton = document.getElementById("nextPageMain");
-    if (prevButton) prevButton.disabled = currentPageMain === 1;
-    if (nextButton) nextButton.disabled = currentPageMain === maxPage;
-}
-
-function displayTodayTransactions() {
-    const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
-    const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
-    const cutoff = Math.max(todayStart, tenHoursAgo);
-
-    const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
 
     const infoBox = document.getElementById("todayTransactionsInfo");
     if (infoBox) {
@@ -965,43 +914,72 @@ function displayTodayTransactions() {
     }
 
     const tableDiv = document.getElementById("todayTransactionsTable");
-    if (tableDiv) {
-        if (todayTxs.length === 0) {
-            tableDiv.innerHTML = "<p>لا توجد معاملات اليوم</p>";
-            return;
-        }
+    if (!tableDiv) return;
 
-        let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>الوقت</th></tr></thead><tbody>';
-        todayTxs.forEach(tx => {
-            html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td></tr>`;
-        });
-        html += '</tbody></table>';
-        tableDiv.innerHTML = html;
+    if (todayTxs.length === 0) {
+        tableDiv.innerHTML = "<p>لا توجد معاملات اليوم</p>";
+        document.getElementById("todayPagination").style.display = "none";
+        return;
+    }
+
+    // حساب الترقيم
+    const start = (currentPageToday - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedTodayTxs = todayTxs.slice(start, end);
+
+    let html = '<table><thead><tr><th>رقم المعاملة</th><th>المهندس</th><th>نوع الاستعمال</th><th>نوع الطلب</th><th>الوقت</th></tr></thead><tbody>';
+    
+    paginatedTodayTxs.forEach(tx => {
+        html += `<tr>
+            <td>${tx.id}</td>
+            <td>${tx.engineer}</td>
+            <td>${tx.type}</td>
+            <td>${tx.requestType}</td>
+            <td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    tableDiv.innerHTML = html;
+
+    // تحديث معلومات الترقيم
+    const maxPage = Math.ceil(todayTxs.length / rowsPerPage);
+    const pageInfo = document.getElementById("todayPageInfo");
+    if (pageInfo) {
+        pageInfo.textContent = `الصفحة ${currentPageToday} من ${maxPage}`;
+    }
+
+    // تحديث حالة أزرار التصفح
+    const prevButton = document.getElementById("prevPageToday");
+    const nextButton = document.getElementById("nextPageToday");
+    if (prevButton) prevButton.disabled = currentPageToday === 1;
+    if (nextButton) nextButton.disabled = currentPageToday === maxPage;
+    
+    document.getElementById("todayPagination").style.display = "flex";
+}
+
+function displayTodayTransactions() {
+    displayTodayTransactionsTable();
+}
+
+function previousPageToday() {
+    if (currentPageToday > 1) {
+        currentPageToday--;
+        displayTodayTransactions();
     }
 }
 
-function previousPageMain() {
-    if (currentPageMain > 1) {
-        currentPageMain--;
-        updateTransactionList();
-    }
-}
-
-function nextPageMain() {
-    const maxPage = Math.ceil(transactions.length / rowsPerPage);
-    if (currentPageMain < maxPage) {
-        currentPageMain++;
-        updateTransactionList();
+function nextPageToday() {
+    const todayTxs = getTodayTransactions();
+    const maxPage = Math.ceil(todayTxs.length / rowsPerPage);
+    if (currentPageToday < maxPage) {
+        currentPageToday++;
+        displayTodayTransactions();
     }
 }
 
 function toggleStatistics() {
-    const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
-    const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
-    const cutoff = Math.max(todayStart, tenHoursAgo);
-
-    const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+    const todayTxs = getTodayTransactions();
 
     if (todayTxs.length === 0) {
         alert('❌ لا توجد معاملات اليوم');
