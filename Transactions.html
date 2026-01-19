@@ -905,65 +905,38 @@ function logout() {
             });
         }
 
-        function updateTransactionList() {
-            const container = document.getElementById("transactionsList");
-            container.innerHTML = "";
+        function displayTodayTransactions() {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
+    const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
+    const cutoff = Math.max(todayStart, tenHoursAgo);
 
-            const today = new Date();
-            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
-            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
-            const cutoff = Math.max(todayStart, tenHoursAgo);
+    const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
 
-            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
+    // تحديث العداد
+    const infoBox = document.getElementById("todayTransactionsInfo");
+    if (infoBox) {
+        infoBox.innerHTML = `📅 معاملات اليوم: ${todayTxs.length}`;
+    }
 
-            if (todayTxs.length === 0) {
-                container.innerHTML = "<p>لا توجد معاملات في آخر 10 ساعات</p>";
-                return;
-            }
-
-            const start = (currentPageMain - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-            const pageData = todayTxs.slice(start, end);
-
-            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>التاريخ</th></tr></thead><tbody>';
-            pageData.forEach(tx => {
-                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleDateString('ar-EG')}</td></tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-
-            const totalPages = Math.ceil(todayTxs.length / rowsPerPage);
-            document.getElementById("pageInfo").textContent = `صفحة ${currentPageMain} من ${totalPages}`;
-            document.getElementById("prevPageMain").disabled = currentPageMain <= 1;
-            document.getElementById("nextPageMain").disabled = currentPageMain >= totalPages;
+    // إذا كنت تريد عرض الجدول، تأكد من وجود div
+    const tableDiv = document.getElementById("todayTransactionsTable");
+    if (tableDiv) {
+        if (todayTxs.length === 0) {
+            tableDiv.innerHTML = "<p>لا توجد معاملات اليوم</p>";
+            tableDiv.style.display = "block";
+            return;
         }
 
-        function updateTotalTransactions() {
-            displayTodayTransactions();
-        }
-
-       function displayTodayTransactions() {
-            const today = new Date();
-            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).getTime();
-            const tenHoursAgo = new Date().getTime() - (10 * 60 * 60 * 1000);
-            const cutoff = Math.max(todayStart, tenHoursAgo);
-
-            const todayTxs = transactions.filter(tx => new Date(tx.date).getTime() >= cutoff);
-
-            document.getElementById("todayTransactionsInfo").innerHTML = `📅 معاملات اليوم: ${todayTxs.length}`;
-        }
-
-            document.getElementById("todayTitle").style.display = 'block';
-            
-            let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>الوقت</th></tr></thead><tbody>';
-            todayTxs.forEach(tx => {
-                html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td></tr>`;
-            });
-            html += '</tbody></table>';
-            
-            document.getElementById("todayTransactionsTable").innerHTML = html;
-            document.getElementById("todayTransactionsTable").style.display = 'block';
-        }
+        let html = '<table><thead><tr><th>رقم</th><th>المهندس</th><th>نوع</th><th>الطلب</th><th>الوقت</th></tr></thead><tbody>';
+        todayTxs.forEach(tx => {
+            html += `<tr><td>${tx.id}</td><td>${tx.engineer}</td><td>${tx.type}</td><td>${tx.requestType}</td><td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        tableDiv.innerHTML = html;
+        tableDiv.style.display = 'block';
+    }
+}
 
         function previousPageMain() {
             if (currentPageMain > 1) {
@@ -1088,6 +1061,7 @@ function logout() {
     </script>
 </body>
 </html>
+
 
 
 
