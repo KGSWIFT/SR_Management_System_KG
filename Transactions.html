@@ -410,6 +410,53 @@
                 margin: 20% auto;
             }
         }
+
+        /* أزرار إيقاف التحويل */
+        .stop-transfer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .stop-transfer-controls button {
+            min-width: 150px;
+        }
+
+        .edit-stop-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+        }
+
+        .delete-stop-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        }
+
+        .email-stop-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9) !important;
+        }
+
+        /* تصميم تواريخ إيقاف التحويل */
+        .date-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .date-input-group input[type="date"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .date-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+            min-width: 80px;
+        }
     </style>
 </head>
 <body>
@@ -507,7 +554,8 @@
                 <button onclick="deleteTransaction()">🗑️ حذف الطلب</button>
                 <button onclick="openEditModal()">✏️ تحديث الطلب</button>
                 <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
-                <button onclick="toggleStopTransfer()">⏸️ إيقاف التحويل</button>
+                <button onclick="openStopTransferModal()">⏸️ إيقاف التحويل</button>
+                <button onclick="toggleStopTransferContainer()">📋 إدارة إيقاف التحويل</button>
                 <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير</button>
             </div>
             
@@ -520,13 +568,14 @@
             </div>
 
             <div id="stop-transfer-container" class="hidden" style="margin-top: 40px;">
-                <h3>⏸️ إيقاف التحويل</h3>
+                <h3>⏸️ إدارة إيقاف التحويل</h3>
                 <table id="stopTransferTable">
                     <thead>
                         <tr>
                             <th>المهندس</th>
                             <th>من تاريخ</th>
                             <th>إلى تاريخ</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -592,6 +641,109 @@
             <div class="modal-buttons">
                 <button class="edit-btn" onclick="editTransaction()">تحديث</button>
                 <button class="cancel-btn" onclick="closeEditModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لإيقاف التحويل -->
+    <div id="stopTransferModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeStopTransferModal()">&times;</span>
+            <h3>⏸️ إيقاف التحويل عن مهندس</h3>
+            <select id="stopEngineer" style="width: 100%; margin-bottom: 20px;">
+                <option value="">اختر المهندس</option>
+                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+            </select>
+            
+            <div class="date-input-group">
+                <span class="date-label">من تاريخ:</span>
+                <input type="date" id="stopStartDate">
+            </div>
+            
+            <div class="date-input-group">
+                <span class="date-label">إلى تاريخ:</span>
+                <input type="date" id="stopEndDate">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="edit-btn" onclick="addStopTransfer()">تأكيد الإيقاف</button>
+                <button class="cancel-btn" onclick="closeStopTransferModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لتعديل إيقاف التحويل -->
+    <div id="editStopModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditStopModal()">&times;</span>
+            <h3>✏️ تعديل إيقاف التحويل</h3>
+            <input type="hidden" id="editStopIndex">
+            <select id="editStopEngineer" style="width: 100%; margin-bottom: 20px;">
+                <option value="">اختر المهندس</option>
+                <option value="أسماء سعيد السعدية">المهندسة أسماء سعيد السعدية</option>
+                <option value="رحمة سيف الصبحية">المهندسة رحمة سيف الصبحية</option>
+                <option value="عائشة راشد الغيثية">المهندسة عائشة راشد الغيثية</option>
+                <option value="غدير محمد الرئيسية">المهندسة غدير محمد الرئيسية</option>
+                <option value="منى سعيد الحضرمية">المهندسة منى سعيد الحضرمية</option>
+                <option value="أنوار علي الهنائية">المهندسة أنوار علي الهنائية</option>
+                <option value="أشواق علي التميمية">المهندسة أشواق علي التميمية</option>
+                <option value="خديجة عبدالله البيمانية">المهندسة خديجة عبدالله البيمانية</option>
+                <option value="فاطمة محمد العدوية">المهندسة فاطمة محمد العدوية</option>
+                <option value="المختار عبدالله الفارسي">المهندس المختار عبدالله الفارسي</option>
+                <option value="طلال محمد الحجري">المهندس طلال محمد الحجري</option>
+                <option value="محمد خميس السيابي">المهندس محمد خميس السيابي</option>
+                <option value="هاجر عبدالله الجابرية">المهندسة هاجر عبدالله الجابرية</option>
+                <option value="أصيلة حمود البوسعيدية">المهندسة أصيلة حمود البوسعيدية</option>
+                <option value="هبة سليمان الفلاحية">المهندسة هبة سليمان الفلاحية</option>
+                <option value="جمانة سعيد المسكرية">المهندسة جمانة سعيد المسكرية</option>
+                <option value="مازن سعيد الذهلي">المهندس مازن سعيد الذهلي</option>
+                <option value="عبدالله محمد الفارسي">المهندس عبدالله محمد الفارسي</option>
+                <option value="هيثم راشد البداعي">المهندس هيثم راشد البداعي</option>
+                <option value="أصيلة علي الحسينية">المهندسة أصيلة علي الحسينية</option>
+                <option value="عماد عبد الله الهادي">المهندس عماد عبد الله الهادي</option>
+                <option value="أمير محمود ال طالب">المهندس أمير محمود ال طالب</option>
+                <option value="ماريا عبد الله البوسعيدية">المهندسة ماريا عبد الله البوسعيدية</option>
+                <option value="عائشة سيف الرحبية">المهندسة عائشة سيف الرحبية</option>
+                <option value="مرشد خلفان الذخري">المهندس مرشد خلفان الذخري</option>
+            </select>
+            
+            <div class="date-input-group">
+                <span class="date-label">من تاريخ:</span>
+                <input type="date" id="editStopStartDate">
+            </div>
+            
+            <div class="date-input-group">
+                <span class="date-label">إلى تاريخ:</span>
+                <input type="date" id="editStopEndDate">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="edit-btn" onclick="updateStopTransfer()">تحديث</button>
+                <button class="cancel-btn" onclick="closeEditStopModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -731,6 +883,233 @@ function closeEditModal() {
     document.getElementById('editRequestType').value = '';
 }
 
+function openStopTransferModal() {
+    if (!currentUser) {
+        alert("⚠️ يجب تسجيل الدخول");
+        return;
+    }
+    document.getElementById('stopTransferModal').style.display = 'block';
+    
+    // تعيين التواريخ الافتراضية
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('stopStartDate').value = today;
+    document.getElementById('stopEndDate').value = today;
+}
+
+function closeStopTransferModal() {
+    document.getElementById('stopTransferModal').style.display = 'none';
+    document.getElementById('stopEngineer').value = '';
+}
+
+function openEditStopModal(index) {
+    const stop = stopTransfers[index];
+    document.getElementById('editStopIndex').value = index;
+    document.getElementById('editStopEngineer').value = stop.engineer;
+    document.getElementById('editStopStartDate').value = stop.startDate.split('T')[0];
+    document.getElementById('editStopEndDate').value = stop.endDate.split('T')[0];
+    document.getElementById('editStopModal').style.display = 'block';
+}
+
+function closeEditStopModal() {
+    document.getElementById('editStopModal').style.display = 'none';
+}
+
+function toggleStopTransferContainer() {
+    const container = document.getElementById('stop-transfer-container');
+    container.classList.toggle('hidden');
+}
+
+async function addStopTransfer() {
+    const engineer = document.getElementById('stopEngineer').value;
+    const startDate = document.getElementById('stopStartDate').value;
+    const endDate = document.getElementById('stopEndDate').value;
+
+    if (!engineer || !startDate || !endDate) {
+        alert("⚠️ الرجاء اختيار المهندس وتحديد التواريخ");
+        return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+        alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+        return;
+    }
+
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'addStopTransfer');
+        params.append('engineer', engineer);
+        params.append('startDate', new Date(startDate).toISOString());
+        params.append('endDate', new Date(endDate).toISOString());
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+        } else {
+            stopTransfers.push({
+                engineer,
+                startDate: new Date(startDate).toISOString(),
+                endDate: new Date(endDate).toISOString()
+            });
+            
+            displayStopTransfers();
+            closeStopTransferModal();
+            
+            // عرض النافذة المنبثقة
+            showNotification(`✅ تم إيقاف التحويل عن المهندس/ة ${engineer}`, 'success');
+            
+            // إرسال إيميل إشعار للمهندس
+            await sendStopNotificationEmail(engineer, startDate, endDate);
+        }
+    } catch (error) {
+        alert(`❌ خطأ: ${error.message}`);
+    }
+}
+
+async function updateStopTransfer() {
+    const index = document.getElementById('editStopIndex').value;
+    const engineer = document.getElementById('editStopEngineer').value;
+    const startDate = document.getElementById('editStopStartDate').value;
+    const endDate = document.getElementById('editStopEndDate').value;
+
+    if (!engineer || !startDate || !endDate) {
+        alert("⚠️ الرجاء اختيار المهندس وتحديد التواريخ");
+        return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+        alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+        return;
+    }
+
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'editStopTransfer');
+        params.append('index', index);
+        params.append('engineer', engineer);
+        params.append('startDate', new Date(startDate).toISOString());
+        params.append('endDate', new Date(endDate).toISOString());
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+        } else {
+            stopTransfers[index] = {
+                engineer,
+                startDate: new Date(startDate).toISOString(),
+                endDate: new Date(endDate).toISOString()
+            };
+            
+            displayStopTransfers();
+            closeEditStopModal();
+            showNotification(`✅ تم تحديث إيقاف التحويل للمهندس/ة ${engineer}`, 'success');
+        }
+    } catch (error) {
+        alert(`❌ خطأ: ${error.message}`);
+    }
+}
+
+async function deleteStopTransfer(index) {
+    if (!confirm("هل أنت متأكد من حذف إيقاف التحويل هذا؟")) return;
+
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'deleteStopTransfer');
+        params.append('index', index);
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+        } else {
+            const engineer = stopTransfers[index].engineer;
+            stopTransfers.splice(index, 1);
+            displayStopTransfers();
+            showNotification(`✅ تم إلغاء إيقاف التحويل للمهندس/ة ${engineer}`, 'success');
+        }
+    } catch (error) {
+        alert(`❌ خطأ: ${error.message}`);
+    }
+}
+
+async function sendStopNotificationEmail(engineer, startDate, endDate) {
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'sendStopNotification');
+        params.append('engineer', engineer);
+        params.append('startDate', startDate);
+        params.append('endDate', endDate);
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification(`📧 تم إرسال إشعار إيقاف التحويل إلى ${engineer}`, 'info');
+        }
+    } catch (error) {
+        console.error('خطأ في إرسال الإيميل:', error);
+    }
+}
+
+async function sendStopReminderEmail(engineer, startDate, endDate) {
+    if (!confirm(`هل تريد إرسال تذكير إيقاف التحويل إلى ${engineer}؟`)) return;
+    
+    try {
+        const params = new URLSearchParams();
+        params.append('action', 'sendStopNotification');
+        params.append('engineer', engineer);
+        params.append('startDate', startDate);
+        params.append('endDate', endDate);
+
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification(`📧 تم إرسال التذكير إلى ${engineer}`, 'info');
+        } else {
+            alert('❌ فشل إرسال التذكير');
+        }
+    } catch (error) {
+        alert(`❌ خطأ: ${error.message}`);
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // إنشاء عنصر الإشعار
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? 'linear-gradient(135deg, #2ecc71, #27ae60)' : 'linear-gradient(135deg, #3498db, #2980b9)'};
+        color: white;
+        padding: 20px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 2000;
+        animation: slideDown 0.5s ease-out;
+        border: 2px solid white;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // إزالة الإشعار بعد 3 ثواني
+    setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.5s ease-out';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 500);
+    }, 3000);
+}
+
 async function addTransaction() {
     if (!currentUser) {
         alert("⚠️ يجب تسجيل الدخول");
@@ -745,6 +1124,23 @@ async function addTransaction() {
     if (!engineer || !transactionId || !transactionType || !requestType) {
         alert("⚠️ الرجاء ملء جميع الحقول");
         return;
+    }
+
+    // التحقق من إيقاف التحويل للمهندس
+    const now = new Date();
+    const isStopped = stopTransfers.some(stop => {
+        if (stop.engineer === engineer) {
+            const startDate = new Date(stop.startDate);
+            const endDate = new Date(stop.endDate);
+            return now >= startDate && now <= endDate;
+        }
+        return false;
+    });
+
+    if (isStopped) {
+        if (!confirm(`⚠️ المهندس/ة ${engineer} في فترة إيقاف تحويل. هل تريد المتابعة؟`)) {
+            return;
+        }
     }
 
     try {
@@ -772,7 +1168,13 @@ async function addTransaction() {
                 createdAt: new Date().getTime()
             });
             displayTodayTransactions();
-            alert("✅ تمت الإضافة بنجاح!");
+            
+            if (isStopped) {
+                showNotification(`⚠️ تمت الإضافة رغم إيقاف التحويل للمهندس/ة ${engineer}`, 'warning');
+            } else {
+                showNotification('✅ تمت الإضافة بنجاح!', 'success');
+            }
+            
             clearFields();
         }
     } catch (error) {
@@ -818,7 +1220,7 @@ async function editTransaction() {
             tx.type = type;
             tx.requestType = requestType;
             displayTodayTransactions();
-            alert("✅ تم التحديث بنجاح!");
+            showNotification('✅ تم التحديث بنجاح!', 'success');
             closeEditModal();
         }
     } catch (error) {
@@ -848,7 +1250,7 @@ async function deleteTransaction() {
         } else {
             transactions = transactions.filter(t => Number(t.id) !== id);
             displayTodayTransactions();
-            alert("✅ تم الحذف بنجاح!");
+            showNotification('✅ تم الحذف بنجاح!', 'success');
             clearFields();
         }
     } catch (error) {
@@ -891,15 +1293,23 @@ function displayStopTransfers() {
     
     tbody.innerHTML = '';
     if (stopTransfers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">لا توجد بيانات إيقاف تحويل</td></tr>';
         return;
     }
 
-    stopTransfers.forEach(stop => {
+    stopTransfers.forEach((stop, index) => {
         const row = tbody.insertRow();
         row.insertCell(0).textContent = stop.engineer;
         row.insertCell(1).textContent = new Date(stop.startDate).toLocaleDateString('ar-EG');
         row.insertCell(2).textContent = new Date(stop.endDate).toLocaleDateString('ar-EG');
+        
+        // إضافة أزرار الإجراءات
+        const actionsCell = row.insertCell(3);
+        actionsCell.innerHTML = `
+            <button onclick="openEditStopModal(${index})" style="background: #f39c12; padding: 8px 15px; min-width: auto; margin: 2px;">✏️ تعديل</button>
+            <button onclick="deleteStopTransfer(${index})" style="background: #e74c3c; padding: 8px 15px; min-width: auto; margin: 2px;">🗑️ حذف</button>
+            <button onclick="sendStopReminderEmail('${stop.engineer}', '${stop.startDate}', '${stop.endDate}')" style="background: #3498db; padding: 8px 15px; min-width: auto; margin: 2px;">📧 إرسال تذكير</button>
+        `;
     });
 }
 
@@ -930,9 +1340,22 @@ function displayTodayTransactionsTable(todayTxs = null) {
     let html = '<table><thead><tr><th>رقم المعاملة</th><th>المهندس</th><th>نوع الاستعمال</th><th>نوع الطلب</th><th>الوقت</th></tr></thead><tbody>';
     
     paginatedTodayTxs.forEach(tx => {
-        html += `<tr>
+        // التحقق من حالة إيقاف التحويل
+        const now = new Date();
+        const isStopped = stopTransfers.some(stop => {
+            if (stop.engineer === tx.engineer) {
+                const startDate = new Date(stop.startDate);
+                const endDate = new Date(stop.endDate);
+                return now >= startDate && now <= endDate;
+            }
+            return false;
+        });
+        
+        const stopClass = isStopped ? 'style="background-color: rgba(231, 76, 60, 0.1);"' : '';
+        
+        html += `<tr ${stopClass}>
             <td>${tx.id}</td>
-            <td>${tx.engineer}</td>
+            <td>${tx.engineer} ${isStopped ? '⏸️' : ''}</td>
             <td>${tx.type}</td>
             <td>${tx.requestType}</td>
             <td>${new Date(tx.date).toLocaleTimeString('ar-EG')}</td>
@@ -1040,11 +1463,6 @@ function toggleStatistics() {
     };
 }
 
-function toggleStopTransfer() {
-    const container = document.getElementById('stop-transfer-container');
-    container.classList.toggle('hidden');
-}
-
 async function sendDailyReport() {
     if (!currentUser) {
         alert("⚠️ يجب تسجيل الدخول");
@@ -1060,22 +1478,49 @@ async function sendDailyReport() {
         const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
         const data = await response.json();
         
-        alert(data.success ? `✅ ${data.message}` : `❌ ${data.message}`);
+        if (data.success) {
+            showNotification(`✅ ${data.message}`, 'success');
+        } else {
+            alert(`❌ ${data.message}`);
+        }
     } catch (error) {
         alert(`❌ خطأ: ${error.message}`);
     }
 }
 
+// إضافة أنماط CSS للرسوم المتحركة
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from {
+            transform: translate(-50%, -100%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
 window.addEventListener('load', () => {
     document.getElementById('login-container').classList.remove('hidden');
     document.getElementById('main-container').classList.add('hidden');
     document.getElementById('editModal').style.display = 'none';
+    document.getElementById('stopTransferModal').style.display = 'none';
+    document.getElementById('editStopModal').style.display = 'none';
     document.getElementById('pin').focus();
 });
     </script>
 </body>
 </html>
-
-
-
-
