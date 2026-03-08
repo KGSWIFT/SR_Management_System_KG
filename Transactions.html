@@ -930,14 +930,14 @@ function toggleStopTransferContainer() {
 
 async function addStopTransfer() {
     const engineer = document.getElementById('stopEngineer').value;
+    const reason = document.getElementById('stopReason').value;
     const startDate = document.getElementById('stopStartDate').value;
     const endDate = document.getElementById('stopEndDate').value;
 
-    if (!engineer || !startDate || !endDate) {
-        alert("⚠️ الرجاء اختيار المهندس وتحديد التواريخ");
+    if (!engineer || !reason || !startDate || !endDate) {
+        alert("⚠️ الرجاء اختيار المهندس وسبب الإيقاف وتحديد التواريخ");
         return;
     }
-
     if (new Date(startDate) > new Date(endDate)) {
         alert("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
         return;
@@ -949,6 +949,7 @@ async function addStopTransfer() {
         params.append('engineer', engineer);
         params.append('startDate', new Date(startDate).toISOString());
         params.append('endDate', new Date(endDate).toISOString());
+        params.append('reason', reason);
 
         const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
         const data = await response.json();
@@ -1533,6 +1534,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
