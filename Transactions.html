@@ -1026,10 +1026,9 @@ async function deleteStopTransfer(index) {
     if (!confirm("هل أنت متأكد من حذف إيقاف التحويل هذا؟")) return;
 
     try {
-        const params = new URLSearchParams();
-        params.append('action', 'deleteStopTransfer');
-        params.append('index', index);
-
+      const params = new URLSearchParams();
+      params.append('action', 'deleteStopTransfer');
+      params.append('engineer', stopTransfers[index].engineer);
         const response = await fetch(SCRIPT_URL, { method: 'POST', body: params });
         const data = await response.json();
         
