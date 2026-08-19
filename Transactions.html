@@ -457,6 +457,55 @@
             color: #1e3c72;
             min-width: 80px;
         }
+
+        /* حالة التواجد */
+        .presence-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+
+        .present-badge {
+            background: rgba(46, 204, 113, 0.15);
+            color: #219653;
+            border: 2px solid #2ecc71;
+        }
+
+        .absent-badge {
+            background: rgba(231, 76, 60, 0.12);
+            color: #c0392b;
+            border: 2px solid #e74c3c;
+        }
+
+        .presence-section-title {
+            text-align: right;
+            font-size: 20px;
+            color: #1e3c72;
+            font-weight: 700;
+            margin: 20px 0 10px;
+        }
+
+        .presence-list {
+            text-align: right;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .presence-list li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .presence-list li span.reason {
+            color: #888;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -556,6 +605,7 @@
                 <button onclick="toggleStatistics()">📊 عرض الإحصائيات</button>
                 <button onclick="openStopTransferModal()">⏸️ إيقاف التحويل</button>
                 <button onclick="toggleStopTransferContainer()">📋 إدارة إيقاف التحويل</button>
+                <button onclick="showPresenceStatus()">🟢 من متواجد اليوم؟</button>
                 <button class="report-btn" onclick="sendDailyReport()">📧 إرسال تقرير</button>
             </div>
             
@@ -760,6 +810,34 @@
     <script>
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxi10RpnIisJnBMgE11u_f_AoyeagBUED5EET4gX03xv6qUJn8bvTWptResBNu6ypS3/exec";
 
+const ENGINEERS_LIST = [
+    "أسماء سعيد السعدية",
+    "رحمة سيف الصبحية",
+    "عائشة راشد الغيثية",
+    "غدير محمد الرئيسية",
+    "منى سعيد الحضرمية",
+    "أنوار علي الهنائية",
+    "أشواق علي التميمية",
+    "خديجة عبدالله البيمانية",
+    "فاطمة محمد العدوية",
+    "المختار عبدالله الفارسي",
+    "طلال محمد الحجري",
+    "محمد خميس السيابي",
+    "هاجر عبدالله الجابرية",
+    "أصيلة حمود البوسعيدية",
+    "هبة سليمان الفلاحية",
+    "جمانة سعيد المسكرية",
+    "مازن سعيد الذهلي",
+    "عبدالله محمد الفارسي",
+    "هيثم راشد البداعي",
+    "أصيلة علي الحسينية",
+    "عماد عبد الله الهادي",
+    "أمير محمود ال طالب",
+    "ماريا عبد الله البوسعيدية",
+    "عائشة سيف الرحبية",
+    "مرشد خلفان الذخري"
+];
+
 let transactions = [];
 let stopTransfers = [];
 let currentPageToday = 1;
@@ -960,7 +1038,8 @@ async function addStopTransfer() {
             stopTransfers.push({
                 engineer,
                 startDate: new Date(startDate).toISOString(),
-                endDate: new Date(endDate).toISOString()
+                endDate: new Date(endDate).toISOString(),
+                reason
             });
             
             displayStopTransfers();
@@ -1010,7 +1089,8 @@ async function updateStopTransfer() {
             stopTransfers[index] = {
                 engineer,
                 startDate: new Date(startDate).toISOString(),
-                endDate: new Date(endDate).toISOString()
+                endDate: new Date(endDate).toISOString(),
+                reason: stopTransfers[index].reason
             };
             
             displayStopTransfers();
@@ -1314,11 +1394,26 @@ function displayStopTransfers() {
         
         // إضافة أزرار الإجراءات
         const actionsCell = row.insertCell(3);
-        actionsCell.innerHTML = `
-            <button onclick="openEditStopModal(${index})" style="background: #f39c12; padding: 8px 15px; min-width: auto; margin: 2px;">✏️ تعديل</button>
-            <button onclick="deleteStopTransfer(${index})" style="background: #e74c3c; padding: 8px 15px; min-width: auto; margin: 2px;">🗑️ حذف</button>
-            <button onclick="sendStopReminderEmail('${stop.engineer}', '${stop.startDate}', '${stop.endDate}')" style="background: #3498db; padding: 8px 15px; min-width: auto; margin: 2px;">📧 إرسال تذكير</button>
-        `;
+        actionsCell.innerHTML = '';
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️ تعديل';
+        editBtn.style.cssText = 'background: #f39c12; padding: 8px 15px; min-width: auto; margin: 2px;';
+        editBtn.addEventListener('click', () => openEditStopModal(index));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️ حذف';
+        deleteBtn.style.cssText = 'background: #e74c3c; padding: 8px 15px; min-width: auto; margin: 2px;';
+        deleteBtn.addEventListener('click', () => deleteStopTransfer(index));
+
+        const emailBtn = document.createElement('button');
+        emailBtn.textContent = '📧 إرسال تذكير';
+        emailBtn.style.cssText = 'background: #3498db; padding: 8px 15px; min-width: auto; margin: 2px;';
+        emailBtn.addEventListener('click', () => sendStopReminderEmail(stop.engineer, stop.startDate, stop.endDate));
+
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
+        actionsCell.appendChild(emailBtn);
     });
 }
 
@@ -1472,6 +1567,79 @@ function toggleStatistics() {
     };
 }
 
+function showPresenceStatus() {
+    const now = new Date();
+
+    const absentList = [];
+    ENGINEERS_LIST.forEach(engineer => {
+        const activeStop = stopTransfers.find(stop => {
+            if (stop.engineer !== engineer) return false;
+            const startDate = new Date(stop.startDate);
+            const endDate = new Date(stop.endDate);
+            return now >= startDate && now <= endDate;
+        });
+        if (activeStop) {
+            absentList.push({ engineer, reason: activeStop.reason || 'غير محدد', endDate: activeStop.endDate });
+        }
+    });
+
+    const absentNames = absentList.map(a => a.engineer);
+    const presentList = ENGINEERS_LIST.filter(e => !absentNames.includes(e));
+
+    let presentHtml = '<div class="presence-section-title">🟢 متواجدون الآن (' + presentList.length + ')</div>';
+    if (presentList.length === 0) {
+        presentHtml += '<p>لا يوجد مهندسون متواجدون حالياً</p>';
+    } else {
+        presentHtml += '<ul class="presence-list">';
+        presentList.forEach(engineer => {
+            presentHtml += `<li><span class="presence-badge present-badge">متواجد</span>${engineer}</li>`;
+        });
+        presentHtml += '</ul>';
+    }
+
+    let absentHtml = '<div class="presence-section-title">🔴 غير متواجدين (' + absentList.length + ')</div>';
+    if (absentList.length === 0) {
+        absentHtml += '<p>لا يوجد مهندسون في إجازة أو إيقاف تحويل حالياً</p>';
+    } else {
+        absentHtml += '<ul class="presence-list">';
+        absentList.forEach(a => {
+            const untilStr = new Date(a.endDate).toLocaleDateString('ar-EG');
+            absentHtml += `<li><span class="presence-badge absent-badge">غير متواجد</span>${a.engineer} <span class="reason">— ${a.reason} (حتى ${untilStr})</span></li>`;
+        });
+        absentHtml += '</ul>';
+    }
+
+    const presenceModal = document.createElement('div');
+    presenceModal.className = 'modal';
+    presenceModal.style.display = 'block';
+    presenceModal.id = 'presenceModal';
+    presenceModal.innerHTML = `
+        <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+            <span class="close" id="closePresenceModal">&times;</span>
+            <h3>🟢 من متواجد اليوم؟</h3>
+            ${presentHtml}
+            ${absentHtml}
+            <div style="margin-top: 20px; text-align: center;">
+                <button id="closePresenceModalBtn" style="width: 200px;">إغلاق</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(presenceModal);
+
+    const closeIt = () => {
+        presenceModal.style.display = 'none';
+        presenceModal.remove();
+    };
+
+    document.getElementById('closePresenceModal').addEventListener('click', closeIt);
+    document.getElementById('closePresenceModalBtn').addEventListener('click', closeIt);
+
+    presenceModal.onclick = function(event) {
+        if (event.target === presenceModal) closeIt();
+    };
+}
+
 async function sendDailyReport() {
     if (!currentUser) {
         alert("⚠️ يجب تسجيل الدخول");
@@ -1533,11 +1701,3 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
