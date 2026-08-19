@@ -844,6 +844,20 @@ let currentPageToday = 1;
 const rowsPerPage = 10;
 let currentUser = null;
 
+// يتحقق ما إذا كان المهندس ضمن فترة إيقاف تحويل نشطة في لحظة معينة (الافتراضي: الآن)
+// يعتبر تاريخ البداية من بداية اليوم (00:00:00) وتاريخ النهاية حتى نهاية اليوم (23:59:59.999)
+// حتى يظل المهندس "غير متواجد" طوال يوم الانتهاء نفسه، وليس فقط حتى منتصف ليله
+function getActiveStop(engineer, referenceDate = new Date()) {
+    return stopTransfers.find(stop => {
+        if (stop.engineer !== engineer) return false;
+        const start = new Date(stop.startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(stop.endDate);
+        end.setHours(23, 59, 59, 999);
+        return referenceDate >= start && referenceDate <= end;
+    });
+}
+
 async function checkPin() {
     const pin = document.getElementById("pin").value.trim();
     
@@ -1216,15 +1230,7 @@ async function addTransaction() {
     }
 
     // التحقق من إيقاف التحويل للمهندس
-    const now = new Date();
-    const isStopped = stopTransfers.some(stop => {
-        if (stop.engineer === engineer) {
-            const startDate = new Date(stop.startDate);
-            const endDate = new Date(stop.endDate);
-            return now >= startDate && now <= endDate;
-        }
-        return false;
-    });
+    const isStopped = !!getActiveStop(engineer);
 
     if (isStopped) {
         if (!confirm(`⚠️ المهندس/ة ${engineer} في فترة إيقاف تحويل. هل تريد المتابعة؟`)) {
@@ -1445,15 +1451,7 @@ function displayTodayTransactionsTable(todayTxs = null) {
     
     paginatedTodayTxs.forEach(tx => {
         // التحقق من حالة إيقاف التحويل
-        const now = new Date();
-        const isStopped = stopTransfers.some(stop => {
-            if (stop.engineer === tx.engineer) {
-                const startDate = new Date(stop.startDate);
-                const endDate = new Date(stop.endDate);
-                return now >= startDate && now <= endDate;
-            }
-            return false;
-        });
+        const isStopped = !!getActiveStop(tx.engineer);
         
         const stopClass = isStopped ? 'style="background-color: rgba(231, 76, 60, 0.1);"' : '';
         
@@ -1568,16 +1566,9 @@ function toggleStatistics() {
 }
 
 function showPresenceStatus() {
-    const now = new Date();
-
     const absentList = [];
     ENGINEERS_LIST.forEach(engineer => {
-        const activeStop = stopTransfers.find(stop => {
-            if (stop.engineer !== engineer) return false;
-            const startDate = new Date(stop.startDate);
-            const endDate = new Date(stop.endDate);
-            return now >= startDate && now <= endDate;
-        });
+        const activeStop = getActiveStop(engineer);
         if (activeStop) {
             absentList.push({ engineer, reason: activeStop.reason || 'غير محدد', endDate: activeStop.endDate });
         }
